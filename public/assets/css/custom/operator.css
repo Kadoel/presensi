@@ -1,0 +1,425 @@
+:root {
+    --school-primary: #1e3a8a;
+}
+
+/* =========================
+   THEME TRANSITION
+========================= */
+
+body {
+    transition: background 0.4s ease, color 0.4s ease;
+}
+
+body.theme-transition * {
+    transition: all 0.35s ease !important;
+}
+
+/* =========================
+   MODERN SWITCH
+========================= */
+
+.theme-switch {
+    position: relative;
+    width: 52px;
+    height: 26px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 34px;
+    transition: 0.4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #fff;
+    border-radius: 50%;
+    transition: 0.4s;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+input:checked+.slider {
+    background-color: var(--school-primary);
+}
+
+input:checked+.slider:before {
+    transform: translateX(26px);
+}
+
+/* LIGHT MODE BACKGROUND */
+body.light-mode {
+    background: linear-gradient(160deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%);
+    color: #1e293b;
+}
+
+/* =========================
+   LIGHT MODE FONT COLOR
+========================= */
+
+/* =========================
+   LIGHT MODE TYPOGRAPHY HIERARCHY
+========================= */
+
+/* Base text */
+body.light-mode {
+    color: #334155;
+}
+
+/* LEVEL 1 - PRIMARY */
+body.light-mode .school-name,
+body.light-mode .big-number,
+body.light-mode .card-header-custom {
+    color: var(--school-primary);
+}
+
+/* LEVEL 2 - SECONDARY */
+body.light-mode .stat-value,
+body.light-mode .history-number,
+body.light-mode .clock-time {
+    color: #334155;
+}
+
+/* LEVEL 3 - MUTED */
+body.light-mode .stat-label,
+body.light-mode .school-address,
+body.light-mode .history-time,
+body.light-mode small,
+body.light-mode .clock-date {
+    color: #64748b !important;
+}
+
+/* Big number clean look */
+body.light-mode .big-number {
+    text-shadow: none;
+}
+
+
+
+body.light-mode .glass-card {
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .big-number {
+    text-shadow: none;
+}
+
+/* FIX BUTTON LIGHT MODE */
+body.light-mode .btn-school {
+    background: var(--school-primary);
+    color: #fff;
+    border: none;
+}
+
+body.light-mode .btn-school:hover {
+    background: #162e6e;
+    color: #fff;
+}
+
+/* FIX DIVIDER LIGHT MODE */
+body.light-mode .card-header-custom::after,
+body.light-mode .stat-label::after {
+    background: linear-gradient(to right,
+            transparent,
+            rgba(0, 0, 0, 0.2),
+            transparent);
+}
+
+body.light-mode .topbar-divider {
+    background: linear-gradient(to bottom,
+            transparent,
+            rgba(0, 0, 0, 0.2),
+            transparent);
+}
+
+
+
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 20% 20%, #1e3a8a 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, #1e40af 0%, transparent 40%),
+        linear-gradient(160deg, #0f172a 0%, #111827 50%, #0b1120 100%);
+    background-attachment: fixed;
+    color: #fff;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* GLASS CARD */
+.glass-card {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    border-radius: 1.2rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+}
+
+/* CONTENT CARD STRUCTURE */
+.card-header-custom {
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    position: relative;
+}
+
+.card-header-custom::after {
+    content: "";
+    position: absolute;
+    left: 1.5rem;
+    right: 1.5rem;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.25), transparent);
+}
+
+.card-body-custom {
+    padding: 1.5rem;
+}
+
+/* STAT CARD */
+.stat-card {
+    padding: 1.2rem 1.5rem;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    position: relative;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.stat-label::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.25), transparent);
+}
+
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+/* BIG NUMBER */
+.big-number {
+    font-size: 5rem;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-shadow: 0 0 20px rgba(30, 58, 138, 0.6);
+}
+
+/* BUTTON */
+.btn-school {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
+
+.btn-school:hover {
+    background: rgba(255, 255, 255, 0.25);
+    color: #fff;
+}
+
+/* CLOCK */
+.clock-time {
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: "Consolas", monospace;
+    letter-spacing: 2px;
+}
+
+.clock-date {
+    font-size: 0.95rem;
+    opacity: 0.85;
+}
+
+/* HISTORY */
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    opacity: 0;
+    transform: translateY(5px);
+    animation: fadeInHistory 0.3s ease forwards;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.history-number {
+    font-weight: 600;
+    font-size: 1.05rem;
+}
+
+.history-time {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+.badge-status {
+    font-size: 0.7rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 20px;
+}
+
+.status-call {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.status-recall {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+@keyframes fadeInHistory {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* SCHOOL BRANDING */
+.school-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.school-logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 50%;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 18px rgba(30, 58, 138, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.school-name {
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.school-address {
+    font-size: 0.8rem;
+    opacity: 0.85;
+}
+
+/* VERTICAL DIVIDER */
+.topbar-divider {
+    width: 1px;
+    height: 55px;
+    background: linear-gradient(to bottom,
+            transparent,
+            rgba(255, 255, 255, 0.35),
+            transparent);
+}
+
+/* =========================
+   INACTIVE STATE STYLE
+========================= */
+
+.inactive-card {
+    animation: fadeInUp 0.6s ease;
+}
+
+.inactive-icon {
+    font-size: 70px;
+    color: #dc3545;
+    animation: pulse 1.8s infinite;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Fade in */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Loading dots */
+.loading-dots span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin: 0 4px;
+    background: #6c757d;
+    border-radius: 50%;
+    animation: bounce 1.4s infinite both;
+}
+
+.loading-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+    }
+
+    40% {
+        transform: scale(1);
+    }
+}

@@ -1,0 +1,213 @@
+:root {
+    --header-footer-padding-y: 15px;
+    --header-footer-padding-x: 25px;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f4f6f9;
+}
+
+/* ================= HEADER ================= */
+.header {
+    background: linear-gradient(90deg, #0d6efd, #0b5ed7);
+    color: white;
+    padding: var(--header-footer-padding-y) var(--header-footer-padding-x);
+}
+
+.school-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.school-logo {
+    width: 65px;
+    height: 65px;
+    object-fit: contain;
+    background: white;
+    border-radius: 15px;
+    padding: 6px;
+}
+
+.school-text h5 {
+    margin: 0;
+    font-weight: 700;
+}
+
+.school-text small {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.datetime {
+    text-align: right;
+    line-height: 1.2;
+}
+
+.date-text {
+    font-size: 0.95rem;
+}
+
+.time-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+/* ================= BODY ================= */
+.content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.queue-wrapper {
+    width: 100%;
+    max-width: 1200px;
+}
+
+.queue-btn {
+    border-radius: 20px;
+    padding: 35px 20px;
+    transition: 0.3s;
+}
+
+.queue-btn:hover {
+    transform: scale(1.05);
+}
+
+.queue-img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}
+
+/* ================= PREMIUM BUTTON ================= */
+
+.queue-btn {
+    position: relative;
+    border-radius: 22px;
+    padding: 35px 20px;
+    border: none;
+    color: white;
+    font-weight: 600;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    backdrop-filter: blur(6px);
+}
+
+.queue-btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.08);
+    opacity: 0;
+    transition: 0.4s;
+}
+
+.queue-btn:hover::before {
+    opacity: 1;
+}
+
+.queue-btn:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+}
+
+.queue-btn:active {
+    transform: scale(0.98);
+}
+
+.queue-btn .queue-img {
+    transition: 0.4s;
+}
+
+.queue-btn:hover .queue-img {
+    transform: scale(1.15) rotate(5deg);
+}
+
+.queue-btn .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(0);
+    animation: ripple-effect 0.6s linear;
+}
+
+@keyframes ripple-effect {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* ================= FOOTER ================= */
+.footer {
+    background: linear-gradient(90deg, #0d6efd, #0b5ed7);
+    color: white;
+    padding: var(--header-footer-padding-y) var(--header-footer-padding-x);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.marquee-container {
+    width: 100%;
+    overflow: hidden;
+}
+
+.marquee {
+    white-space: nowrap;
+    display: inline-block;
+    animation: marquee 18s linear infinite;
+}
+
+@keyframes marquee {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 576px) {
+
+    .header {
+        text-align: center;
+    }
+
+    .school-info {
+        justify-content: center;
+        margin-bottom: 8px;
+    }
+
+    .datetime {
+        text-align: center;
+        margin-top: 5px;
+    }
+
+    .school-logo {
+        width: 45px;
+        height: 45px;
+    }
+
+    .school-text h5 {
+        font-size: 1rem;
+    }
+
+    .school-text small {
+        font-size: 0.75rem;
+    }
+
+    .queue-img {
+        width: 60px;
+        height: 60px;
+    }
+}

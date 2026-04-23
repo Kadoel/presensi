@@ -1,0 +1,39 @@
+/* Animasi gelombang audio */
+.audio-wave {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border-radius: 50%;
+    opacity: 0;
+    margin-left: 5px;
+}
+
+.playing .audio-wave {
+    animation: wave 0.6s infinite;
+    background: #0d6efd;
+    /* warna biru bootstrap */
+    opacity: 1;
+}
+
+@keyframes wave {
+    0% {
+        transform: scaleY(1);
+    }
+
+    25% {
+        transform: scaleY(2);
+    }
+
+    50% {
+        transform: scaleY(1);
+    }
+
+    75% {
+        transform: scaleY(1.5);
+    }
+
+    100% {
+        transform: scaleY(1);
+    }
+}
