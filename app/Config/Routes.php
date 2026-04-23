@@ -118,6 +118,14 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
         $routes->post('reject', 'Admin\TukarJadwal::reject');
         $routes->post('slot-pegawai', 'Admin\TukarJadwal::getSlotPegawai');
     });
+
+    //Presensi
+    $routes->group('presensi', static function ($routes) {
+        $routes->match(['GET', 'POST'], '/', 'Admin\Presensi::index');
+        $routes->post('detail', 'Admin\Presensi::detail');
+        $routes->post('generate-alpa', 'Admin\Presensi::generateAlpa');
+        $routes->post('ringkasan', 'Admin\Presensi::ringkasan');
+    });
 });
 
 /* --------- ROLE PEGAWAI -------------*/
