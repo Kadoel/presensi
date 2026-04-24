@@ -23,6 +23,9 @@ $routes->group('presensi', static function ($routes) {
 /* --------- ROLE ADMIN -------------*/
 $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->GET("/", "Admin\Beranda::index");
+    $routes->get('summary', 'Admin\Beranda::summary');
+    $routes->get('presensi-hari-ini', 'Admin\Beranda::presensiHariIni');
+    $routes->get('aktivitas-terbaru', 'Admin\Beranda::aktivitasTerbaru');
     $routes->GET("logout", "Admin\Beranda::logout");
 
     //Pengaturan

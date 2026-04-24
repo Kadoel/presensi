@@ -147,4 +147,55 @@ class PresensiModel extends Model
             ->get()
             ->getResult();
     }
+
+    public function countHadirByTanggal(string $tanggal): int
+    {
+        return (int) $this->where('tanggal', $tanggal)
+            ->where('status_datang', 'hadir')
+            ->countAllResults();
+    }
+
+    public function countTelatByTanggal(string $tanggal): int
+    {
+        return (int) $this->where('tanggal', $tanggal)
+            ->where('status_datang', 'telat')
+            ->countAllResults();
+    }
+
+    public function countAlpaByTanggal(string $tanggal): int
+    {
+        return (int) $this->where('tanggal', $tanggal)
+            ->where('status_datang', 'alpa')
+            ->countAllResults();
+    }
+
+    public function countIzinSakitByTanggal(string $tanggal): int
+    {
+        return (int) $this->where('tanggal', $tanggal)
+            ->whereIn('status_datang', ['izin', 'sakit'])
+            ->countAllResults();
+    }
+
+    public function getPresensiHariIni(string $tanggal, int $limit = 10): array
+    {
+        return $this->select('
+            presensi.id,
+            presensi.pegawai_id,
+            presensi.tanggal,
+            presensi.jam_datang,
+            presensi.jam_pulang,
+            presensi.status_datang,
+            presensi.status_pulang,
+            presensi.menit_telat,
+            pegawai.kode_pegawai,
+            pegawai.nama_pegawai,
+            shift.nama_shift
+        ')
+            ->join('pegawai', 'pegawai.id = presensi.pegawai_id', 'left')
+            ->join('shift', 'shift.id = presensi.shift_id', 'left')
+            ->where('presensi.tanggal', $tanggal)
+            ->orderBy('presensi.jam_datang', 'DESC')
+            ->limit($limit)
+            ->findAll();
+    }
 }

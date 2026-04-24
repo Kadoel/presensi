@@ -86,4 +86,9 @@ class TukarJadwalModel extends Model
             'status' => 'pending',
         ])->first();
     }
+
+    public function countPending(): int
+    {
+        return (int) $this->where('status', 'pending')->countAllResults();
+    }
 }

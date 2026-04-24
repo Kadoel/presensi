@@ -235,4 +235,9 @@ class PegawaiModel extends Model
             ->where('is_active', 1)
             ->first();
     }
+
+    public function countAktif(): int
+    {
+        return (int) $this->where('is_active', 1)->countAllResults();
+    }
 }

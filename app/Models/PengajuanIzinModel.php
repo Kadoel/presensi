@@ -78,4 +78,17 @@ class PengajuanIzinModel extends Model
 
         return (int) $builder->countAllResults();
     }
+
+    public function countApprovedAktifByTanggal(string $tanggal): int
+    {
+        return (int) $this->where('status', 'approved')
+            ->where('tanggal_mulai <=', $tanggal)
+            ->where('tanggal_selesai >=', $tanggal)
+            ->countAllResults();
+    }
+
+    public function countPending(): int
+    {
+        return (int) $this->where('status', 'pending')->countAllResults();
+    }
 }

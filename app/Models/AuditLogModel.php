@@ -140,4 +140,22 @@ class AuditLogModel extends Model
             ->getResult();
         return $rows;
     }
+
+    public function getAktivitasTerbaru(int $limit = 10): array
+    {
+        return $this->select('
+            audit_logs.id,
+            audit_logs.user_id,
+            audit_logs.action,
+            audit_logs.table_name,
+            audit_logs.description,
+            audit_logs.ip_address,
+            audit_logs.created_at,
+            users.username
+        ')
+            ->join('users', 'users.id = audit_logs.user_id', 'left')
+            ->orderBy('audit_logs.created_at', 'DESC')
+            ->limit($limit)
+            ->findAll();
+    }
 }

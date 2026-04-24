@@ -136,7 +136,36 @@ class PresensiAdminService extends BaseService
                     continue;
                 }
 
-                if ($this->presensiModel->sudahAdaPresensi($pegawaiId, $tanggal)) {
+                $presensiExisting = $this->presensiModel->getPresensiByPegawaiDanTanggal($pegawaiId, $tanggal);
+
+                if ($presensiExisting !== null) {
+                    $statusDatangExisting = $presensiExisting->status_datang ?? null;
+                    $statusPulangExisting = $presensiExisting->status_pulang ?? null;
+
+                    if (
+                        in_array($statusDatangExisting, ['hadir', 'telat'], true)
+                        && empty($statusPulangExisting)
+                    ) {
+                        $update = $this->presensiModel->update((int) $presensiExisting->id, [
+                            'status_datang'      => 'alpa',
+                            'status_pulang'      => null,
+                            'menit_telat'        => 0,
+                            'menit_pulang_cepat' => 0,
+                            'catatan_admin'      => trim(($presensiExisting->catatan_admin ?? '') . ' | Diubah alpa otomatis karena tidak presensi pulang'),
+                            'is_manual'          => 1,
+                            'sumber_presensi'    => 'sinkron',
+                        ]);
+
+                        if ($update) {
+                            $jumlahDiproses++;
+                            $jumlahAlpa++;
+                        } else {
+                            $jumlahDilewati++;
+                        }
+
+                        continue;
+                    }
+
                     $jumlahDilewati++;
                     continue;
                 }

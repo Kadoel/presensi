@@ -3,18 +3,45 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
+use App\Services\BerandaService;
 
 class Beranda extends BaseController
 {
-    public function __construct() {}
+    protected BerandaService $berandaService;
+
+    public function __construct()
+    {
+        $this->berandaService = new BerandaService();
+    }
 
     public function index()
     {
-        // dd(session()->get());
         $data = [
-            'judul'         => 'Beranda',
+            'judul' => 'Beranda',
         ];
+
         return view('pages/admin/beranda/index', $data);
+    }
+
+    public function summary()
+    {
+        return $this->response->setJSON(
+            $this->berandaService->getSummary()
+        );
+    }
+
+    public function presensiHariIni()
+    {
+        return $this->response->setJSON(
+            $this->berandaService->getPresensiHariIni()
+        );
+    }
+
+    public function aktivitasTerbaru()
+    {
+        return $this->response->setJSON(
+            $this->berandaService->getAktivitasTerbaru()
+        );
     }
 
     public function logout()
