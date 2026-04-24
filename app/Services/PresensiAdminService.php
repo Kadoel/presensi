@@ -216,7 +216,7 @@ class PresensiAdminService extends BaseService
 
         // ❌ Tidak boleh masa depan
         if ($tanggal > $hariIni) {
-            return $this->hasilGagal([], 'Sinkron presensi tidak boleh untuk tanggal setelah tangal ' . tanggal_indonesia($hariIni));
+            return $this->hasilGagal([], 'Sinkron presensi tidak boleh untuk tanggal setelah tanggal ' . tanggal_indonesia($hariIni));
         }
 
         // ✅ Masa lalu aman
