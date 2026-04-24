@@ -6,9 +6,12 @@ use CodeIgniter\Model;
 
 class PresensiModel extends Model
 {
-    protected $table         = 'presensi';
-    protected $primaryKey    = 'id';
-    protected $returnType    = 'object';
+    protected $table            = 'presensi';
+    protected $primaryKey       = 'id';
+    protected $returnType       = 'object';
+    protected $useAutoIncrement = true;
+    protected $protectFields    = true;
+
     protected $allowedFields = [
         'pegawai_id',
         'tanggal',
@@ -29,9 +32,8 @@ class PresensiModel extends Model
         'catatan_admin',
         'is_manual',
     ];
-    protected $useTimestamps = true;
 
-    public function getPresensiByPegawaiDanTanggal(int $pegawaiId, string $tanggal)
+    public function getPresensiByPegawaiDanTanggal(int $pegawaiId, string $tanggal): ?object
     {
         return $this->where([
             'pegawai_id' => $pegawaiId,
@@ -42,5 +44,102 @@ class PresensiModel extends Model
     public function sudahAdaPresensi(int $pegawaiId, string $tanggal): bool
     {
         return $this->getPresensiByPegawaiDanTanggal($pegawaiId, $tanggal) !== null;
+    }
+
+    public function dataTabel(?string $tanggal = null)
+    {
+        $builder = $this->db->table($this->table)
+            ->select('
+                presensi.id,
+                presensi.tanggal,
+                presensi.pegawai_id,
+                presensi.jadwal_kerja_id,
+                presensi.shift_id,
+                presensi.jam_datang,
+                presensi.jam_pulang,
+                presensi.status_datang,
+                presensi.status_pulang,
+                presensi.menit_telat,
+                presensi.menit_pulang_cepat,
+                presensi.catatan_admin,
+                presensi.is_manual,
+                pegawai.kode_pegawai,
+                pegawai.nama_pegawai,
+                shift.kode_shift,
+                shift.nama_shift
+            ')
+            ->join('pegawai', 'pegawai.id = presensi.pegawai_id', 'left')
+            ->join('shift', 'shift.id = presensi.shift_id', 'left');
+
+        if (! empty($tanggal)) {
+            $builder->where('presensi.tanggal', $tanggal);
+        }
+
+        return $builder;
+    }
+
+    public function getDetailAdminById(int $id): ?object
+    {
+        return $this->db->table($this->table)
+            ->select('
+                presensi.*,
+                pegawai.kode_pegawai,
+                pegawai.nama_pegawai,
+                pegawai.no_hp,
+                pegawai.alamat,
+                pegawai.jenis_kelamin,
+                shift.kode_shift,
+                shift.nama_shift
+            ')
+            ->join('pegawai', 'pegawai.id = presensi.pegawai_id', 'left')
+            ->join('shift', 'shift.id = presensi.shift_id', 'left')
+            ->where('presensi.id', $id)
+            ->get()
+            ->getRow();
+    }
+
+    public function countByTanggalDanStatusDatang(string $tanggal, string $status): int
+    {
+        return (int) $this->where([
+            'tanggal'       => $tanggal,
+            'status_datang' => $status,
+        ])->countAllResults();
+    }
+
+    public function countByTanggalDanStatusPulang(string $tanggal, string $status): int
+    {
+        return (int) $this->where([
+            'tanggal'       => $tanggal,
+            'status_pulang' => $status,
+        ])->countAllResults();
+    }
+
+    public function countByTanggal(string $tanggal): int
+    {
+        return (int) $this->where('tanggal', $tanggal)->countAllResults();
+    }
+
+    public function getPresensiTerbaru(string $tanggal, int $limit = 10): array
+    {
+        return $this->db->table($this->table)
+            ->select('
+                presensi.id,
+                presensi.tanggal,
+                presensi.jam_datang,
+                presensi.jam_pulang,
+                presensi.status_datang,
+                presensi.status_pulang,
+                presensi.is_manual,
+                pegawai.kode_pegawai,
+                pegawai.nama_pegawai,
+                shift.nama_shift
+            ')
+            ->join('pegawai', 'pegawai.id = presensi.pegawai_id', 'left')
+            ->join('shift', 'shift.id = presensi.shift_id', 'left')
+            ->where('presensi.tanggal', $tanggal)
+            ->orderBy('presensi.id', 'DESC')
+            ->limit($limit)
+            ->get()
+            ->getResult();
     }
 }

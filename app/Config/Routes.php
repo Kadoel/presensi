@@ -123,7 +123,8 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->group('presensi', static function ($routes) {
         $routes->match(['GET', 'POST'], '/', 'Admin\Presensi::index');
         $routes->post('detail', 'Admin\Presensi::detail');
-        $routes->post('generate-alpa', 'Admin\Presensi::generateAlpa');
+        $routes->post('sinkron', 'Admin\Presensi::sinkron');
+        $routes->post('generate-alpa', 'Admin\Presensi::generateAlpa'); // optional alias lama
         $routes->post('ringkasan', 'Admin\Presensi::ringkasan');
     });
 });
