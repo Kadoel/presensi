@@ -106,14 +106,13 @@
             ],
             order: [
                 [2, 'asc'],
-                [3, 'asc'],
                 [4, 'asc']
             ],
             rowGroup: {
-                dataSrc: ['bulan_jadwal', 'nama_pegawai']
+                dataSrc: ['bulan_jadwal', 'tanggal']
             },
             columnDefs: [{
-                    targets: [1, 2, 3],
+                    targets: [1, 2, 4],
                     visible: false
                 },
                 {
