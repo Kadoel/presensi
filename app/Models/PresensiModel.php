@@ -31,6 +31,7 @@ class PresensiModel extends Model
         'user_agent',
         'catatan_admin',
         'is_manual',
+        'sumber_presensi',
     ];
 
     public function getPresensiByPegawaiDanTanggal(int $pegawaiId, string $tanggal): ?object
@@ -63,6 +64,7 @@ class PresensiModel extends Model
                 presensi.menit_pulang_cepat,
                 presensi.catatan_admin,
                 presensi.is_manual,
+                presensi.sumber_presensi,
                 pegawai.kode_pegawai,
                 pegawai.nama_pegawai,
                 shift.kode_shift,
@@ -89,7 +91,10 @@ class PresensiModel extends Model
                 pegawai.alamat,
                 pegawai.jenis_kelamin,
                 shift.kode_shift,
-                shift.nama_shift
+                shift.nama_shift,
+                shift.jam_masuk,
+                shift.jam_pulang,
+                shift.toleransi_telat_menit
             ')
             ->join('pegawai', 'pegawai.id = presensi.pegawai_id', 'left')
             ->join('shift', 'shift.id = presensi.shift_id', 'left')
@@ -129,7 +134,7 @@ class PresensiModel extends Model
                 presensi.jam_pulang,
                 presensi.status_datang,
                 presensi.status_pulang,
-                presensi.is_manual,
+                presensi.sumber_presensi,
                 pegawai.kode_pegawai,
                 pegawai.nama_pegawai,
                 shift.nama_shift

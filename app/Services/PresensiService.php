@@ -284,6 +284,7 @@ class PresensiService extends BaseService
             'user_agent'         => $this->stringAtauNull($meta['user_agent'] ?? service('request')->getUserAgent()?->getAgentString()),
             'catatan_admin'      => null,
             'is_manual'          => 0,
+            'sumber_presensi'    => 'scan'
         ]);
 
         if (! $insert) {

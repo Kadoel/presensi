@@ -124,8 +124,11 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
         $routes->match(['GET', 'POST'], '/', 'Admin\Presensi::index');
         $routes->post('detail', 'Admin\Presensi::detail');
         $routes->post('sinkron', 'Admin\Presensi::sinkron');
-        $routes->post('generate-alpa', 'Admin\Presensi::generateAlpa'); // optional alias lama
+        $routes->post('generate-alpa', 'Admin\Presensi::generateAlpa'); // alias lama
         $routes->post('ringkasan', 'Admin\Presensi::ringkasan');
+        $routes->post('lupa/simpan', 'Admin\Presensi::simpanLupa');
+        $routes->post('lupa/update/(:num)', 'Admin\Presensi::updateLupa/$1');
+        $routes->post('lupa/delete', 'Admin\Presensi::deleteLupa');
     });
 });
 

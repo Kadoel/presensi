@@ -3,233 +3,232 @@
 <?= $this->section('content'); ?>
 <?php $tanggal = date('Y-m-d'); ?>
 
-<div class="row">
-    <div class="col-md-12">
-        <!-- KPI DASAR -->
-        <div id="block-ringkasan" class="mb-4">
-            <div class="row">
-                <div class="col-6 col-xl-4">
-                    <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                            <div class="d-none d-sm-block">
-                                <i class="fa fa-calendar-days fa-2x opacity-25"></i>
-                            </div>
-                            <div>
-                                <div class="fs-3 fw-semibold" id="ringkasan-total-jadwal"><?= esc($ringkasan['total_jadwal'] ?? 0); ?></div>
-                                <div class="fs-sm fw-semibold text-uppercase text-muted">Total Jadwal</div>
-                            </div>
-                        </div>
-                    </a>
+<div id="block-ringkasan" class="mb-4">
+    <div class="row">
+        <div class="col-6 col-xl-4">
+            <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
+                    <div class="d-none d-sm-block"><i class="fa fa-calendar-days fa-2x opacity-25"></i></div>
+                    <div>
+                        <div class="fs-3 fw-semibold" id="ringkasan-total-jadwal"><?= esc($ringkasan['total_jadwal'] ?? 0); ?></div>
+                        <div class="fs-sm fw-semibold text-uppercase text-muted">Total Jadwal</div>
+                    </div>
                 </div>
-
-                <div class="col-6 col-xl-4">
-                    <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                            <div class="d-none d-sm-block">
-                                <i class="fa fa-clipboard-check fa-2x opacity-25"></i>
-                            </div>
-                            <div>
-                                <div class="fs-3 fw-semibold" id="ringkasan-total-presensi"><?= esc($ringkasan['total_presensi'] ?? 0); ?></div>
-                                <div class="fs-sm fw-semibold text-uppercase text-muted">Total Presensi</div>
-                            </div>
-                        </div>
-                    </a>
+            </a>
+        </div>
+        <div class="col-6 col-xl-4">
+            <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
+                    <div class="d-none d-sm-block"><i class="fa fa-clipboard-check fa-2x opacity-25"></i></div>
+                    <div>
+                        <div class="fs-3 fw-semibold" id="ringkasan-total-presensi"><?= esc($ringkasan['total_presensi'] ?? 0); ?></div>
+                        <div class="fs-sm fw-semibold text-uppercase text-muted">Total Presensi</div>
+                    </div>
                 </div>
+            </a>
+        </div>
+        <div class="col-6 col-xl-4">
+            <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
+                    <div class="d-none d-sm-block"><i class="fa fa-hourglass-half fa-2x opacity-25"></i></div>
+                    <div>
+                        <div class="fs-3 fw-semibold" id="ringkasan-belum-presensi"><?= esc($ringkasan['belum_presensi'] ?? 0); ?></div>
+                        <div class="fs-sm fw-semibold text-uppercase text-muted">Belum Presensi</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
 
-                <div class="col-6 col-xl-4">
-                    <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                            <div class="d-none d-sm-block">
-                                <i class="fa fa-hourglass-half fa-2x opacity-25"></i>
-                            </div>
-                            <div>
-                                <div class="fs-3 fw-semibold" id="ringkasan-belum-presensi"><?= esc($ringkasan['belum_presensi'] ?? 0); ?></div>
-                                <div class="fs-sm fw-semibold text-uppercase text-muted">Belum Presensi</div>
-                            </div>
+    <div class="row">
+        <?php
+        $statusDatangCards = [
+            ['id' => 'hadir', 'label' => 'Hadir', 'icon' => 'fa-user-check', 'class' => 'text-success'],
+            ['id' => 'telat', 'label' => 'Telat', 'icon' => 'fa-clock', 'class' => 'text-warning'],
+            ['id' => 'alpa', 'label' => 'Alpa', 'icon' => 'fa-user-xmark', 'class' => 'text-danger'],
+            ['id' => 'izin', 'label' => 'Izin', 'icon' => 'fa-file-signature', 'class' => 'text-info'],
+            ['id' => 'sakit', 'label' => 'Sakit', 'icon' => 'fa-notes-medical', 'class' => 'text-primary'],
+            ['id' => 'libur', 'label' => 'Libur', 'icon' => 'fa-umbrella-beach', 'class' => 'text-secondary'],
+        ];
+        ?>
+        <?php foreach ($statusDatangCards as $card): ?>
+            <div class="col-6 col-xl-2">
+                <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                    <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
+                        <div class="d-none d-sm-block"><i class="fa <?= esc($card['icon']); ?> fa-2x opacity-25"></i></div>
+                        <div>
+                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="ringkasan-<?= esc($card['id']); ?>"><?= esc($ringkasan[$card['id']] ?? 0); ?></div>
+                            <div class="fs-sm fw-semibold text-uppercase text-muted"><?= esc($card['label']); ?></div>
                         </div>
-                    </a>
+                    </div>
+                </a>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+    <div class="row">
+        <?php
+        $statusPulangCards = [
+            ['id' => 'belum-pulang', 'key' => 'belum_pulang', 'label' => 'Belum Pulang', 'icon' => 'fa-door-open', 'class' => 'text-secondary'],
+            ['id' => 'pulang', 'key' => 'pulang', 'label' => 'Pulang', 'icon' => 'fa-right-from-bracket', 'class' => 'text-success'],
+            ['id' => 'pulang-cepat', 'key' => 'pulang_cepat', 'label' => 'Pulang Cepat', 'icon' => 'fa-person-walking-arrow-right', 'class' => 'text-warning'],
+        ];
+        ?>
+        <?php foreach ($statusPulangCards as $card): ?>
+            <div class="col-6 col-xl-4">
+                <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                    <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
+                        <div class="d-none d-sm-block"><i class="fa <?= esc($card['icon']); ?> fa-2x opacity-25"></i></div>
+                        <div>
+                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="ringkasan-<?= esc($card['id']); ?>"><?= esc($ringkasan[$card['key']] ?? 0); ?></div>
+                            <div class="fs-sm fw-semibold text-uppercase text-muted"><?= esc($card['label']); ?></div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+
+<div id="block-presensi" class="block block-themed block-rounded">
+    <div class="block-header">
+        <h3 class="block-title text-white"><i class="fa fa-calendar-check"></i> <b>DATA PRESENSI</b></h3>
+    </div>
+
+    <div class="block-content">
+        <div class="row mb-4 justify-content-center align-items-center">
+            <div class="col-auto" style="min-width: 250px;">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fa fa-calendar"></i>
+                    </span>
+                    <input type="text" class="form-control" id="filter-tanggal"
+                        value="<?= $tanggal; ?>">
                 </div>
             </div>
 
-            <!-- STATUS DATANG -->
-            <div class="row">
-                <div class="col-6 col-xl-2">
-                    <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                            <div class="d-none d-sm-block">
-                                <i class="fa fa-user-check fa-2x opacity-25"></i>
-                            </div>
-                            <div>
-                                <div class="fs-3 fw-semibold text-success" id="ringkasan-hadir"><?= esc($ringkasan['hadir'] ?? 0); ?></div>
-                                <div class="fs-sm fw-semibold text-uppercase text-muted">Hadir</div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
+            <div class="col-auto">
+                <div class="d-flex gap-2">
+                    <button id="btn-lupa-presensi" class="btn btn-primary text-white">
+                        <i class="fa fa-plus"></i> Lupa Presensi
+                    </button>
 
-                <div class="col-6 col-xl-2">
-                    <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                            <div class="d-none d-sm-block">
-                                <i class="fa fa-clock fa-2x opacity-25"></i>
-                            </div>
-                            <div>
-                                <div class="fs-3 fw-semibold text-warning" id="ringkasan-telat"><?= esc($ringkasan['telat'] ?? 0); ?></div>
-                                <div class="fs-sm fw-semibold text-uppercase text-muted">Telat</div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-6 col-xl-2">
-                    <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                            <div class="d-none d-sm-block">
-                                <i class="fa fa-user-xmark fa-2x opacity-25"></i>
-                            </div>
-                            <div>
-                                <div class="fs-3 fw-semibold text-danger" id="ringkasan-alpa"><?= esc($ringkasan['alpa'] ?? 0); ?></div>
-                                <div class="fs-sm fw-semibold text-uppercase text-muted">Alpa</div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-6 col-xl-2">
-                    <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                            <div class="d-none d-sm-block">
-                                <i class="fa fa-file-signature fa-2x opacity-25"></i>
-                            </div>
-                            <div>
-                                <div class="fs-3 fw-semibold text-info" id="ringkasan-izin"><?= esc($ringkasan['izin'] ?? 0); ?></div>
-                                <div class="fs-sm fw-semibold text-uppercase text-muted">Izin</div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-6 col-xl-2">
-                    <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                            <div class="d-none d-sm-block">
-                                <i class="fa fa-notes-medical fa-2x opacity-25"></i>
-                            </div>
-                            <div>
-                                <div class="fs-3 fw-semibold text-primary" id="ringkasan-sakit"><?= esc($ringkasan['sakit'] ?? 0); ?></div>
-                                <div class="fs-sm fw-semibold text-uppercase text-muted">Sakit</div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-6 col-xl-2">
-                    <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                            <div class="d-none d-sm-block">
-                                <i class="fa fa-umbrella-beach fa-2x opacity-25"></i>
-                            </div>
-                            <div>
-                                <div class="fs-3 fw-semibold text-secondary" id="ringkasan-libur"><?= esc($ringkasan['libur'] ?? 0); ?></div>
-                                <div class="fs-sm fw-semibold text-uppercase text-muted">Libur</div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-            <!-- STATUS PULANG -->
-            <div class="row">
-                <div class="col-6 col-xl-4">
-                    <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                            <div class="d-none d-sm-block">
-                                <i class="fa fa-door-open fa-2x opacity-25"></i>
-                            </div>
-                            <div>
-                                <div class="fs-3 fw-semibold text-secondary" id="ringkasan-belum-pulang"><?= esc($ringkasan['belum_pulang'] ?? 0); ?></div>
-                                <div class="fs-sm fw-semibold text-uppercase text-muted">Belum Pulang</div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-6 col-xl-4">
-                    <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                            <div class="d-none d-sm-block">
-                                <i class="fa fa-right-from-bracket fa-2x opacity-25"></i>
-                            </div>
-                            <div>
-                                <div class="fs-3 fw-semibold text-success" id="ringkasan-pulang"><?= esc($ringkasan['pulang'] ?? 0); ?></div>
-                                <div class="fs-sm fw-semibold text-uppercase text-muted">Pulang</div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-6 col-xl-4">
-                    <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                            <div class="d-none d-sm-block">
-                                <i class="fa fa-person-walking-arrow-right fa-2x opacity-25"></i>
-                            </div>
-                            <div>
-                                <div class="fs-3 fw-semibold text-warning" id="ringkasan-pulang-cepat"><?= esc($ringkasan['pulang_cepat'] ?? 0); ?></div>
-                                <div class="fs-sm fw-semibold text-uppercase text-muted">Pulang Cepat</div>
-                            </div>
-                        </div>
-                    </a>
+                    <button id="btn-sinkron-presensi" class="btn btn-danger">
+                        <i class="fa fa-arrows-rotate"></i> Sinkron
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div id="block-presensi" class="block block-themed block-rounded">
-            <div class="block-header">
-                <h3 class="block-title text-white">
-                    <i class="fa fa-calendar-check"></i> <b>DATA PRESENSI</b>
-                </h3>
-            </div>
+    <div class="block-content block-content-full overflow-x-auto">
+        <table id="presensi-tabel" class="table table-vcenter table-hover nowrap w-100">
+            <thead>
+                <tr>
+                    <th class="text-center"><b>#</b></th>
+                    <th><b>ID</b></th>
+                    <th><b>TANGGAL</b></th>
+                    <th><b>KODE</b></th>
+                    <th><b>NAMA PEGAWAI</b></th>
+                    <th><b>SHIFT</b></th>
+                    <th><b>JAM DATANG</b></th>
+                    <th><b>STATUS DATANG</b></th>
+                    <th><b>JAM PULANG</b></th>
+                    <th><b>STATUS PULANG</b></th>
+                    <th><b>SUMBER</b></th>
+                    <th class="text-center"><b>AKSI</b></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
 
-            <div class="block-content">
-                <div class="row">
-                    <div class="col-md-3">
-                        <label class="form-label" for="filter-tanggal">Tanggal</label>
-                        <input type="text"
-                            class="js-flatpickr form-control"
-                            id="filter-tanggal"
-                            value="<?= $tanggal; ?>"
-                            autocomplete="off">
-                    </div>
-
-                    <div class="col-md-3 d-flex align-items-end">
-                        <button type="button" id="btn-sinkron-presensi" class="btn btn-danger">
-                            <i class="fa fa-arrows-rotate"></i> Sinkron Presensi
-                        </button>
-                    </div>
+<div class="modal" id="modal-lupa-presensi" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id="block-content-lupa" class="block block-themed block-rounded shadow-none mb-0">
+                <div class="block-header">
+                    <h3 class="block-title text-white"><i class="fa fa-plus"></i> <b>LUPA PRESENSI</b></h3>
                 </div>
+                <form id="form-lupa-presensi" autocomplete="off">
+                    <div class="block-content">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label" for="pegawai_id">Pegawai <span class="text-danger">*</span></label>
+                                <select class="js-select2 form-select" id="pegawai_id" name="pegawai_id" style="width:100%" data-placeholder="-- Pilih Pegawai --">
+                                    <option></option>
+                                    <?php if (! empty($pegawais ?? [])): ?>
+                                        <?php foreach ($pegawais as $pegawai): ?>
+                                            <option value="<?= esc($pegawai->id); ?>"><?= esc($pegawai->nama_pegawai); ?></option>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <option value="" disabled>Data pegawai aktif tidak tersedia</option>
+                                    <?php endif; ?>
+                                </select>
+                                <div id="error-pegawai_id" class="invalid-feedback animated fadeIn"></div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label" for="tanggal">Tanggal <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="tanggal" name="tanggal" value="<?= $tanggal; ?>">
+                                <div id="error-tanggal" class="invalid-feedback animated fadeIn"></div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label" for="jam_datang">Jam Datang <span class="text-danger">*</span></label>
+                                <input type="time" class="form-control" id="jam_datang" name="jam_datang">
+                                <div id="error-jam_datang" class="invalid-feedback animated fadeIn"></div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label" for="jam_pulang">Jam Pulang</label>
+                                <input type="time" class="form-control" id="jam_pulang" name="jam_pulang">
+                                <div id="error-jam_pulang" class="invalid-feedback animated fadeIn"></div>
+                            </div>
+                            <div class="col-md-12 mb-4">
+                                <label class="form-label" for="catatan_admin">Catatan Admin <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="catatan_admin" name="catatan_admin" rows="3" placeholder="Contoh: Pegawai lupa scan karena kios bermasalah"></textarea>
+                                <div id="error-catatan_admin" class="invalid-feedback animated fadeIn"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="block-content block-content-full block-content-sm text-end border-top">
+                        <button type="button" class="btn btn-danger" id="tutup-modal-lupa"><i class="fa fa-times"></i> Batal</button>
+                        <button type="submit" id="simpan-lupa" class="btn btn-primary text-white"><i class="far fa-paper-plane"></i> Simpan</button>
+                    </div>
+                </form>
             </div>
+        </div>
+    </div>
+</div>
 
-            <div class="block-content block-content-full overflow-x-auto">
-                <table id="presensi-tabel" class="table table-vcenter js-dataTable-responsive table-hover nowrap w-100">
-                    <thead>
-                        <tr>
-                            <th class="text-center" style="width: 8%;"><b>#</b></th>
-                            <th><b>ID</b></th>
-                            <th><b>TANGGAL</b></th>
-                            <th><b>KODE</b></th>
-                            <th><b>NAMA PEGAWAI</b></th>
-                            <th><b>SHIFT</b></th>
-                            <th><b>JAM DATANG</b></th>
-                            <th><b>STATUS DATANG</b></th>
-                            <th><b>JAM PULANG</b></th>
-                            <th><b>STATUS PULANG</b></th>
-                            <th><b>SUMBER</b></th>
-                            <th class="text-center" style="width: 8%;"><b>AKSI</b></th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+<div class="modal" id="modal-edit-lupa" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id="block-content-edit-lupa" class="block block-themed block-rounded shadow-none mb-0">
+                <div class="block-header">
+                    <h3 class="block-title text-white"><i class="fa fa-edit"></i> <b>EDIT LUPA PRESENSI</b></h3>
+                </div>
+                <form id="form-edit-lupa" autocomplete="off">
+                    <div class="block-content">
+                        <input type="hidden" id="edit-id" name="edit-id">
+                        <div class="row">
+                            <div class="col-md-6 mb-4"><label class="form-label">Pegawai</label><input type="text" class="form-control" id="edit-pegawai" readonly></div>
+                            <div class="col-md-6 mb-4"><label class="form-label">Tanggal</label><input type="text" class="form-control" id="edit-tanggal" readonly></div>
+                            <div class="col-md-6 mb-4"><label class="form-label" for="edit-jam_datang">Jam Datang <span class="text-danger">*</span></label><input type="time" class="form-control" id="edit-jam_datang" name="edit-jam_datang">
+                                <div id="error-edit-jam_datang" class="invalid-feedback animated fadeIn"></div>
+                            </div>
+                            <div class="col-md-6 mb-4"><label class="form-label" for="edit-jam_pulang">Jam Pulang</label><input type="time" class="form-control" id="edit-jam_pulang" name="edit-jam_pulang">
+                                <div id="error-edit-jam_pulang" class="invalid-feedback animated fadeIn"></div>
+                            </div>
+                            <div class="col-md-12 mb-4"><label class="form-label" for="edit-catatan_admin">Catatan Admin <span class="text-danger">*</span></label><textarea class="form-control" id="edit-catatan_admin" name="edit-catatan_admin" rows="3"></textarea>
+                                <div id="error-edit-catatan_admin" class="invalid-feedback animated fadeIn"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="block-content block-content-full block-content-sm text-end border-top">
+                        <button type="button" class="btn btn-danger" id="tutup-modal-edit-lupa"><i class="fa fa-times"></i> Batal</button>
+                        <button type="submit" id="update-lupa" class="btn btn-primary text-white"><i class="far fa-paper-plane"></i> Ubah</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -240,9 +239,7 @@
         <div class="modal-content">
             <div id="block-content-detail" class="block block-themed block-rounded shadow-none mb-0">
                 <div class="block-header">
-                    <h3 class="block-title text-white">
-                        <i class="fa fa-circle-info"></i> <b>DETAIL PRESENSI</b>
-                    </h3>
+                    <h3 class="block-title text-white"><i class="fa fa-circle-info"></i> <b>DETAIL PRESENSI</b></h3>
                 </div>
 
                 <div class="block-content">
@@ -251,79 +248,64 @@
                             <label class="form-label fw-semibold">Kode Pegawai</label>
                             <div id="detail-kode_pegawai" class="form-control bg-body-light">-</div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Nama Pegawai</label>
                             <div id="detail-nama_pegawai" class="form-control bg-body-light">-</div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Jenis Kelamin</label>
                             <div id="detail-jenis_kelamin" class="form-control bg-body-light">-</div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">No. HP</label>
                             <div id="detail-no_hp" class="form-control bg-body-light">-</div>
                         </div>
-
                         <div class="col-md-12">
                             <label class="form-label fw-semibold">Alamat</label>
                             <div id="detail-alamat" class="form-control bg-body-light">-</div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Tanggal</label>
                             <div id="detail-tanggal" class="form-control bg-body-light">-</div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Shift</label>
                             <div id="detail-shift" class="form-control bg-body-light">-</div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Jam Datang</label>
                             <div id="detail-jam_datang" class="form-control bg-body-light">-</div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Status Datang</label>
                             <div id="detail-status_datang" class="form-control bg-body-light">-</div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Jam Pulang</label>
                             <div id="detail-jam_pulang" class="form-control bg-body-light">-</div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Status Pulang</label>
                             <div id="detail-status_pulang" class="form-control bg-body-light">-</div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Menit Telat</label>
                             <div id="detail-menit_telat" class="form-control bg-body-light">-</div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Menit Pulang Cepat</label>
                             <div id="detail-menit_pulang_cepat" class="form-control bg-body-light">-</div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Sumber Input</label>
-                            <div id="detail-is_manual" class="form-control bg-body-light">-</div>
+                            <div id="detail-sumber_presensi" class="form-control bg-body-light">-</div>
                         </div>
-
                         <div class="col-md-12">
                             <label class="form-label fw-semibold">Catatan Admin</label>
                             <div id="detail-catatan_admin" class="form-control bg-body-light">-</div>
                         </div>
                     </div>
                 </div>
-
                 <div class="block-content block-content-full block-content-sm text-end border-top">
                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
                         <i class="fa fa-times"></i> Tutup
@@ -333,5 +315,4 @@
         </div>
     </div>
 </div>
-
 <?= $this->endSection(); ?>

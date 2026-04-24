@@ -1,3 +1,4 @@
+<script src="/assets/plugins/select2/js/select2.full.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
         let csrfToken = '<?= csrf_token(); ?>';
@@ -6,18 +7,83 @@
         <?= loadingoverlay_fa(); ?>
         <?= notifikasi(); ?>
 
-        <?php if (session()->getFlashdata('sukses')) : ?>
-            notifikasi('success', 'right', '<?= session()->getFlashdata('sukses'); ?>');
-        <?php elseif (session()->getFlashdata('gagal')) : ?>
-            notifikasi('danger', 'right', '<?= session()->getFlashdata("gagal"); ?>');
-        <?php endif; ?>
-
         function ambilTanggalFilter() {
             return $('#filter-tanggal').val();
         }
 
+        function initSelect2() {
+            if ($.fn.select2) {
+                $('#pegawai_id').select2({
+                    dropdownParent: $('#modal-lupa-presensi'),
+                    placeholder: '-- Pilih Pegawai --',
+                    allowClear: true,
+                    width: '100%'
+                });
+            }
+        }
+
+        initSelect2();
+
+        function clearErrors(mode = 'tambah') {
+            const fields = mode === 'edit' ? ['edit-jam_datang', 'edit-jam_pulang', 'edit-catatan_admin'] : ['pegawai_id', 'tanggal', 'jam_datang', 'jam_pulang', 'catatan_admin'];
+
+            fields.forEach(function(field) {
+                $('#' + field).removeClass('is-invalid');
+                $('#error-' + field).html('').hide();
+            });
+        }
+
+        function tampilkanErrors(errors) {
+            if (!errors) return;
+
+            Object.keys(errors).forEach(function(field) {
+                const target = $('#' + field);
+                const error = $('#error-' + field);
+
+                target.addClass('is-invalid');
+                error.html(errors[field]).show();
+            });
+        }
+
+        function handleGagal(result) {
+            if (result.errors && Object.keys(result.errors).length > 0) {
+                tampilkanErrors(result.errors);
+                return;
+            }
+
+            if (result.pesan) {
+                notifikasi('danger', 'right', result.pesan);
+                return;
+            }
+
+            if (typeof KadoelAjax !== 'undefined') {
+                KadoelAjax.handleError(result);
+            }
+        }
+
+        function resetFormLupa() {
+            $('#pegawai_id').val('').trigger('change');
+            $('#tanggal').val(ambilTanggalFilter());
+            $('#jam_datang').val('');
+            $('#jam_pulang').val('');
+            $('#catatan_admin').val('');
+            clearErrors('tambah');
+        }
+
+        function formatJamUntukInput(value) {
+            if (!value) return '';
+            value = String(value);
+            if (value.length >= 16 && value.includes(' ')) {
+                return value.substring(11, 16);
+            }
+            if (value.length >= 5) {
+                return value.substring(0, 5);
+            }
+            return '';
+        }
+
         function refreshRingkasan() {
-            $("#block-ringkasan").LoadingOverlay("show");
+            $('#block-ringkasan').LoadingOverlay('show');
 
             $.ajax({
                 type: 'POST',
@@ -28,36 +94,31 @@
                     tanggal: ambilTanggalFilter()
                 },
                 success: function(result) {
-                    $("#block-ringkasan").LoadingOverlay("hide");
+                    $('#block-ringkasan').LoadingOverlay('hide');
 
                     if (result.sukses) {
-                        const ringkasan = result.ringkasan || {};
+                        const r = result.ringkasan || {};
 
-                        $('#ringkasan-total-jadwal').text(ringkasan.total_jadwal || 0);
-                        $('#ringkasan-total-presensi').text(ringkasan.total_presensi || 0);
-                        $('#ringkasan-belum-presensi').text(ringkasan.belum_presensi || 0);
-
-                        $('#ringkasan-hadir').text(ringkasan.hadir || 0);
-                        $('#ringkasan-telat').text(ringkasan.telat || 0);
-                        $('#ringkasan-alpa').text(ringkasan.alpa || 0);
-                        $('#ringkasan-izin').text(ringkasan.izin || 0);
-                        $('#ringkasan-sakit').text(ringkasan.sakit || 0);
-                        $('#ringkasan-libur').text(ringkasan.libur || 0);
-
-                        $('#ringkasan-belum-pulang').text(ringkasan.belum_pulang || 0);
-                        $('#ringkasan-pulang').text(ringkasan.pulang || 0);
-                        $('#ringkasan-pulang-cepat').text(ringkasan.pulang_cepat || 0);
+                        $('#ringkasan-total-jadwal').text(r.total_jadwal || 0);
+                        $('#ringkasan-total-presensi').text(r.total_presensi || 0);
+                        $('#ringkasan-belum-presensi').text(r.belum_presensi || 0);
+                        $('#ringkasan-hadir').text(r.hadir || 0);
+                        $('#ringkasan-telat').text(r.telat || 0);
+                        $('#ringkasan-alpa').text(r.alpa || 0);
+                        $('#ringkasan-izin').text(r.izin || 0);
+                        $('#ringkasan-sakit').text(r.sakit || 0);
+                        $('#ringkasan-libur').text(r.libur || 0);
+                        $('#ringkasan-belum-pulang').text(r.belum_pulang || 0);
+                        $('#ringkasan-pulang').text(r.pulang || 0);
+                        $('#ringkasan-pulang-cepat').text(r.pulang_cepat || 0);
                     } else {
-                        KadoelAjax.handleError(result);
+                        handleGagal(result);
                     }
                 },
                 error: function(xhr) {
-                    $("#block-ringkasan").LoadingOverlay("hide");
-
+                    $('#block-ringkasan').LoadingOverlay('hide');
                     if (xhr.status == 403) {
                         notifikasi('info', 'right', 'Token Kadaluarsa, Silahkan Reload Halaman Terlebih Dahulu');
-                    } else {
-                        notifikasi('danger', 'right', 'Gagal mengambil ringkasan presensi');
                     }
                 }
             });
@@ -71,6 +132,8 @@
             paging: true,
             info: true,
             pagingType: 'full_numbers',
+            responsive: false, // ❗ WAJIB false
+            scrollX: true, // ❗ INI KUNCI
             language: {
                 url: '<?= base_url("assets/plugins/DataTablesbs5/plugins/id.json"); ?>'
             },
@@ -81,7 +144,6 @@
                     d[csrfToken] = csrfHash;
                     d.tanggal = ambilTanggalFilter();
                 },
-                async: true,
                 error: function(xhr, error, code) {
                     if (xhr.status == 403) {
                         notifikasi('info', 'right', 'Token Kadaluarsa, Silahkan Reload Halaman Terlebih Dahulu');
@@ -121,13 +183,12 @@
                     data: 'status_pulang'
                 },
                 {
-                    data: 'is_manual'
+                    data: 'sumber_presensi'
                 },
                 {
                     data: 'action'
                 }
             ],
-            responsive: true,
             order: [
                 [1, 'desc']
             ],
@@ -157,15 +218,67 @@
         if (typeof flatpickr !== 'undefined') {
             flatpickr('#filter-tanggal', {
                 dateFormat: 'Y-m-d',
+                maxDate: 'today',
                 onChange: function() {
                     data_presensi.ajax.reload();
                     refreshRingkasan();
                 }
             });
+
+            flatpickr('#tanggal', {
+                dateFormat: 'Y-m-d',
+                maxDate: 'today'
+            });
         }
 
-        $('#btn-refresh-ringkasan').on('click', function() {
-            refreshRingkasan();
+        $('#btn-lupa-presensi').on('click', function() {
+            resetFormLupa();
+            $('#modal-lupa-presensi').modal('show');
+        });
+
+        $('#tutup-modal-lupa').on('click', function() {
+            $('#modal-lupa-presensi').modal('hide');
+        });
+
+        $('#form-lupa-presensi').on('submit', function(e) {
+            e.preventDefault();
+
+            $('#simpan-lupa').prop('disabled', true);
+            clearErrors('tambah');
+            $('#block-content-lupa').LoadingOverlay('show');
+
+            let fd = new FormData(this);
+            fd.append(csrfToken, csrfHash);
+
+            $.ajax({
+                type: 'POST',
+                url: '<?= base_url('admin/presensi/lupa/simpan') ?>',
+                dataType: 'JSON',
+                data: fd,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(result) {
+                    $('#block-content-lupa').LoadingOverlay('hide');
+                    $('#simpan-lupa').prop('disabled', false);
+
+                    if (result.sukses) {
+                        $('#modal-lupa-presensi').modal('hide');
+                        notifikasi('success', 'right', result.pesan);
+                        data_presensi.ajax.reload();
+                        refreshRingkasan();
+                    } else {
+                        handleGagal(result);
+                    }
+                },
+                error: function(xhr) {
+                    $('#block-content-lupa').LoadingOverlay('hide');
+                    $('#simpan-lupa').prop('disabled', false);
+                    if (xhr.status == 403) {
+                        notifikasi('info', 'right', 'Token Kadaluarsa, Silahkan Reload Halaman Terlebih Dahulu');
+                    }
+                }
+            });
         });
 
         $('#btn-sinkron-presensi').on('click', function() {
@@ -173,27 +286,20 @@
 
             Swal.fire({
                 title: 'PRESENSI',
-                html: 'Sinkron presensi untuk tanggal <b>' + KadoelHelper.toTanggalIndonesia(tanggal) + '</b>?',
-                showClass: {
-                    popup: 'animate__animated animate__zoomIn'
-                },
-                hideClass: {
-                    popup: 'animate__animated animate__zoomOut'
-                },
+                html: 'Sinkron presensi untuk tanggal <b>' + tanggal + '</b>?',
                 imageUrl: '<?= base_url('assets/media/favicons/apple-touch-icon-180x180.png') ?>',
                 imageWidth: 128,
                 imageHeight: 128,
-                imageAlt: 'PRESENSI',
                 showCancelButton: true,
                 confirmButtonColor: '#65A30D',
                 cancelButtonColor: '#d33',
-                confirmButtonText: '<i class="fa fa-check"></i> Proses',
+                confirmButtonText: '<i class="fa fa-check"></i> Sinkron',
                 cancelButtonText: '<i class="fas fa-times"></i> Batal',
                 allowEscapeKey: false,
                 allowOutsideClick: false,
             }).then((result) => {
                 if (result.isConfirmed) {
-                    $("#block-presensi").LoadingOverlay("show");
+                    $('#block-presensi').LoadingOverlay('show');
 
                     $.ajax({
                         type: 'POST',
@@ -204,23 +310,20 @@
                             tanggal: tanggal
                         },
                         success: function(result) {
-                            $("#block-presensi").LoadingOverlay("hide");
+                            $('#block-presensi').LoadingOverlay('hide');
 
                             if (result.sukses) {
                                 notifikasi('success', 'right', result.pesan);
                                 data_presensi.ajax.reload();
                                 refreshRingkasan();
                             } else {
-                                KadoelAjax.handleError(result);
+                                handleGagal(result);
                             }
                         },
                         error: function(xhr) {
-                            $("#block-presensi").LoadingOverlay("hide");
-
+                            $('#block-presensi').LoadingOverlay('hide');
                             if (xhr.status == 403) {
-                                notifikasi('info', 'right', 'Silahkan Reload Halaman Terlebih Dahulu, Kemudian Ulangi Proses');
-                            } else {
-                                notifikasi('danger', 'right', 'Gagal generate ALPA');
+                                notifikasi('info', 'right', 'Silahkan Reload Halaman Terlebih Dahulu');
                             }
                         }
                     });
@@ -242,7 +345,7 @@
             $('#detail-status_pulang').text('-');
             $('#detail-menit_telat').text('-');
             $('#detail-menit_pulang_cepat').text('-');
-            $('#detail-is_manual').text('-');
+            $('#detail-sumber_presensi').text('-');
             $('#detail-catatan_admin').text('-');
         }
 
@@ -250,7 +353,7 @@
             let id = $(this).data('id');
 
             resetDetail();
-            $("#block-content-detail").LoadingOverlay("show");
+            $('#block-content-detail').LoadingOverlay('show');
 
             $.ajax({
                 type: 'POST',
@@ -261,17 +364,14 @@
                     id: id
                 },
                 success: function(result) {
-                    $("#block-content-detail").LoadingOverlay("hide");
+                    $('#block-content-detail').LoadingOverlay('hide');
 
                     if (result.sukses) {
                         const p = result.presensi || {};
 
                         $('#detail-kode_pegawai').text(p.kode_pegawai || '-');
                         $('#detail-nama_pegawai').text(p.nama_pegawai || '-');
-                        $('#detail-jenis_kelamin').text(
-                            p.jenis_kelamin === 'L' ? 'Laki-Laki' :
-                            (p.jenis_kelamin === 'P' ? 'Perempuan' : '-')
-                        );
+                        $('#detail-jenis_kelamin').text(p.jenis_kelamin === 'L' ? 'Laki-Laki' : (p.jenis_kelamin === 'P' ? 'Perempuan' : '-'));
                         $('#detail-no_hp').text(p.no_hp || '-');
                         $('#detail-alamat').text(p.alamat || '-');
                         $('#detail-tanggal').text(p.tanggal || '-');
@@ -282,22 +382,157 @@
                         $('#detail-status_pulang').text(p.status_pulang || '-');
                         $('#detail-menit_telat').text(p.menit_telat ?? 0);
                         $('#detail-menit_pulang_cepat').text(p.menit_pulang_cepat ?? 0);
-                        $('#detail-is_manual').text(parseInt(p.is_manual) === 1 ? 'Manual' : 'Scan');
+                        $('#detail-sumber_presensi').text(p.sumber_presensi || '-');
                         $('#detail-catatan_admin').text(p.catatan_admin || '-');
 
                         $('#modal-detail').modal('show');
                     } else {
-                        KadoelAjax.handleError(result);
+                        handleGagal(result);
                     }
                 },
                 error: function(xhr) {
-                    $("#block-content-detail").LoadingOverlay("hide");
-
+                    $('#block-content-detail').LoadingOverlay('hide');
                     if (xhr.status == 403) {
                         notifikasi('info', 'right', 'Token Kadaluarsa, Silahkan Reload Halaman Terlebih Dahulu');
-                    } else {
-                        notifikasi('danger', 'right', 'Gagal mengambil detail presensi');
                     }
+                }
+            });
+        });
+
+        $('#presensi-tabel').on('click', '#act-edit-lupa', function() {
+            let id = $(this).data('id');
+
+            clearErrors('edit');
+            $('#block-content-edit-lupa').LoadingOverlay('show');
+
+            $.ajax({
+                type: 'POST',
+                url: '<?= base_url('admin/presensi/detail') ?>',
+                dataType: 'JSON',
+                data: {
+                    [csrfToken]: csrfHash,
+                    id: id
+                },
+                success: function(result) {
+                    $('#block-content-edit-lupa').LoadingOverlay('hide');
+
+                    if (result.sukses) {
+                        const p = result.presensi || {};
+
+                        $('#edit-id').val(p.id);
+                        $('#edit-pegawai').val((p.nama_pegawai || '-'));
+                        $('#edit-tanggal').val(p.tanggal || '-');
+                        $('#edit-jam_datang').val(formatJamUntukInput(p.jam_datang));
+                        $('#edit-jam_pulang').val(formatJamUntukInput(p.jam_pulang));
+                        $('#edit-catatan_admin').val(p.catatan_admin || '');
+
+                        $('#modal-edit-lupa').modal('show');
+                    } else {
+                        handleGagal(result);
+                    }
+                },
+                error: function(xhr) {
+                    $('#block-content-edit-lupa').LoadingOverlay('hide');
+                    if (xhr.status == 403) {
+                        notifikasi('info', 'right', 'Token Kadaluarsa, Silahkan Reload Halaman Terlebih Dahulu');
+                    }
+                }
+            });
+        });
+
+        $('#tutup-modal-edit-lupa').on('click', function() {
+            $('#modal-edit-lupa').modal('hide');
+        });
+
+        $('#form-edit-lupa').on('submit', function(e) {
+            e.preventDefault();
+
+            const id = $('#edit-id').val();
+            $('#update-lupa').prop('disabled', true);
+            clearErrors('edit');
+            $('#block-content-edit-lupa').LoadingOverlay('show');
+
+            let fd = new FormData(this);
+            fd.append(csrfToken, csrfHash);
+
+            $.ajax({
+                type: 'POST',
+                url: '<?= base_url('admin/presensi/lupa/update') ?>' + '/' + id,
+                dataType: 'JSON',
+                data: fd,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(result) {
+                    $('#block-content-edit-lupa').LoadingOverlay('hide');
+                    $('#update-lupa').prop('disabled', false);
+
+                    if (result.sukses) {
+                        $('#modal-edit-lupa').modal('hide');
+                        notifikasi('success', 'right', result.pesan);
+                        data_presensi.ajax.reload();
+                        refreshRingkasan();
+                    } else {
+                        handleGagal(result);
+                    }
+                },
+                error: function(xhr) {
+                    $('#block-content-edit-lupa').LoadingOverlay('hide');
+                    $('#update-lupa').prop('disabled', false);
+                    if (xhr.status == 403) {
+                        notifikasi('info', 'right', 'Token Kadaluarsa, Silahkan Reload Halaman Terlebih Dahulu');
+                    }
+                }
+            });
+        });
+
+        $('#presensi-tabel').on('click', '#act-delete-lupa', function() {
+            let id = $(this).data('id');
+            let nama = $(this).data('nama');
+
+            Swal.fire({
+                title: 'PRESENSI',
+                html: 'Hapus lupa presensi <b>' + nama + '</b>?',
+                imageUrl: '<?= base_url('assets/media/favicons/apple-touch-icon-180x180.png') ?>',
+                imageWidth: 128,
+                imageHeight: 128,
+                showCancelButton: true,
+                confirmButtonColor: '#65A30D',
+                cancelButtonColor: '#d33',
+                confirmButtonText: '<i class="fa fa-trash-can"></i> Hapus',
+                cancelButtonText: '<i class="fas fa-times"></i> Batal',
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#block-presensi').LoadingOverlay('show');
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '<?= base_url('admin/presensi/lupa/delete') ?>',
+                        dataType: 'JSON',
+                        data: {
+                            [csrfToken]: csrfHash,
+                            id: id
+                        },
+                        success: function(result) {
+                            $('#block-presensi').LoadingOverlay('hide');
+
+                            if (result.sukses) {
+                                notifikasi('success', 'right', result.pesan);
+                                data_presensi.ajax.reload();
+                                refreshRingkasan();
+                            } else {
+                                handleGagal(result);
+                            }
+                        },
+                        error: function(xhr) {
+                            $('#block-presensi').LoadingOverlay('hide');
+                            if (xhr.status == 403) {
+                                notifikasi('info', 'right', 'Silahkan Reload Halaman Terlebih Dahulu');
+                            }
+                        }
+                    });
                 }
             });
         });

@@ -6,9 +6,10 @@ use CodeIgniter\Model;
 
 class JadwalKerjaModel extends Model
 {
-    protected $table         = 'jadwal_kerja';
-    protected $primaryKey    = 'id';
-    protected $returnType    = 'object';
+    protected $table      = 'jadwal_kerja';
+    protected $primaryKey = 'id';
+    protected $returnType = 'object';
+
     protected $allowedFields = [
         'pegawai_id',
         'tanggal',
@@ -24,6 +25,7 @@ class JadwalKerjaModel extends Model
         'catatan',
         'created_by',
     ];
+
     protected $useTimestamps = true;
 
     public function selectData()
@@ -41,13 +43,10 @@ class JadwalKerjaModel extends Model
                 jadwal_kerja.created_by,
                 jadwal_kerja.created_at,
                 jadwal_kerja.updated_at,
-
                 pegawai.kode_pegawai,
                 pegawai.nama_pegawai,
-
                 shift.kode_shift,
                 shift.nama_shift,
-
                 users.username AS dibuat_oleh,
                 DATE_FORMAT(jadwal_kerja.tanggal, "%Y-%m") AS bulan_jadwal
             ')
@@ -73,14 +72,32 @@ class JadwalKerjaModel extends Model
             ->getRow();
     }
 
-    /**
-     * @return object|null
-     */
     public function getJadwalByPegawaiDanTanggal(int $pegawaiId, string $tanggal): ?object
     {
         return $this->where('pegawai_id', $pegawaiId)
             ->where('tanggal', $tanggal)
             ->first();
+    }
+
+    public function getJadwalDetailByPegawaiDanTanggal(int $pegawaiId, string $tanggal): ?object
+    {
+        return $this->db->table('jadwal_kerja')
+            ->select('
+                jadwal_kerja.*,
+                pegawai.kode_pegawai,
+                pegawai.nama_pegawai,
+                shift.kode_shift,
+                shift.nama_shift,
+                shift.jam_masuk,
+                shift.jam_pulang,
+                shift.toleransi_telat_menit
+            ')
+            ->join('pegawai', 'pegawai.id = jadwal_kerja.pegawai_id', 'left')
+            ->join('shift', 'shift.id = jadwal_kerja.shift_id', 'left')
+            ->where('jadwal_kerja.pegawai_id', $pegawaiId)
+            ->where('jadwal_kerja.tanggal', $tanggal)
+            ->get()
+            ->getRow();
     }
 
     public function getJadwalByPengajuanIzinId(int $pengajuanIzinId): array
@@ -129,5 +146,19 @@ class JadwalKerjaModel extends Model
     public function getJadwalByHariLiburId(int $hariLiburId): array
     {
         return $this->where('hari_libur_id', $hariLiburId)->findAll();
+    }
+
+    public function getBatasAkhirPulangTerakhir(string $tanggal): ?string
+    {
+        $row = $this->db->table('jadwal_kerja')
+            ->select('MAX(shift.batas_akhir_pulang) as batas_akhir_pulang')
+            ->join('shift', 'shift.id = jadwal_kerja.shift_id', 'left')
+            ->where('jadwal_kerja.tanggal', $tanggal)
+            ->where('jadwal_kerja.status_hari', 'kerja')
+            ->where('jadwal_kerja.shift_id IS NOT NULL')
+            ->get()
+            ->getRow();
+
+        return $row->batas_akhir_pulang ?? null;
     }
 }
