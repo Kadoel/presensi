@@ -190,7 +190,7 @@ class PresensiAdminService extends BaseService
                 'sinkron_presensi',
                 'presensi',
                 null,
-                'Sinkron presensi tanggal ' . $tanggal .
+                'Sinkron presensi tanggal ' . tanggal_indonesia($tanggal) .
                     ' | alpa: ' . $jumlahAlpa .
                     ', izin: ' . $jumlahIzin .
                     ', sakit: ' . $jumlahSakit .
