@@ -4,16 +4,19 @@
 <?php $tanggal = date('Y-m-d'); ?>
 
 <div class="content">
-    <div class="row">
+    <div id="block-ringkasan-beranda" class="row">
         <?php
         $cards = [
             ['id' => 'total-pegawai', 'label' => 'Total Pegawai', 'icon' => 'fa-users', 'class' => 'text-primary'],
             ['id' => 'hadir-hari-ini', 'label' => 'Hadir Hari Ini', 'icon' => 'fa-user-check', 'class' => 'text-success'],
-            ['id' => 'terlambat-hari-ini', 'label' => 'Terlambat', 'icon' => 'fa-clock', 'class' => 'text-warning'],
-            ['id' => 'izin-sakit-hari-ini', 'label' => 'Izin / Sakit', 'icon' => 'fa-notes-medical', 'class' => 'text-info'],
             ['id' => 'alpa-hari-ini', 'label' => 'Alpa Hari Ini', 'icon' => 'fa-user-xmark', 'class' => 'text-danger'],
-            ['id' => 'izin-pending', 'label' => 'Izin Pending', 'icon' => 'fa-file-signature', 'class' => 'text-secondary'],
-            ['id' => 'tukar-jadwal-pending', 'label' => 'Tukar Jadwal Pending', 'icon' => 'fa-right-left', 'class' => 'text-secondary'],
+            ['id' => 'izin-hari-ini', 'label' => 'Izin Hari Ini', 'icon' => 'fa-file-signature', 'class' => 'text-info'],
+            ['id' => 'sakit-hari-ini', 'label' => 'Sakit Hari Ini', 'icon' => 'fa-notes-medical', 'class' => 'text-primary'],
+            ['id' => 'telat-hari-ini', 'label' => 'Datang Telat', 'icon' => 'fa-clock', 'class' => 'text-warning'],
+            ['id' => 'pulang-cepat-hari-ini', 'label' => 'Pulang Cepat', 'icon' => 'fa-person-walking-arrow-right', 'class' => 'text-warning'],
+            ['id' => 'belum-sinkron', 'label' => 'Belum Sinkron', 'icon' => 'fa-clock-rotate-left', 'class' => 'text-danger'],
+            ['id' => 'izin-pending', 'label' => 'Izin Pending', 'icon' => 'fa-file-circle-question', 'class' => 'text-warning'],
+            ['id' => 'tukar-jadwal-pending', 'label' => 'Tukar Jadwal Pending', 'icon' => 'fa-right-left', 'class' => 'text-warning'],
         ];
         ?>
 
@@ -22,10 +25,11 @@
                 <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
                     <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
                         <div class="d-none d-sm-block">
-                            <i class="fa <?= esc($card['icon']); ?> fa-2x opacity-25"></i>
+                            <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
                         </div>
                         <div>
-                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="<?= esc($card['id']); ?>">0</div>
+                            <div class=" fs-3 fw-semibold <?= esc($card['class']); ?>" id="<?= esc($card['id']); ?>">0
+                            </div>
                             <div class="fs-sm fw-semibold text-uppercase text-muted"><?= esc($card['label']); ?></div>
                         </div>
                     </div>
@@ -58,6 +62,7 @@
                                 <th>Status Datang</th>
                                 <th>Jam Pulang</th>
                                 <th>Status Pulang</th>
+                                <th>Hasil Presensi</th>
                             </tr>
                         </thead>
                         <tbody id="presensi-hari-ini-body">

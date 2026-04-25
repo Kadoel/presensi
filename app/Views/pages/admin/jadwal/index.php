@@ -152,7 +152,7 @@
                                 <option></option>
                                 <?php foreach ($shift as $item) : ?>
                                     <option value="<?= $item->id; ?>">
-                                        <?= esc($item->kode_shift . ' - ' . $item->nama_shift); ?>
+                                        <?= esc($item->nama_shift); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>

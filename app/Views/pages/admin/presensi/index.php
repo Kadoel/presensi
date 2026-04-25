@@ -7,8 +7,8 @@
     <div class="row">
         <?php
         $ringkasanUtamaCards = [
-            ['id' => 'total-jadwal', 'key' => 'total_jadwal', 'label' => 'Total Jadwal', 'icon' => 'fa-calendar-days', 'class' => 'text-dark'],
-            ['id' => 'total-presensi', 'key' => 'total_presensi', 'label' => 'Total Record Presensi', 'icon' => 'fa-clipboard-check', 'class' => 'text-dark'],
+            ['id' => 'total-jadwal', 'key' => 'total_jadwal', 'label' => 'Total Jadwal', 'icon' => 'fa-calendar-days', 'class' => 'text-primary'],
+            ['id' => 'total-presensi', 'key' => 'total_presensi', 'label' => 'Total Record Presensi', 'icon' => 'fa-clipboard-check', 'class' => 'text-success'],
             ['id' => 'belum-sinkron', 'key' => 'belum_sinkron', 'label' => 'Belum Sinkron', 'icon' => 'fa-clock-rotate-left', 'class' => 'text-warning'],
         ];
         ?>
@@ -18,7 +18,7 @@
                 <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
                     <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
                         <div class="d-none d-sm-block">
-                            <i class="fa <?= esc($card['icon']); ?> fa-2x opacity-25"></i>
+                            <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
                         </div>
                         <div>
                             <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="ringkasan-<?= esc($card['id']); ?>">
@@ -39,7 +39,7 @@
             ['id' => 'alpa', 'key' => 'alpa', 'label' => 'Alpa', 'icon' => 'fa-user-xmark', 'class' => 'text-danger'],
             ['id' => 'izin', 'key' => 'izin', 'label' => 'Izin', 'icon' => 'fa-file-signature', 'class' => 'text-info'],
             ['id' => 'sakit', 'key' => 'sakit', 'label' => 'Sakit', 'icon' => 'fa-notes-medical', 'class' => 'text-primary'],
-            ['id' => 'libur', 'key' => 'libur', 'label' => 'Libur', 'icon' => 'fa-umbrella-beach', 'class' => 'text-secondary'],
+            ['id' => 'libur', 'key' => 'libur', 'label' => 'Libur', 'icon' => 'fa-umbrella-beach', 'class' => 'text-warning'],
         ];
         ?>
 
@@ -48,7 +48,7 @@
                 <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
                     <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
                         <div class="d-none d-sm-block">
-                            <i class="fa <?= esc($card['icon']); ?> fa-2x opacity-25"></i>
+                            <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
                         </div>
                         <div>
                             <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="ringkasan-<?= esc($card['id']); ?>">
@@ -77,7 +77,7 @@
                 <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
                     <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
                         <div class="d-none d-sm-block">
-                            <i class="fa <?= esc($card['icon']); ?> fa-2x opacity-25"></i>
+                            <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
                         </div>
                         <div>
                             <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="ringkasan-<?= esc($card['id']); ?>">

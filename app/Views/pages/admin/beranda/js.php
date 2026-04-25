@@ -13,22 +13,28 @@
                 url: '<?= base_url('admin/summary'); ?>',
                 dataType: 'json',
                 beforeSend: function() {
-                    $('.block').LoadingOverlay('show');
+                    $('#block-ringkasan-beranda, #block-presensi-hari-ini, #block-aktivitas-terbaru').LoadingOverlay('show');
                 },
                 success: function(res) {
                     $('#total-pegawai').text(res.total_pegawai ?? 0);
+
                     $('#hadir-hari-ini').text(res.hadir_hari_ini ?? 0);
-                    $('#terlambat-hari-ini').text(res.terlambat_hari_ini ?? 0);
-                    $('#izin-sakit-hari-ini').text(res.izin_sakit_hari_ini ?? 0);
                     $('#alpa-hari-ini').text(res.alpa_hari_ini ?? 0);
+                    $('#izin-hari-ini').text(res.izin_hari_ini ?? 0);
+                    $('#sakit-hari-ini').text(res.sakit_hari_ini ?? 0);
+
+                    $('#telat-hari-ini').text(res.telat_hari_ini ?? 0);
+                    $('#pulang-cepat-hari-ini').text(res.pulang_cepat_hari_ini ?? 0);
+                    $('#belum-sinkron').text(res.belum_sinkron ?? 0);
+
                     $('#izin-pending').text(res.izin_pending ?? 0);
                     $('#tukar-jadwal-pending').text(res.tukar_jadwal_pending ?? 0);
                 },
-                error: function(xhr) {
+                error: function() {
                     notifikasi('danger', 'right', 'Gagal memuat ringkasan beranda');
                 },
                 complete: function() {
-                    $('.block').LoadingOverlay('hide');
+                    $('#block-ringkasan-beranda, #block-presensi-hari-ini, #block-aktivitas-terbaru').LoadingOverlay('hide');
                 }
             });
         }
@@ -47,7 +53,7 @@
                     if (!res || res.length === 0) {
                         html = `
                             <tr>
-                                <td colspan="8" class="text-center text-muted">
+                                <td colspan="9" class="text-center text-muted">
                                     Belum ada data presensi hari ini
                                 </td>
                             </tr>
@@ -64,6 +70,7 @@
                                     <td>${badgeStatusDatang(item.status_datang)}</td>
                                     <td>${formatJam(item.jam_pulang)}</td>
                                     <td>${badgeStatusPulang(item.status_pulang)}</td>
+                                    <td>${badgeHasilPresensi(item.hasil_presensi)}</td>
                                 </tr>
                             `;
                         });
@@ -74,7 +81,7 @@
                 error: function() {
                     $('#presensi-hari-ini-body').html(`
                         <tr>
-                            <td colspan="8" class="text-center text-danger">
+                            <td colspan="9" class="text-center text-danger">
                                 Gagal memuat data presensi
                             </td>
                         </tr>
@@ -104,7 +111,8 @@
                             html += `
                                 <div class="d-flex py-3 border-bottom">
                                     <div class="flex-shrink-0 me-3">
-                                        <span class="avatar avatar-sm rounded-circle bg-primary text-white">
+                                        <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary text-white"
+                                            style="width:36px;height:36px;">
                                             <i class="fa fa-history"></i>
                                         </span>
                                     </div>
@@ -134,30 +142,63 @@
         }
 
         function badgeStatusDatang(status) {
-            status = status ?? '-';
-
-            const badges = {
-                hadir: 'success',
-                telat: 'warning',
-                izin: 'info',
-                sakit: 'primary',
-                alpa: 'danger',
-                libur: 'secondary'
+            const labels = {
+                tepat_waktu: 'Tepat Waktu',
+                telat: 'Telat'
             };
 
-            return `<span class="badge bg-${badges[status] ?? 'secondary'}">${escapeHtml(status)}</span>`;
+            const badges = {
+                tepat_waktu: 'success',
+                telat: 'warning'
+            };
+
+            if (!status) {
+                return '<span class="badge bg-secondary">-</span>';
+            }
+
+            return `<span class="badge bg-${badges[status] ?? 'secondary'}">${labels[status] ?? escapeHtml(status)}</span>`;
         }
 
         function badgeStatusPulang(status) {
-            status = status ?? '-';
+            const labels = {
+                tepat_waktu: 'Tepat Waktu',
+                pulang_cepat: 'Pulang Cepat'
+            };
 
             const badges = {
-                pulang: 'success',
-                belum_pulang: 'secondary',
+                tepat_waktu: 'success',
                 pulang_cepat: 'warning'
             };
 
-            return `<span class="badge bg-${badges[status] ?? 'secondary'}">${escapeHtml(status)}</span>`;
+            if (!status) {
+                return '<span class="badge bg-secondary">-</span>';
+            }
+
+            return `<span class="badge bg-${badges[status] ?? 'secondary'}">${labels[status] ?? escapeHtml(status)}</span>`;
+        }
+
+        function badgeHasilPresensi(status) {
+            const labels = {
+                hadir: 'Hadir',
+                alpa: 'Alpa',
+                izin: 'Izin',
+                sakit: 'Sakit',
+                libur: 'Libur'
+            };
+
+            const badges = {
+                hadir: 'success',
+                alpa: 'danger',
+                izin: 'info',
+                sakit: 'primary',
+                libur: 'secondary'
+            };
+
+            if (!status) {
+                return '<span class="badge bg-light text-dark">Belum Sinkron</span>';
+            }
+
+            return `<span class="badge bg-${badges[status] ?? 'secondary'}">${labels[status] ?? escapeHtml(status)}</span>`;
         }
 
         function formatJam(value) {

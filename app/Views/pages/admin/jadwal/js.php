@@ -188,14 +188,19 @@
                         $('#shift_id').val('').trigger('change');
                         $('#catatan').val('');
 
+                        const el = document.querySelector('#tanggal');
+                        if (el && el._flatpickr) {
+                            el._flatpickr.clear();
+                        }
+
                         toggleShiftTambah();
                         clear_errors_tambah();
                         notifikasi('success', 'right', result['pesan']);
                         data_jadwal.ajax.reload();
 
-                        if (result['warning_hari_libur'] && result['hari_libur'] && result['hari_libur'].length) {
+                        if (result['warning_hari_libur'] && result['hari_libur'] && result['status_hari_kerja'] && result['hari_libur'].length) {
                             let infoLibur = result['hari_libur'].map(function(item) {
-                                return `<li><b>${item.tanggal}</b> - ${item.nama_libur}</li>`;
+                                return `<li><b>${KadoelHelper.toTanggalIndonesia(item.tanggal)}</b> - ${item.nama_libur}</li>`;
                             }).join('');
 
                             Swal.fire({
@@ -250,6 +255,7 @@
                     $("#block-content-ubah").LoadingOverlay("hide");
 
                     if (result['sukses']) {
+                        console.log(result);
                         const jadwal = result['jadwal'] || {};
                         const hariLibur = result['hari_libur'] || null;
 
@@ -326,9 +332,9 @@
                         notifikasi('success', 'right', result['pesan']);
                         data_jadwal.ajax.reload();
 
-                        if (result['warning_hari_libur'] && result['hari_libur'] && result['hari_libur'].length) {
+                        if (result['warning_hari_libur'] && result['hari_libur'] && result['status_hari_kerja'] && result['hari_libur'].length) {
                             let infoLibur = result['hari_libur'].map(function(item) {
-                                return `<li><b>${item.tanggal}</b> - ${item.nama_libur}</li>`;
+                                return `<li><b>${KadoelHelper.toTanggalIndonesia(item.tanggal)}</b> - ${item.nama_libur}</li>`;
                             }).join('');
 
                             Swal.fire({
@@ -368,7 +374,7 @@
 
             Swal.fire({
                 title: 'PRESENSI',
-                html: 'Hapus Jadwal Kerja <b>' + nama + '</b> pada tanggal <b>' + tanggal + '</b>?',
+                html: 'Hapus Jadwal Kerja <b>' + nama + '</b> <br />pada tanggal <b>' + KadoelHelper.toTanggalIndonesia(tanggal) + '</b>?',
                 showClass: {
                     popup: 'animate__animated animate__zoomIn'
                 },
@@ -426,4 +432,22 @@
 </script>
 <script>
     Codebase.helpersOnLoad(['jq-select2', 'js-flatpickr']);
+
+    const minTanggal = '<?= date('Y-m-d'); ?>';
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof flatpickr !== 'undefined') {
+            flatpickr('#tanggal', {
+                dateFormat: 'Y-m-d',
+                minDate: minTanggal
+            });
+
+            flatpickr('#edit-tanggal', {
+                dateFormat: 'Y-m-d',
+                minDate: minTanggal,
+                clickOpens: false,
+                allowInput: false
+            });
+        }
+    });
 </script>

@@ -295,7 +295,7 @@ class PresensiService extends BaseService
         $presensiId = (int) $this->presensiModel->getInsertID();
 
         $this->catatAudit(
-            'scan_datang',
+            'scan datang',
             'presensi',
             $presensiId,
             'Presensi datang pegawai ID ' . (int) $pegawai->id
@@ -350,7 +350,7 @@ class PresensiService extends BaseService
         }
 
         $this->catatAudit(
-            'scan_pulang',
+            'scan pulang',
             'presensi',
             (int) $presensi->id,
             'Presensi pulang pegawai ID ' . (int) $pegawai->id

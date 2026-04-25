@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\HariLiburModel;
 use App\Models\JadwalKerjaModel;
 use App\Models\PegawaiModel;
+use App\Models\PresensiModel;
 use App\Models\ShiftModel;
 
 class JadwalKerjaService extends BaseService
@@ -13,6 +14,7 @@ class JadwalKerjaService extends BaseService
     protected PegawaiModel $pegawaiModel;
     protected ShiftModel $shiftModel;
     protected HariLiburModel $hariLiburModel;
+    protected PresensiModel $presensiModel;
 
     public function __construct()
     {
@@ -21,6 +23,7 @@ class JadwalKerjaService extends BaseService
         $this->pegawaiModel     = new PegawaiModel();
         $this->shiftModel       = new ShiftModel();
         $this->hariLiburModel   = new HariLiburModel();
+        $this->presensiModel    = new PresensiModel();
     }
 
     public function dataTabel()
@@ -259,6 +262,7 @@ class JadwalKerjaService extends BaseService
             return $this->hasilSukses('Data Jadwal Kerja Berhasil Ditambahkan', [
                 'warning_hari_libur' => ! empty($hariLiburTerdeteksi),
                 'hari_libur'         => $hariLiburTerdeteksi,
+                'status_hari_kerja'  => $statusHari == 'kerja' ? true : false
             ]);
         });
     }
@@ -350,6 +354,7 @@ class JadwalKerjaService extends BaseService
             return $this->hasilSukses('Data Jadwal Kerja Berhasil Diubah', [
                 'warning_hari_libur' => ! empty($hariLiburTerdeteksi),
                 'hari_libur'         => $hariLiburTerdeteksi,
+                'status_hari_kerja'  => $statusHari == 'kerja' ? true : false
             ]);
         });
     }
@@ -357,10 +362,15 @@ class JadwalKerjaService extends BaseService
     public function ambil(int $id): array
     {
         return $this->eksekusi(function () use ($id) {
+            $hariIni = date('Y-m-d');
             $jadwal = $this->jadwalKerjaModel->getJadwalById($id);
 
             if ($jadwal === null) {
                 return $this->hasilTidakDitemukan('Data Jadwal Kerja Tidak Ditemukan');
+            }
+
+            if ($jadwal->tanggal < $hariIni) {
+                return $this->hasilGagal([], 'Tidak diizinkan mengubah jadwal sebelum hari ini');
             }
 
             $hariLibur = $this->hariLiburModel->where('tanggal', $jadwal->tanggal)->first();
@@ -375,14 +385,23 @@ class JadwalKerjaService extends BaseService
     public function hapus(int $id): array
     {
         return $this->eksekusi(function () use ($id) {
+            $hariIni = date('Y-m-d');
             $jadwal = $this->jadwalKerjaModel->getJadwalById($id);
 
             if ($jadwal === null) {
                 return $this->hasilTidakDitemukan('Data Jadwal Kerja Tidak Ada Di Database');
             }
 
+            if ($jadwal->tanggal < $hariIni) {
+                return $this->hasilGagal([], 'Tidak diizinkan menghapus jadwal sebelum hari ini');
+            }
+
             if (($jadwal->sumber_data ?? 'manual') !== 'manual') {
                 return $this->hasilGagal([], 'Data jadwal hasil override sistem tidak dapat diubah manual');
+            }
+
+            if ($this->presensiModel->sudahAdaPresensi($jadwal->pegawai_id, $jadwal->tanggal)) {
+                return $this->hasilGagal([], 'Tidak diizinkan menghapus jadwal yang sudah presensi');
             }
 
             $hapus = $this->jadwalKerjaModel->delete($id);

@@ -18,6 +18,8 @@ class BerandaService extends BaseService
 
     public function __construct()
     {
+        parent::__construct();
+
         $this->pegawaiModel = new PegawaiModel();
         $this->presensiModel = new PresensiModel();
         $this->pengajuanIzinModel = new PengajuanIzinModel();
@@ -30,23 +32,30 @@ class BerandaService extends BaseService
         $tanggal = date('Y-m-d');
 
         return [
-            'total_pegawai' => $this->pegawaiModel->countAktif(),
-            'hadir_hari_ini' => $this->presensiModel->countHadirByTanggal($tanggal),
-            'terlambat_hari_ini' => $this->presensiModel->countTelatByTanggal($tanggal),
-            'izin_sakit_hari_ini' => $this->presensiModel->countIzinSakitByTanggal($tanggal),
-            'alpa_hari_ini' => $this->presensiModel->countAlpaByTanggal($tanggal),
-            'izin_pending' => $this->pengajuanIzinModel->countPending(),
+            'total_pegawai'        => $this->pegawaiModel->countAktif(),
+
+            'hadir_hari_ini'       => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'hadir'),
+            'alpa_hari_ini'        => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'alpa'),
+            'izin_hari_ini'        => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'izin'),
+            'sakit_hari_ini'       => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'sakit'),
+            'libur_hari_ini'       => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'libur'),
+
+            'telat_hari_ini'       => $this->presensiModel->countByTanggalDanStatusDatang($tanggal, 'telat'),
+            'pulang_cepat_hari_ini' => $this->presensiModel->countByTanggalDanStatusPulang($tanggal, 'pulang_cepat'),
+            'belum_sinkron'        => $this->presensiModel->countByTanggalDanHasilPresensiNull($tanggal),
+
+            'izin_pending'         => $this->pengajuanIzinModel->countPending(),
             'tukar_jadwal_pending' => $this->tukarJadwalModel->countPending(),
         ];
     }
 
     public function getPresensiHariIni(): array
     {
-        return $this->presensiModel->getPresensiHariIni(date('Y-m-d'));
+        return $this->presensiModel->getPresensiHariIni(date('Y-m-d'), 10);
     }
 
     public function getAktivitasTerbaru(): array
     {
-        return $this->auditLogModel->getAktivitasTerbaru();
+        return $this->auditLogModel->getAktivitasTerbaru(10);
     }
 }

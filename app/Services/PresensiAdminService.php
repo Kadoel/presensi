@@ -204,7 +204,7 @@ class PresensiAdminService extends BaseService
             }
 
             $this->catatAudit(
-                'sinkron_presensi',
+                'sinkron presensi',
                 'presensi',
                 null,
                 'Sinkron presensi tanggal ' . tanggal_indonesia($tanggal) .
@@ -407,7 +407,7 @@ class PresensiAdminService extends BaseService
             }
 
             $this->catatAudit(
-                'create_lupa_presensi',
+                'create lupa presensi',
                 'presensi',
                 (int) $this->presensiModel->getInsertID(),
                 'Input lupa presensi pegawai ID ' . $pegawaiId . ' tanggal ' . $tanggal
@@ -500,7 +500,7 @@ class PresensiAdminService extends BaseService
                 return $this->hasilGagal([], 'Lupa presensi gagal diubah');
             }
 
-            $this->catatAudit('update_lupa_presensi', 'presensi', $id, 'Update lupa presensi ID ' . $id);
+            $this->catatAudit('update lupa presensi', 'presensi', $id, 'Update lupa presensi ID ' . $id);
 
             return $this->hasilSukses('Lupa presensi berhasil diubah');
         });
@@ -524,7 +524,7 @@ class PresensiAdminService extends BaseService
                 return $this->hasilGagal([], 'Lupa presensi gagal dihapus');
             }
 
-            $this->catatAudit('delete_lupa_presensi', 'presensi', $id, 'Hapus lupa presensi ID ' . $id);
+            $this->catatAudit('delete lupa presensi', 'presensi', $id, 'Hapus lupa presensi ID ' . $id);
 
             return $this->hasilSukses('Lupa presensi berhasil dihapus');
         });
