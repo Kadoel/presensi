@@ -140,8 +140,7 @@ class PresensiAdminService extends BaseService
 
                 $statusHari = (string) ($jadwal->status_hari ?? '');
 
-                $presensiExisting = $this->presensiModel
-                    ->getPresensiByPegawaiDanTanggal($pegawaiId, $tanggal);
+                $presensiExisting = $this->presensiModel->getPresensiByPegawaiDanTanggal($pegawaiId, $tanggal);
 
                 $hasilPresensi = $this->tentukanHasilPresensiSinkron($statusHari, $presensiExisting);
 
@@ -154,8 +153,6 @@ class PresensiAdminService extends BaseService
                     $update = $this->presensiModel->update((int) $presensiExisting->id, [
                         'hasil_presensi' => $hasilPresensi,
                         'catatan_admin'  => $this->catatanSinkron($presensiExisting->catatan_admin ?? null, $hasilPresensi),
-                        'is_manual'      => 1,
-                        'sumber_presensi' => 'sinkron',
                     ]);
 
                     if (! $update) {
@@ -285,12 +282,12 @@ class PresensiAdminService extends BaseService
         $batasTimestamp = strtotime($tanggal . ' ' . $batasAkhir);
         $sekarang = time();
 
-        // if ($sekarang <= $batasTimestamp) {
-        //     return $this->hasilGagal(
-        //         [],
-        //         'Sinkron presensi hari ini hanya bisa setelah batas akhir pulang: ' . substr($batasAkhir, 0, 5)
-        //     );
-        // }
+        if ($sekarang <= $batasTimestamp) {
+            return $this->hasilGagal(
+                [],
+                'Sinkron presensi hari ini hanya bisa setelah batas akhir pulang: ' . substr($batasAkhir, 0, 5)
+            );
+        }
 
         return null;
     }
