@@ -67,6 +67,7 @@ class JadwalKerjaService extends BaseService
     {
         return $this->transaksi(function () use ($post) {
             $post['pegawai_id_validasi'] = '1';
+            $hariIni = date("Y-m-d");
 
             $rules = [
                 'pegawai_id_validasi' => [
@@ -161,6 +162,10 @@ class JadwalKerjaService extends BaseService
 
             $pegawaiIds = array_values(array_unique(array_map('intval', $pegawaiIdsRaw)));
             $tanggalList = array_values(array_unique(array_filter(array_map('trim', explode(',', $tanggalRaw)))));
+
+            if ($post['tanggal'] < $hariIni) {
+                return $this->hasilGagal([], 'Tidak diizinkan membuat jadwal sebelum hari ini');
+            }
 
             $validasiStatus = $this->validasiStatusDanShift(
                 $statusHari,
