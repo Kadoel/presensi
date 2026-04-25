@@ -101,15 +101,17 @@
 
                         $('#ringkasan-total-jadwal').text(r.total_jadwal || 0);
                         $('#ringkasan-total-presensi').text(r.total_presensi || 0);
-                        $('#ringkasan-belum-presensi').text(r.belum_presensi || 0);
+                        $('#ringkasan-belum-sinkron').text(r.belum_sinkron || 0);
+
                         $('#ringkasan-hadir').text(r.hadir || 0);
-                        $('#ringkasan-telat').text(r.telat || 0);
                         $('#ringkasan-alpa').text(r.alpa || 0);
                         $('#ringkasan-izin').text(r.izin || 0);
                         $('#ringkasan-sakit').text(r.sakit || 0);
                         $('#ringkasan-libur').text(r.libur || 0);
-                        $('#ringkasan-belum-pulang').text(r.belum_pulang || 0);
-                        $('#ringkasan-pulang').text(r.pulang || 0);
+
+                        $('#ringkasan-tepat-waktu-datang').text(r.tepat_waktu_datang || 0);
+                        $('#ringkasan-telat').text(r.telat || 0);
+                        $('#ringkasan-tepat-waktu-pulang').text(r.tepat_waktu_pulang || 0);
                         $('#ringkasan-pulang-cepat').text(r.pulang_cepat || 0);
                     } else {
                         handleGagal(result);
@@ -183,6 +185,9 @@
                     data: 'status_pulang'
                 },
                 {
+                    data: 'hasil_presensi'
+                },
+                {
                     data: 'sumber_presensi'
                 },
                 {
@@ -197,19 +202,19 @@
                     visible: false
                 },
                 {
-                    targets: [0, 11],
+                    targets: [0, 12],
                     orderable: false
                 },
                 {
-                    targets: [0, 11],
+                    targets: [0, 12],
                     searchable: false
                 },
                 {
-                    targets: [0, 7, 9, 10, 11],
+                    targets: [0, 7, 9, 10, 11, 12],
                     className: 'text-center'
                 },
                 {
-                    targets: [0, 11],
+                    targets: [0, 12],
                     width: '8%'
                 }
             ]
@@ -347,6 +352,7 @@
             $('#detail-menit_pulang_cepat').text('-');
             $('#detail-sumber_presensi').text('-');
             $('#detail-catatan_admin').text('-');
+            $('#detail-hasil_presensi').text('-');
         }
 
         $('#presensi-tabel').on('click', '#act-detail', function() {
@@ -380,6 +386,7 @@
                         $('#detail-status_datang').text(p.status_datang || '-');
                         $('#detail-jam_pulang').text(p.jam_pulang || '-');
                         $('#detail-status_pulang').text(p.status_pulang || '-');
+                        $('#detail-hasil_presensi').text(p.hasil_presensi || '-');
                         $('#detail-menit_telat').text(p.menit_telat ?? 0);
                         $('#detail-menit_pulang_cepat').text(p.menit_pulang_cepat ?? 0);
                         $('#detail-sumber_presensi').text(p.sumber_presensi || '-');

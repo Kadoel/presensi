@@ -40,6 +40,7 @@ class Presensi extends BaseController
             ->edit('status_datang', fn($row) => $this->presensiAdminService->badgeStatusDatang($row->status_datang))
             ->edit('status_pulang', fn($row) => $this->presensiAdminService->badgeStatusPulang($row->status_pulang))
             ->edit('sumber_presensi', fn($row) => $this->presensiAdminService->badgeSumberPresensi($row->sumber_presensi ?? 'scan'))
+            ->edit('hasil_presensi', fn($row) => $this->presensiAdminService->badgeHasilPresensi($row->hasil_presensi))
             ->add('action', function ($row) {
                 $button = '
                     <button type="button" class="btn btn-sm btn-info" id="act-detail" data-id="' . $row->id . '">

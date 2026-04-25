@@ -5,59 +5,25 @@
 
 <div id="block-ringkasan" class="mb-4">
     <div class="row">
-        <div class="col-6 col-xl-4">
-            <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                    <div class="d-none d-sm-block"><i class="fa fa-calendar-days fa-2x opacity-25"></i></div>
-                    <div>
-                        <div class="fs-3 fw-semibold" id="ringkasan-total-jadwal"><?= esc($ringkasan['total_jadwal'] ?? 0); ?></div>
-                        <div class="fs-sm fw-semibold text-uppercase text-muted">Total Jadwal</div>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="col-6 col-xl-4">
-            <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                    <div class="d-none d-sm-block"><i class="fa fa-clipboard-check fa-2x opacity-25"></i></div>
-                    <div>
-                        <div class="fs-3 fw-semibold" id="ringkasan-total-presensi"><?= esc($ringkasan['total_presensi'] ?? 0); ?></div>
-                        <div class="fs-sm fw-semibold text-uppercase text-muted">Total Presensi</div>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="col-6 col-xl-4">
-            <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                    <div class="d-none d-sm-block"><i class="fa fa-hourglass-half fa-2x opacity-25"></i></div>
-                    <div>
-                        <div class="fs-3 fw-semibold" id="ringkasan-belum-presensi"><?= esc($ringkasan['belum_presensi'] ?? 0); ?></div>
-                        <div class="fs-sm fw-semibold text-uppercase text-muted">Belum Presensi</div>
-                    </div>
-                </div>
-            </a>
-        </div>
-    </div>
-
-    <div class="row">
         <?php
-        $statusDatangCards = [
-            ['id' => 'hadir', 'label' => 'Hadir', 'icon' => 'fa-user-check', 'class' => 'text-success'],
-            ['id' => 'telat', 'label' => 'Telat', 'icon' => 'fa-clock', 'class' => 'text-warning'],
-            ['id' => 'alpa', 'label' => 'Alpa', 'icon' => 'fa-user-xmark', 'class' => 'text-danger'],
-            ['id' => 'izin', 'label' => 'Izin', 'icon' => 'fa-file-signature', 'class' => 'text-info'],
-            ['id' => 'sakit', 'label' => 'Sakit', 'icon' => 'fa-notes-medical', 'class' => 'text-primary'],
-            ['id' => 'libur', 'label' => 'Libur', 'icon' => 'fa-umbrella-beach', 'class' => 'text-secondary'],
+        $ringkasanUtamaCards = [
+            ['id' => 'total-jadwal', 'key' => 'total_jadwal', 'label' => 'Total Jadwal', 'icon' => 'fa-calendar-days', 'class' => 'text-dark'],
+            ['id' => 'total-presensi', 'key' => 'total_presensi', 'label' => 'Total Record Presensi', 'icon' => 'fa-clipboard-check', 'class' => 'text-dark'],
+            ['id' => 'belum-sinkron', 'key' => 'belum_sinkron', 'label' => 'Belum Sinkron', 'icon' => 'fa-clock-rotate-left', 'class' => 'text-warning'],
         ];
         ?>
-        <?php foreach ($statusDatangCards as $card): ?>
-            <div class="col-6 col-xl-2">
+
+        <?php foreach ($ringkasanUtamaCards as $card): ?>
+            <div class="col-6 col-xl-4">
                 <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
                     <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                        <div class="d-none d-sm-block"><i class="fa <?= esc($card['icon']); ?> fa-2x opacity-25"></i></div>
+                        <div class="d-none d-sm-block">
+                            <i class="fa <?= esc($card['icon']); ?> fa-2x opacity-25"></i>
+                        </div>
                         <div>
-                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="ringkasan-<?= esc($card['id']); ?>"><?= esc($ringkasan[$card['id']] ?? 0); ?></div>
+                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="ringkasan-<?= esc($card['id']); ?>">
+                                <?= esc($ringkasan[$card['key']] ?? 0); ?>
+                            </div>
                             <div class="fs-sm fw-semibold text-uppercase text-muted"><?= esc($card['label']); ?></div>
                         </div>
                     </div>
@@ -68,19 +34,55 @@
 
     <div class="row">
         <?php
-        $statusPulangCards = [
-            ['id' => 'belum-pulang', 'key' => 'belum_pulang', 'label' => 'Belum Pulang', 'icon' => 'fa-door-open', 'class' => 'text-secondary'],
-            ['id' => 'pulang', 'key' => 'pulang', 'label' => 'Pulang', 'icon' => 'fa-right-from-bracket', 'class' => 'text-success'],
+        $hasilPresensiCards = [
+            ['id' => 'hadir', 'key' => 'hadir', 'label' => 'Hadir', 'icon' => 'fa-user-check', 'class' => 'text-success'],
+            ['id' => 'alpa', 'key' => 'alpa', 'label' => 'Alpa', 'icon' => 'fa-user-xmark', 'class' => 'text-danger'],
+            ['id' => 'izin', 'key' => 'izin', 'label' => 'Izin', 'icon' => 'fa-file-signature', 'class' => 'text-info'],
+            ['id' => 'sakit', 'key' => 'sakit', 'label' => 'Sakit', 'icon' => 'fa-notes-medical', 'class' => 'text-primary'],
+            ['id' => 'libur', 'key' => 'libur', 'label' => 'Libur', 'icon' => 'fa-umbrella-beach', 'class' => 'text-secondary'],
+        ];
+        ?>
+
+        <?php foreach ($hasilPresensiCards as $card): ?>
+            <div class="col-6 col-xl">
+                <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                    <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
+                        <div class="d-none d-sm-block">
+                            <i class="fa <?= esc($card['icon']); ?> fa-2x opacity-25"></i>
+                        </div>
+                        <div>
+                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="ringkasan-<?= esc($card['id']); ?>">
+                                <?= esc($ringkasan[$card['key']] ?? 0); ?>
+                            </div>
+                            <div class="fs-sm fw-semibold text-uppercase text-muted"><?= esc($card['label']); ?></div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+    <div class="row">
+        <?php
+        $detailScanCards = [
+            ['id' => 'tepat-waktu-datang', 'key' => 'tepat_waktu_datang', 'label' => 'Datang Tepat Waktu', 'icon' => 'fa-person-circle-check', 'class' => 'text-success'],
+            ['id' => 'telat', 'key' => 'telat', 'label' => 'Datang Telat', 'icon' => 'fa-clock', 'class' => 'text-warning'],
+            ['id' => 'tepat-waktu-pulang', 'key' => 'tepat_waktu_pulang', 'label' => 'Pulang Tepat Waktu', 'icon' => 'fa-right-from-bracket', 'class' => 'text-success'],
             ['id' => 'pulang-cepat', 'key' => 'pulang_cepat', 'label' => 'Pulang Cepat', 'icon' => 'fa-person-walking-arrow-right', 'class' => 'text-warning'],
         ];
         ?>
-        <?php foreach ($statusPulangCards as $card): ?>
-            <div class="col-6 col-xl-4">
+
+        <?php foreach ($detailScanCards as $card): ?>
+            <div class="col-6 col-xl-3">
                 <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
                     <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                        <div class="d-none d-sm-block"><i class="fa <?= esc($card['icon']); ?> fa-2x opacity-25"></i></div>
+                        <div class="d-none d-sm-block">
+                            <i class="fa <?= esc($card['icon']); ?> fa-2x opacity-25"></i>
+                        </div>
                         <div>
-                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="ringkasan-<?= esc($card['id']); ?>"><?= esc($ringkasan[$card['key']] ?? 0); ?></div>
+                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="ringkasan-<?= esc($card['id']); ?>">
+                                <?= esc($ringkasan[$card['key']] ?? 0); ?>
+                            </div>
                             <div class="fs-sm fw-semibold text-uppercase text-muted"><?= esc($card['label']); ?></div>
                         </div>
                     </div>
@@ -135,6 +137,7 @@
                     <th><b>STATUS DATANG</b></th>
                     <th><b>JAM PULANG</b></th>
                     <th><b>STATUS PULANG</b></th>
+                    <th><b>HASIL PRESENSI</b></th>
                     <th><b>SUMBER</b></th>
                     <th class="text-center"><b>AKSI</b></th>
                 </tr>
@@ -287,6 +290,10 @@
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Status Pulang</label>
                             <div id="detail-status_pulang" class="form-control bg-body-light">-</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Hasil Presensi</label>
+                            <div id="detail-hasil_presensi" class="form-control bg-body-light">-</div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Menit Telat</label>

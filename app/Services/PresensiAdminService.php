@@ -68,16 +68,18 @@ class PresensiAdminService extends BaseService
                     'total_presensi'  => $totalPresensi,
                     'belum_presensi'  => max($totalJadwal - $totalPresensi, 0),
 
-                    'hadir'           => $this->presensiModel->countByTanggalDanStatusDatang($tanggal, 'hadir'),
-                    'telat'           => $this->presensiModel->countByTanggalDanStatusDatang($tanggal, 'telat'),
-                    'alpa'            => $this->presensiModel->countByTanggalDanStatusDatang($tanggal, 'alpa'),
-                    'izin'            => $this->presensiModel->countByTanggalDanStatusDatang($tanggal, 'izin'),
-                    'sakit'           => $this->presensiModel->countByTanggalDanStatusDatang($tanggal, 'sakit'),
-                    'libur'           => $this->presensiModel->countByTanggalDanStatusDatang($tanggal, 'libur'),
+                    'belum_sinkron'        => (int) $this->presensiModel->countByTanggalDanHasilPresensiNull($tanggal) + ((int) $totalJadwal - (int) $totalPresensi),
 
-                    'belum_pulang'    => $this->presensiModel->countByTanggalDanStatusPulang($tanggal, 'belum_pulang'),
-                    'pulang'          => $this->presensiModel->countByTanggalDanStatusPulang($tanggal, 'pulang'),
-                    'pulang_cepat'    => $this->presensiModel->countByTanggalDanStatusPulang($tanggal, 'pulang_cepat'),
+                    'hadir'                => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'hadir'),
+                    'alpa'                 => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'alpa'),
+                    'izin'                 => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'izin'),
+                    'sakit'                => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'sakit'),
+                    'libur'                => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'libur'),
+
+                    'tepat_waktu_datang'   => $this->presensiModel->countByTanggalDanStatusDatang($tanggal, 'tepat_waktu'),
+                    'telat'                => $this->presensiModel->countByTanggalDanStatusDatang($tanggal, 'telat'),
+                    'tepat_waktu_pulang'   => $this->presensiModel->countByTanggalDanStatusPulang($tanggal, 'tepat_waktu'),
+                    'pulang_cepat'         => $this->presensiModel->countByTanggalDanStatusPulang($tanggal, 'pulang_cepat'),
                 ],
             ]);
         });
@@ -603,7 +605,7 @@ class PresensiAdminService extends BaseService
     public function badgeStatusPulang(?string $status): string
     {
         return match ($status) {
-            'tepat_waktu'       => '<span class="badge bg-success">Tepat Waktu</span>',
+            'tepat_waktu'  => '<span class="badge bg-success">Tepat Waktu</span>',
             'pulang_cepat' => '<span class="badge bg-warning">Pulang Cepat</span>',
             default        => '<span class="badge bg-secondary">-</span>',
         };
@@ -616,6 +618,18 @@ class PresensiAdminService extends BaseService
             'sinkron'       => '<span class="badge bg-info">Sinkron</span>',
             'lupa_presensi' => '<span class="badge bg-warning">Lupa Presensi</span>',
             default         => '<span class="badge bg-secondary">-</span>',
+        };
+    }
+
+    public function badgeHasilPresensi(?string $hasil): string
+    {
+        return match ($hasil) {
+            'hadir' => '<span class="badge bg-success">Hadir</span>',
+            'alpa'  => '<span class="badge bg-danger">Alpa</span>',
+            'izin'  => '<span class="badge bg-info">Izin</span>',
+            'sakit' => '<span class="badge bg-primary">Sakit</span>',
+            'libur' => '<span class="badge bg-secondary">Libur</span>',
+            default => '<span class="badge bg-light text-dark">Belum Sinkron</span>',
         };
     }
 }

@@ -197,4 +197,11 @@ class PresensiModel extends Model
             ->where('status_pulang', 'pulang_cepat')
             ->countAllResults();
     }
+
+    public function countByTanggalDanHasilPresensiNull(string $tanggal): int
+    {
+        return (int) $this->where('tanggal', $tanggal)
+            ->where('hasil_presensi', null)
+            ->countAllResults();
+    }
 }
