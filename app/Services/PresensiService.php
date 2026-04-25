@@ -167,7 +167,7 @@ class PresensiService extends BaseService
         $toleransiMenit = (int) ($shift->toleransi_telat_menit ?? 0);
         $batasToleransi = (clone $jamMasuk)->modify('+' . $toleransiMenit . ' minutes');
 
-        $statusPreview = 'hadir';
+        $statusPreview = 'tepat_waktu';
         $menitTelat    = 0;
 
         if ($now > $batasToleransi) {
@@ -219,7 +219,7 @@ class PresensiService extends BaseService
             return $this->hasilGagal([], 'Batas presensi pulang sudah lewat');
         }
 
-        $statusPreview = 'pulang';
+        $statusPreview = 'tepat_waktu';
         $menitPulangCepat = 0;
 
         if ($now < $jamPulang) {
@@ -257,7 +257,7 @@ class PresensiService extends BaseService
         $toleransiMenit = (int) ($shift->toleransi_telat_menit ?? 0);
         $batasToleransi = (clone $jamMasuk)->modify('+' . $toleransiMenit . ' minutes');
 
-        $statusDatang = 'hadir';
+        $statusDatang = 'tepat_waktu';
         $menitTelat   = 0;
 
         if ($now > $batasToleransi) {
@@ -273,7 +273,8 @@ class PresensiService extends BaseService
             'jam_datang'         => $now->format('Y-m-d H:i:s'),
             'jam_pulang'         => null,
             'status_datang'      => $statusDatang,
-            'status_pulang'      => 'belum_pulang',
+            'status_pulang'      => null,
+            'hasil_presensi'     => null,
             'menit_telat'        => $menitTelat,
             'menit_pulang_cepat' => 0,
             'selfie_datang'      => $this->stringAtauNull($selfiePath),
@@ -326,7 +327,7 @@ class PresensiService extends BaseService
 
         $jamPulang = $this->gabungTanggalJam($tanggalKerja, (string) $shift->jam_pulang);
 
-        $statusPulang = 'pulang';
+        $statusPulang = 'tepat_waktu';
         $menitPulangCepat = 0;
 
         if ($now < $jamPulang) {

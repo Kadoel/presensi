@@ -63,6 +63,9 @@ Vagrantfile
 /writable/debugbar/*
 !/writable/debugbar/index.html
 
+/public/assests/uploads/selfie_presensi/*
+/public/assests/media/lampiran/*
+/public/assests/media/pegawai/*
 php_errors.log
 
 #-------------------------

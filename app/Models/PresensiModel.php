@@ -32,6 +32,7 @@ class PresensiModel extends Model
         'catatan_admin',
         'is_manual',
         'sumber_presensi',
+        'hasil_presensi',
     ];
 
     public function getPresensiByPegawaiDanTanggal(int $pegawaiId, string $tanggal): ?object
@@ -65,6 +66,7 @@ class PresensiModel extends Model
                 presensi.catatan_admin,
                 presensi.is_manual,
                 presensi.sumber_presensi,
+                presensi.hasil_presensi,
                 pegawai.kode_pegawai,
                 pegawai.nama_pegawai,
                 shift.kode_shift,
@@ -135,6 +137,7 @@ class PresensiModel extends Model
                 presensi.status_datang,
                 presensi.status_pulang,
                 presensi.sumber_presensi,
+                presensi.hasil_presensi,
                 pegawai.kode_pegawai,
                 pegawai.nama_pegawai,
                 shift.nama_shift
@@ -146,34 +149,6 @@ class PresensiModel extends Model
             ->limit($limit)
             ->get()
             ->getResult();
-    }
-
-    public function countHadirByTanggal(string $tanggal): int
-    {
-        return (int) $this->where('tanggal', $tanggal)
-            ->where('status_datang', 'hadir')
-            ->countAllResults();
-    }
-
-    public function countTelatByTanggal(string $tanggal): int
-    {
-        return (int) $this->where('tanggal', $tanggal)
-            ->where('status_datang', 'telat')
-            ->countAllResults();
-    }
-
-    public function countAlpaByTanggal(string $tanggal): int
-    {
-        return (int) $this->where('tanggal', $tanggal)
-            ->where('status_datang', 'alpa')
-            ->countAllResults();
-    }
-
-    public function countIzinSakitByTanggal(string $tanggal): int
-    {
-        return (int) $this->where('tanggal', $tanggal)
-            ->whereIn('status_datang', ['izin', 'sakit'])
-            ->countAllResults();
     }
 
     public function getPresensiHariIni(string $tanggal, int $limit = 10): array
@@ -189,6 +164,7 @@ class PresensiModel extends Model
             presensi.menit_telat,
             pegawai.kode_pegawai,
             pegawai.nama_pegawai,
+            presensi.hasil_presensi,
             shift.nama_shift
         ')
             ->join('pegawai', 'pegawai.id = presensi.pegawai_id', 'left')
@@ -197,5 +173,28 @@ class PresensiModel extends Model
             ->orderBy('presensi.jam_datang', 'DESC')
             ->limit($limit)
             ->findAll();
+    }
+
+    //
+    public function countByTanggalDanHasilPresensi(string $tanggal, string $hasil): int
+    {
+        return (int) $this->where([
+            'tanggal'         => $tanggal,
+            'hasil_presensi' => $hasil,
+        ])->countAllResults();
+    }
+
+    public function countTelatByTanggal(string $tanggal): int
+    {
+        return (int) $this->where('tanggal', $tanggal)
+            ->where('status_datang', 'telat')
+            ->countAllResults();
+    }
+
+    public function countPulangCepatByTanggal(string $tanggal): int
+    {
+        return (int) $this->where('tanggal', $tanggal)
+            ->where('status_pulang', 'pulang_cepat')
+            ->countAllResults();
     }
 }

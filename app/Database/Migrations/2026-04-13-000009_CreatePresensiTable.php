@@ -45,12 +45,12 @@ class CreatePresensiTable extends Migration
             ],
             'status_datang' => [
                 'type'       => 'ENUM',
-                'constraint' => ['hadir', 'telat', 'izin', 'sakit', 'alpa', 'libur'],
+                'constraint' => ['tepat_waktu', 'telat'],
                 'null'       => true,
             ],
             'status_pulang' => [
                 'type'       => 'ENUM',
-                'constraint' => ['pulang', 'pulang_cepat', 'belum_pulang'],
+                'constraint' => ['tepat_waktu', 'pulang_cepat'],
                 'null'       => true,
             ],
             'menit_telat' => [
@@ -62,6 +62,11 @@ class CreatePresensiTable extends Migration
                 'type'       => 'INT',
                 'constraint' => 11,
                 'default'    => 0,
+            ],
+            'hasil_presensi' => [
+                'type'       => 'ENUM',
+                'constraint' => ['hadir', 'alpa', 'izin', 'sakit', 'libur'],
+                'null'       => true,
             ],
             'selfie_datang' => [
                 'type'       => 'VARCHAR',

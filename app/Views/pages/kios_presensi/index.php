@@ -1302,20 +1302,22 @@
                 let pesanPreview = hasil.pesan || 'QRCode valid.';
 
                 if (data.mode === 'datang') {
-                    if (typeof data.preview_telat !== 'undefined' && Number(data.preview_telat) > 0) {
-                        pesanPreview += '. Status: ' + (KadoelHelper.toCapitalizeEachWord(data.preview_status) || '-') + ' | Telat: ' + data.preview_telat + ' menit';
+                    if (data.preview_status === 'telat' && Number(data.preview_telat) > 0) {
+                        pesanPreview += '. Status: ' + (KadoelHelper.toCapitalizeEachWord(data.preview_status) || '-') + ' (' + data.preview_telat + ' menit)';
                     } else {
                         pesanPreview += '. Status: ' + (KadoelHelper.toCapitalizeEachWord(data.preview_status) || '-');
                     }
                 }
 
                 if (data.mode === 'pulang') {
-                    if (typeof data.preview_pulang_cepat !== 'undefined' && Number(data.preview_pulang_cepat) > 0) {
-                        pesanPreview += '. Status: ' + (KadoelHelper.toCapitalizeEachWord(data.preview_status) || '-') + ' | Pulang Cepat: ' + data.preview_pulang_cepat + ' menit';
+                    if (data.preview_status === 'pulang_cepat' && Number(data.preview_pulang_cepat) > 0) {
+                        pesanPreview += '. Status: ' + (KadoelHelper.toCapitalizeEachWord(data.preview_status) || '-') + ' (' + data.preview_pulang_cepat + ' menit)';
                     } else {
                         pesanPreview += '. Status: ' + (KadoelHelper.toCapitalizeEachWord(data.preview_status) || '-');
                     }
                 }
+
+                console.log(pesanPreview);
 
                 isQrLocked = true;
 
@@ -1382,14 +1384,14 @@
 
                 if (hasil.tipe === 'datang') {
                     pesan += '. <br />Status: ' + (KadoelHelper.toCapitalizeEachWord(hasil.status) || '-');
-                    if (typeof hasil.menit_telat !== 'undefined') {
+                    if (hasil.status === 'telat') {
                         pesan += ' (' + hasil.menit_telat + ' menit)';
                     }
                 }
 
                 if (hasil.tipe === 'pulang') {
                     pesan += '. <br />Status: ' + (KadoelHelper.toCapitalizeEachWord(hasil.status) || '-');
-                    if (typeof hasil.menit_pulang_cepat !== 'undefined') {
+                    if (hasil.status === 'pulang_cepat') {
                         pesan += ' (' + hasil.menit_pulang_cepat + ' menit)';
                     }
                 }

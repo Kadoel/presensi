@@ -114,6 +114,7 @@ class PresensiAdminService extends BaseService
                     'tanggal'         => $tanggal,
                     'jumlah_diproses' => 0,
                     'jumlah_dilewati' => 0,
+                    'jumlah_hadir'    => 0,
                     'jumlah_alpa'     => 0,
                     'jumlah_izin'     => 0,
                     'jumlah_sakit'    => 0,
@@ -123,6 +124,7 @@ class PresensiAdminService extends BaseService
 
             $jumlahDiproses = 0;
             $jumlahDilewati = 0;
+            $jumlahHadir = 0;
             $jumlahAlpa = 0;
             $jumlahIzin = 0;
             $jumlahSakit = 0;
@@ -136,77 +138,64 @@ class PresensiAdminService extends BaseService
                     continue;
                 }
 
-                $presensiExisting = $this->presensiModel->getPresensiByPegawaiDanTanggal($pegawaiId, $tanggal);
+                $statusHari = (string) ($jadwal->status_hari ?? '');
 
-                if ($presensiExisting !== null) {
-                    $statusDatangExisting = $presensiExisting->status_datang ?? null;
-                    $statusPulangExisting = $presensiExisting->status_pulang ?? null;
+                $presensiExisting = $this->presensiModel
+                    ->getPresensiByPegawaiDanTanggal($pegawaiId, $tanggal);
 
-                    if (
-                        in_array($statusDatangExisting, ['hadir', 'telat'], true)
-                        && empty($statusPulangExisting)
-                    ) {
-                        $update = $this->presensiModel->update((int) $presensiExisting->id, [
-                            'status_datang'      => 'alpa',
-                            'status_pulang'      => null,
-                            'menit_telat'        => 0,
-                            'menit_pulang_cepat' => 0,
-                            'catatan_admin'      => trim(($presensiExisting->catatan_admin ?? '') . ' | Diubah alpa otomatis karena tidak presensi pulang'),
-                            'is_manual'          => 1,
-                            'sumber_presensi'    => 'sinkron',
-                        ]);
+                $hasilPresensi = $this->tentukanHasilPresensiSinkron($statusHari, $presensiExisting);
 
-                        if ($update) {
-                            $jumlahDiproses++;
-                            $jumlahAlpa++;
-                        } else {
-                            $jumlahDilewati++;
-                        }
+                if ($hasilPresensi === null) {
+                    $jumlahDilewati++;
+                    continue;
+                }
 
+                if (is_object($presensiExisting)) {
+                    $update = $this->presensiModel->update((int) $presensiExisting->id, [
+                        'hasil_presensi' => $hasilPresensi,
+                        'catatan_admin'  => $this->catatanSinkron($presensiExisting->catatan_admin ?? null, $hasilPresensi),
+                        'is_manual'      => 1,
+                        'sumber_presensi' => 'sinkron',
+                    ]);
+
+                    if (! $update) {
+                        $jumlahDilewati++;
                         continue;
                     }
+                } else {
+                    $insert = $this->presensiModel->insert([
+                        'pegawai_id'         => $pegawaiId,
+                        'tanggal'            => $tanggal,
+                        'jadwal_kerja_id'    => (int) ($jadwal->id ?? 0),
+                        'shift_id'           => $this->intAtauNull($jadwal->shift_id ?? null),
+                        'jam_datang'         => null,
+                        'jam_pulang'         => null,
+                        'status_datang'      => null,
+                        'status_pulang'      => null,
+                        'hasil_presensi'     => $hasilPresensi,
+                        'menit_telat'        => 0,
+                        'menit_pulang_cepat' => 0,
+                        'selfie_datang'      => null,
+                        'selfie_pulang'      => null,
+                        'barcode_datang'     => null,
+                        'barcode_pulang'     => null,
+                        'ip_address'         => null,
+                        'user_agent'         => null,
+                        'catatan_admin'      => 'Sinkron otomatis dari jadwal kerja',
+                        'is_manual'          => 1,
+                        'sumber_presensi'    => 'sinkron',
+                    ]);
 
-                    $jumlahDilewati++;
-                    continue;
-                }
-
-                $statusDatang = $this->mapStatusDatangDariJadwal((string) ($jadwal->status_hari ?? ''));
-
-                if ($statusDatang === null) {
-                    $jumlahDilewati++;
-                    continue;
-                }
-
-                $insert = $this->presensiModel->insert([
-                    'pegawai_id'         => $pegawaiId,
-                    'tanggal'            => $tanggal,
-                    'jadwal_kerja_id'    => (int) ($jadwal->id ?? 0),
-                    'shift_id'           => $this->intAtauNull($jadwal->shift_id ?? null),
-                    'jam_datang'         => null,
-                    'jam_pulang'         => null,
-                    'status_datang'      => $statusDatang,
-                    'status_pulang'      => null,
-                    'menit_telat'        => 0,
-                    'menit_pulang_cepat' => 0,
-                    'selfie_datang'      => null,
-                    'selfie_pulang'      => null,
-                    'barcode_datang'     => null,
-                    'barcode_pulang'     => null,
-                    'ip_address'         => null,
-                    'user_agent'         => null,
-                    'catatan_admin'      => 'Sinkron otomatis dari jadwal kerja',
-                    'is_manual'          => 1,
-                    'sumber_presensi'    => 'sinkron',
-                ]);
-
-                if (! $insert) {
-                    $jumlahDilewati++;
-                    continue;
+                    if (! $insert) {
+                        $jumlahDilewati++;
+                        continue;
+                    }
                 }
 
                 $jumlahDiproses++;
 
-                match ($statusDatang) {
+                match ($hasilPresensi) {
+                    'hadir' => $jumlahHadir++,
                     'alpa'  => $jumlahAlpa++,
                     'izin'  => $jumlahIzin++,
                     'sakit' => $jumlahSakit++,
@@ -220,7 +209,8 @@ class PresensiAdminService extends BaseService
                 'presensi',
                 null,
                 'Sinkron presensi tanggal ' . tanggal_indonesia($tanggal) .
-                    ' | alpa: ' . $jumlahAlpa .
+                    ' | hadir: ' . $jumlahHadir .
+                    ', alpa: ' . $jumlahAlpa .
                     ', izin: ' . $jumlahIzin .
                     ', sakit: ' . $jumlahSakit .
                     ', libur: ' . $jumlahLibur .
@@ -231,12 +221,44 @@ class PresensiAdminService extends BaseService
                 'tanggal'         => $tanggal,
                 'jumlah_diproses' => $jumlahDiproses,
                 'jumlah_dilewati' => $jumlahDilewati,
+                'jumlah_hadir'    => $jumlahHadir,
                 'jumlah_alpa'     => $jumlahAlpa,
                 'jumlah_izin'     => $jumlahIzin,
                 'jumlah_sakit'    => $jumlahSakit,
                 'jumlah_libur'    => $jumlahLibur,
             ]);
         });
+    }
+
+    protected function tentukanHasilPresensiSinkron(string $statusHari, ?object $presensi): ?string
+    {
+        return match ($statusHari) {
+            'izin'  => 'izin',
+            'sakit' => 'sakit',
+            'libur' => 'libur',
+            'kerja' => (
+                is_object($presensi)
+                && ! empty($presensi->status_datang)
+                && ! empty($presensi->status_pulang)
+            ) ? 'hadir' : 'alpa',
+            default => null,
+        };
+    }
+
+    protected function catatanSinkron(?string $catatanLama, string $hasilPresensi): string
+    {
+        $catatanLama = trim((string) $catatanLama);
+        $catatanBaru = 'Sinkron hasil presensi: ' . $hasilPresensi;
+
+        if ($catatanLama === '') {
+            return $catatanBaru;
+        }
+
+        if (str_contains($catatanLama, 'Sinkron hasil presensi:')) {
+            return $catatanLama;
+        }
+
+        return $catatanLama . ' | ' . $catatanBaru;
     }
 
     protected function validasiWaktuSinkron(string $tanggal): ?array
@@ -263,12 +285,12 @@ class PresensiAdminService extends BaseService
         $batasTimestamp = strtotime($tanggal . ' ' . $batasAkhir);
         $sekarang = time();
 
-        if ($sekarang <= $batasTimestamp) {
-            return $this->hasilGagal(
-                [],
-                'Sinkron presensi hari ini hanya bisa setelah batas akhir pulang: ' . substr($batasAkhir, 0, 5)
-            );
-        }
+        // if ($sekarang <= $batasTimestamp) {
+        //     return $this->hasilGagal(
+        //         [],
+        //         'Sinkron presensi hari ini hanya bisa setelah batas akhir pulang: ' . substr($batasAkhir, 0, 5)
+        //     );
+        // }
 
         return null;
     }
@@ -575,12 +597,8 @@ class PresensiAdminService extends BaseService
     public function badgeStatusDatang(?string $status): string
     {
         return match ($status) {
-            'hadir' => '<span class="badge bg-success">Hadir</span>',
+            'tepat_waktu' => '<span class="badge bg-success">Tepat Waktu</span>',
             'telat' => '<span class="badge bg-warning">Telat</span>',
-            'alpa'  => '<span class="badge bg-danger">Alpa</span>',
-            'izin'  => '<span class="badge bg-info">Izin</span>',
-            'sakit' => '<span class="badge bg-primary">Sakit</span>',
-            'libur' => '<span class="badge bg-secondary">Libur</span>',
             default => '<span class="badge bg-secondary">-</span>',
         };
     }
@@ -588,8 +606,7 @@ class PresensiAdminService extends BaseService
     public function badgeStatusPulang(?string $status): string
     {
         return match ($status) {
-            'belum_pulang' => '<span class="badge bg-secondary">Belum Pulang</span>',
-            'pulang'       => '<span class="badge bg-success">Pulang</span>',
+            'tepat_waktu'       => '<span class="badge bg-success">Tepat Waktu</span>',
             'pulang_cepat' => '<span class="badge bg-warning">Pulang Cepat</span>',
             default        => '<span class="badge bg-secondary">-</span>',
         };
