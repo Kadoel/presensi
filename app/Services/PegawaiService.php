@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\JabatanModel;
 use App\Models\PegawaiModel;
+use App\Models\PresensiModel;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
@@ -14,6 +15,7 @@ class PegawaiService extends BaseService
     protected PegawaiModel $pegawaiModel;
     protected JabatanModel $jabatanModel;
     protected SettingsService $settingsService;
+    protected PresensiModel $presensiModel;
 
     public function __construct()
     {
@@ -21,6 +23,7 @@ class PegawaiService extends BaseService
         $this->pegawaiModel = new PegawaiModel();
         $this->jabatanModel = new JabatanModel();
         $this->settingsService = new SettingsService();
+        $this->presensiModel = new PresensiModel();
     }
 
     public function dataJabatanSelect()
@@ -291,6 +294,22 @@ class PegawaiService extends BaseService
                 return $this->hasilTidakDitemukan('Data Pegawai Tidak Ditemukan');
             }
 
+            $statusLama = (int) ($pegawai->is_active ?? 0);
+            $statusBaru = $this->intVal($post['edit-is_active'] ?? 1, 1);
+
+            if ($statusLama === 1 && $statusBaru === 0) {
+                $bulanIni = date('Y-m');
+
+                $jumlahPresensiBulanIni = $this->presensiModel
+                    ->countByPegawaiDanBulan($id, $bulanIni);
+
+                if ($jumlahPresensiBulanIni > 0) {
+                    return $this->hasilGagal([
+                        'edit-is_active' => 'Pegawai tidak dapat dinonaktifkan karena sudah memiliki data presensi pada bulan ini'
+                    ]);
+                }
+            }
+
             $data = [
                 'id'            => $post['edit-id'] ?? $id,
                 'nama_pegawai'  => $this->stringWajib($post['edit-nama_pegawai'] ?? ''),
@@ -300,7 +319,7 @@ class PegawaiService extends BaseService
                 'no_hp'         => $this->stringAtauNull($post['edit-no_hp'] ?? ''),
                 'alamat'        => $this->stringAtauNull($post['edit-alamat'] ?? ''),
                 'jabatan_id'    => $this->intAtauNull($post['edit-jabatan_id'] ?? null),
-                'is_active'     => $this->intVal($post['edit-is_active'] ?? 1, 1),
+                'is_active'     => $statusBaru,
             ];
 
             if ($file && $file->getError() != 4) {

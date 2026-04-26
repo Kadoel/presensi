@@ -175,4 +175,12 @@ class JadwalKerjaModel extends Model
             ->orderBy('tanggal', 'ASC')
             ->findAll();
     }
+
+    public function countStatusKerjaByTanggal($tanggal)
+    {
+        return $this->jadwalKerjaModel
+            ->where('tanggal', $tanggal)
+            ->where('status_hari', 'kerja')
+            ->countAllResults();
+    }
 }

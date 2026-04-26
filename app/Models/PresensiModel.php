@@ -213,4 +213,11 @@ class PresensiModel extends Model
             ->orderBy('tanggal', 'ASC')
             ->findAll();
     }
+
+    public function countByPegawaiDanBulan(int $pegawaiId, string $bulan): int
+    {
+        return (int) $this->where('pegawai_id', $pegawaiId)
+            ->where('DATE_FORMAT(tanggal, "%Y-%m") =', $bulan)
+            ->countAllResults();
+    }
 }

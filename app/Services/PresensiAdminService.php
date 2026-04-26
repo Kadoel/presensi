@@ -253,8 +253,8 @@ class PresensiAdminService extends BaseService
             return $catatanBaru;
         }
 
-        if (str_contains($catatanLama, 'Sinkron hasil presensi:')) {
-            return $catatanLama;
+        if (preg_match('/Sinkron hasil presensi: [a-z_]+/i', $catatanLama)) {
+            return preg_replace('/Sinkron hasil presensi: [a-z_]+/i', $catatanBaru, $catatanLama);
         }
 
         return $catatanLama . ' | ' . $catatanBaru;
@@ -274,6 +274,11 @@ class PresensiAdminService extends BaseService
             return null;
         }
 
+        $totalJadwalKerja = (int) $this->jadwalKerjaModel->countStatusKerjaByTanggal($tanggal);
+        if ($totalJadwalKerja < 1) {
+            return null;
+        }
+
         // 🔥 Hari ini → cek batas akhir pulang
         $batasAkhir = $this->jadwalKerjaModel->getBatasAkhirPulangTerakhir($tanggal);
 
@@ -284,12 +289,12 @@ class PresensiAdminService extends BaseService
         $batasTimestamp = strtotime($tanggal . ' ' . $batasAkhir);
         $sekarang = time();
 
-        // if ($sekarang <= $batasTimestamp) {
-        //     return $this->hasilGagal(
-        //         [],
-        //         'Sinkron presensi hari ini hanya bisa setelah batas akhir pulang: ' . substr($batasAkhir, 0, 5)
-        //     );
-        // }
+        if ($sekarang <= $batasTimestamp) {
+            return $this->hasilGagal(
+                [],
+                'Sinkron presensi hari ini hanya bisa setelah batas akhir pulang: ' . substr($batasAkhir, 0, 5)
+            );
+        }
 
         return null;
     }
@@ -374,9 +379,15 @@ class PresensiAdminService extends BaseService
             $jamPulangInput = $this->stringAtauNull($post['jam_pulang'] ?? null);
             $jamPulang = $jamPulangInput ? $this->formatDateTimePresensi($tanggal, $jamPulangInput) : null;
 
+            if ($jamPulangInput !== null && $jamPulang <= $jamDatang) {
+                return $this->hasilGagal([
+                    'jam_pulang' => 'Jam pulang harus lebih besar dari jam datang'
+                ]);
+            }
+
             $statusDatang = $this->hitungStatusDatangLupa($tanggal, $post['jam_datang'], $jadwal);
             $statusPulang = $jamPulangInput ? $this->hitungStatusPulangLupa($tanggal, $jamPulangInput, $jadwal) : [
-                'status' => 'belum_pulang',
+                'status' => null,
                 'menit_pulang_cepat' => 0,
             ];
 
@@ -391,6 +402,7 @@ class PresensiAdminService extends BaseService
                 'status_pulang'      => $statusPulang['status'],
                 'menit_telat'        => $statusDatang['menit_telat'],
                 'menit_pulang_cepat' => $statusPulang['menit_pulang_cepat'],
+                'hasil_presensi'     => null,
                 'selfie_datang'      => null,
                 'selfie_pulang'      => null,
                 'barcode_datang'     => null,
@@ -476,13 +488,19 @@ class PresensiAdminService extends BaseService
             $jamPulangInput = $this->stringAtauNull($post['edit-jam_pulang'] ?? null);
             $jamPulang = $jamPulangInput ? $this->formatDateTimePresensi($tanggal, $jamPulangInput) : null;
 
+            if ($jamPulangInput !== null && $jamPulang <= $jamDatang) {
+                return $this->hasilGagal([
+                    'edit-jam_pulang' => 'Jam pulang harus lebih besar dari jam datang'
+                ]);
+            }
+
             if ($tanggal > date('Y-m-d')) {
                 return $this->hasilGagal([], 'Lupa presensi tanggal setelah hari ini tidak dapat diubah');
             }
 
             $statusDatang = $this->hitungStatusDatangLupa($tanggal, $post['edit-jam_datang'], $jadwal);
             $statusPulang = $jamPulangInput ? $this->hitungStatusPulangLupa($tanggal, $jamPulangInput, $jadwal) : [
-                'status' => 'belum_pulang',
+                'status' => null,
                 'menit_pulang_cepat' => 0,
             ];
 
@@ -493,6 +511,7 @@ class PresensiAdminService extends BaseService
                 'status_pulang'      => $statusPulang['status'],
                 'menit_telat'        => $statusDatang['menit_telat'],
                 'menit_pulang_cepat' => $statusPulang['menit_pulang_cepat'],
+                'hasil_presensi'     => null,
                 'catatan_admin'      => $this->stringWajib($post['edit-catatan_admin']),
             ]);
 
@@ -539,17 +558,6 @@ class PresensiAdminService extends BaseService
         return null;
     }
 
-    protected function mapStatusDatangDariJadwal(string $statusHari): ?string
-    {
-        return match ($statusHari) {
-            'kerja' => 'alpa',
-            'izin'  => 'izin',
-            'sakit' => 'sakit',
-            'libur' => 'libur',
-            default => null,
-        };
-    }
-
     protected function formatDateTimePresensi(string $tanggal, string $jam): string
     {
         return $tanggal . ' ' . $this->formatJam($jam);
@@ -570,7 +578,7 @@ class PresensiAdminService extends BaseService
         }
 
         return [
-            'status' => 'hadir',
+            'status' => 'tepat_waktu',
             'menit_telat' => 0,
         ];
     }
@@ -588,7 +596,7 @@ class PresensiAdminService extends BaseService
         }
 
         return [
-            'status' => 'pulang',
+            'status' => 'tepat_waktu',
             'menit_pulang_cepat' => 0,
         ];
     }
