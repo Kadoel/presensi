@@ -240,4 +240,16 @@ class PegawaiModel extends Model
     {
         return (int) $this->where('is_active', 1)->countAllResults();
     }
+
+    public function getPegawaiDropdown(): array
+    {
+        $pegawai = $this->db->table('pegawai')
+            ->select('pegawai.id, pegawai.kode_pegawai, pegawai.nama_pegawai')
+            ->where('pegawai.is_active', 1)
+            ->orderBy('pegawai.nama_pegawai', 'ASC')
+            ->get()
+            ->getResult();
+
+        return $pegawai;
+    }
 }

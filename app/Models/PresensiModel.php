@@ -204,4 +204,13 @@ class PresensiModel extends Model
             ->where('hasil_presensi', null)
             ->countAllResults();
     }
+
+    public function getPresensiPegawaiDalamRentang(int $pegawaiId, string $tanggalMulai, string $tanggalSelesai): array
+    {
+        return $this->where('pegawai_id', $pegawaiId)
+            ->where('tanggal >=', $tanggalMulai)
+            ->where('tanggal <=', $tanggalSelesai)
+            ->orderBy('tanggal', 'ASC')
+            ->findAll();
+    }
 }

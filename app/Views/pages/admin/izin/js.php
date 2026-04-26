@@ -142,6 +142,16 @@
                         $('#tanggal_selesai').val('');
                         $('#alasan').val('');
                         $('#lampiran').val('');
+
+                        const el = document.querySelector('#tanggal_mulai');
+                        if (el && el._flatpickr) {
+                            el._flatpickr.clear();
+                        }
+
+                        const ol = document.querySelector('#tanggal_selesai');
+                        if (ol && ol._flatpickr) {
+                            ol._flatpickr.clear();
+                        }
                         clear_errors_tambah();
                         notifikasi('success', 'right', result['pesan']);
                         data_pengajuan.ajax.reload();
@@ -250,6 +260,16 @@
             $('#edit-tanggal_selesai').val('');
             $('#edit-alasan').val('');
             $('#edit-lampiran').val('');
+
+            const el = document.querySelector('#edit-tanggal_mulai');
+            if (el && el._flatpickr) {
+                el._flatpickr.clear();
+            }
+
+            const ol = document.querySelector('#edit-tanggal_selesai');
+            if (ol && ol._flatpickr) {
+                ol._flatpickr.clear();
+            }
             jQuery('#modal-ubah').modal('hide');
         }
 

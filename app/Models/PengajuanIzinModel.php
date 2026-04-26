@@ -70,6 +70,7 @@ class PengajuanIzinModel extends Model
             ->groupStart()
             ->where('tanggal_mulai <=', $tanggalSelesai)
             ->where('tanggal_selesai >=', $tanggalMulai)
+            ->where('status !=', 'rejected')
             ->groupEnd();
 
         if ($excludeId !== null) {

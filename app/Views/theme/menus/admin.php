@@ -42,6 +42,13 @@ $segment['3'] = $totalSegment > 2 ? current_url(true)->getSegment(3) : '';
 </li>
 
 <li class="nav-main-item">
+    <a class="nav-main-link <?= $segment['2'] == 'jadwal' ? 'active' : ''; ?>" href="<?= base_url('admin/jadwal'); ?>">
+        <i class="nav-main-link-icon fa fa-calendar-alt"></i>
+        <span class="nav-main-link-name">Jadwal Kerja</span>
+    </a>
+</li>
+
+<li class="nav-main-item">
     <a class="nav-main-link <?= $segment['2'] == 'libur' ? 'active' : ''; ?>" href="<?= base_url('admin/libur'); ?>">
         <i class="nav-main-link-icon fa fa-calendar-xmark"></i>
         <span class="nav-main-link-name">Hari Libur</span>
@@ -55,13 +62,6 @@ $segment['3'] = $totalSegment > 2 ? current_url(true)->getSegment(3) : '';
     </a>
 </li>
 
-
-<li class="nav-main-item">
-    <a class="nav-main-link <?= $segment['2'] == 'jadwal' ? 'active' : ''; ?>" href="<?= base_url('admin/jadwal'); ?>">
-        <i class="nav-main-link-icon fa fa-calendar-alt"></i>
-        <span class="nav-main-link-name">Jadwal</span>
-    </a>
-</li>
 
 <li class="nav-main-item">
     <a class="nav-main-link <?= $segment['2'] == 'tukar' ? 'active' : ''; ?>" href="<?= base_url('admin/tukar'); ?>">

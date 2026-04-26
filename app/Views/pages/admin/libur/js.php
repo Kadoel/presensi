@@ -330,6 +330,7 @@
                 },
                 success: function(result) {
                     $("#block-content-ubah").LoadingOverlay("hide");
+                    reset_form_tambah();
 
                     if (result['sukses']) {
                         const hariLibur = result['hari_libur'] || {};

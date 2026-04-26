@@ -191,9 +191,6 @@ class JadwalKerja extends BaseController
                 <button type="button" class="btn btn-sm btn-warning" id="act-edit" data-id="' . $row->id . '">
                     <i class="fa fa-edit text-white"></i>
                 </button>
-                <button type="button" class="btn btn-sm btn-danger" id="act-delete" data-id="' . $row->id . '" data-nama="' . esc($row->nama_pegawai) . '" data-tanggal="' . esc($row->tanggal) . '">
-                    <i class="fa fa-trash-can"></i>
-                </button>
             ';
             })
             ->addNumbering('#')
@@ -218,14 +215,6 @@ class JadwalKerja extends BaseController
     public function update($id)
     {
         $result = $this->jadwalKerjaService->ubah((int) $id, $this->request->getPost());
-
-        return $this->response->setJSON($result);
-    }
-
-    public function delete()
-    {
-        $id = (int) $this->request->getVar('id');
-        $result = $this->jadwalKerjaService->hapus($id);
 
         return $this->response->setJSON($result);
     }

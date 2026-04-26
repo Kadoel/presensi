@@ -6,6 +6,7 @@ use App\Models\JadwalKerjaModel;
 use App\Models\PegawaiModel;
 use App\Models\PengajuanIzinModel;
 use App\Models\HariLiburModel;
+use App\Models\PresensiModel;
 
 class PengajuanIzinService extends BaseService
 {
@@ -13,6 +14,7 @@ class PengajuanIzinService extends BaseService
     protected PegawaiModel $pegawaiModel;
     protected JadwalKerjaModel $jadwalKerjaModel;
     protected HariLiburModel $hariLiburModel;
+    protected PresensiModel $presensiModel;
 
 
     public function __construct()
@@ -22,6 +24,7 @@ class PengajuanIzinService extends BaseService
         $this->pegawaiModel       = new PegawaiModel();
         $this->jadwalKerjaModel   = new JadwalKerjaModel();
         $this->hariLiburModel   = new HariLiburModel();
+        $this->presensiModel = new PresensiModel();
     }
 
     public function dataTabel()
@@ -136,6 +139,28 @@ class PengajuanIzinService extends BaseService
 
             if (! $validasiHariLibur['sukses']) {
                 return $validasiHariLibur;
+            }
+
+            $validasiJadwal = $this->validasiJadwalLengkapDalamRentang(
+                $pegawaiId,
+                $tanggalMulai,
+                $tanggalSelesai,
+                'simpan',
+            );
+
+            if (! $validasiJadwal['sukses']) {
+                return $validasiJadwal;
+            }
+
+            $validasiPresensi = $this->validasiPresensiLengkapDalamRentang(
+                $pegawaiId,
+                $tanggalMulai,
+                $tanggalSelesai,
+                'simpan',
+            );
+
+            if (! $validasiPresensi['sukses']) {
+                return $validasiPresensi;
             }
 
             $bentrok = $this->pengajuanIzinModel->jumlahBentrokTanggal(
@@ -334,6 +359,28 @@ class PengajuanIzinService extends BaseService
                 'edit-tanggal_selesai'
             );
 
+            $validasiJadwal = $this->validasiJadwalLengkapDalamRentang(
+                $pegawaiId,
+                $tanggalMulai,
+                $tanggalSelesai,
+                'ubah'
+            );
+
+            if (! $validasiJadwal['sukses']) {
+                return $validasiJadwal;
+            }
+
+            $validasiPresensi = $this->validasiPresensiLengkapDalamRentang(
+                $pegawaiId,
+                $tanggalMulai,
+                $tanggalSelesai,
+                'ubah',
+            );
+
+            if (! $validasiPresensi['sukses']) {
+                return $validasiPresensi;
+            }
+
             if (! $validasiHariLibur['sukses']) {
                 return $validasiHariLibur;
             }
@@ -429,6 +476,17 @@ class PengajuanIzinService extends BaseService
                 return $this->hasilGagal([], 'Data yang sudah disetujui tidak dapat dihapus');
             }
 
+            $validasiPresensi = $this->validasiPresensiLengkapDalamRentang(
+                $pengajuan->pegawai_id,
+                $pengajuan->tanggal_mulai,
+                $pengajuan->tanggal_selesai,
+                'hapus'
+            );
+
+            if (! $validasiPresensi['sukses']) {
+                return $validasiPresensi;
+            }
+
             $hapus = $this->pengajuanIzinModel->delete($id);
 
             if (! $hapus) {
@@ -462,6 +520,28 @@ class PengajuanIzinService extends BaseService
 
             if (($pengajuan->status ?? 'pending') === 'approved') {
                 return $this->hasilGagal([], 'Data pengajuan sudah disetujui sebelumnya');
+            }
+
+            $validasiJadwal = $this->validasiJadwalLengkapDalamRentang(
+                $pengajuan->pegawai_id,
+                $pengajuan->tanggal_mulai,
+                $pengajuan->tanggal_selesai,
+                'approve'
+            );
+
+            if (! $validasiJadwal['sukses']) {
+                return $validasiJadwal;
+            }
+
+            $validasiPresensi = $this->validasiPresensiLengkapDalamRentang(
+                $pengajuan->pegawai_id,
+                $pengajuan->tanggal_mulai,
+                $pengajuan->tanggal_selesai,
+                'approve'
+            );
+
+            if (! $validasiPresensi['sukses']) {
+                return $validasiPresensi;
             }
 
             $update = $this->pengajuanIzinModel->update($id, [
@@ -540,6 +620,17 @@ class PengajuanIzinService extends BaseService
 
             if (($pengajuan->status ?? 'pending') !== 'approved') {
                 return $this->hasilGagal([], 'Hanya data yang sudah disetujui yang dapat dibatalkan');
+            }
+
+            $validasiPresensi = $this->validasiPresensiLengkapDalamRentang(
+                $pengajuan->pegawai_id,
+                $pengajuan->tanggal_mulai,
+                $pengajuan->tanggal_selesai,
+                'cancel'
+            );
+
+            if (! $validasiPresensi['sukses']) {
+                return $validasiPresensi;
             }
 
             $rollback = $this->rollbackApproveDariJadwalKerja($id);
@@ -787,6 +878,132 @@ class PengajuanIzinService extends BaseService
             return $this->hasilGagal([
                 $fieldMulai   => 'Rentang tanggal mengandung hari libur global: ' . implode(', ', $tanggalLibur),
                 $fieldSelesai => 'Rentang tanggal mengandung hari libur global: ' . implode(', ', $tanggalLibur),
+            ]);
+        }
+
+        return $this->hasilSukses();
+    }
+
+    protected function validasiJadwalLengkapDalamRentang(
+        int $pegawaiId,
+        string $tanggalMulai,
+        string $tanggalSelesai,
+        string $method
+    ): array {
+        $jadwalList = $this->jadwalKerjaModel->getJadwalPegawaiDalamRentang(
+            $pegawaiId,
+            $tanggalMulai,
+            $tanggalSelesai
+        );
+
+        $methodLabel = match ($method) {
+            'simpan'  => 'menyimpan',
+            'ubah'    => 'mengubah',
+            'approve' => 'menyetujui',
+            default   => 'memproses',
+        };
+
+        $fields = match ($method) {
+            'simpan' => ['tanggal_mulai', 'tanggal_selesai'],
+            'ubah'   => ['edit-tanggal_mulai', 'edit-tanggal_selesai'],
+            default  => ['general', 'general'],
+        };
+
+        $tanggalAdaJadwal = [];
+
+        foreach ($jadwalList as $jadwal) {
+            $tanggalAdaJadwal[] = (string) $jadwal->tanggal;
+        }
+
+        $tanggalAdaJadwal = array_unique($tanggalAdaJadwal);
+
+        $tanggalTidakAdaJadwal = [];
+        $tanggal = $tanggalMulai;
+
+        while ($tanggal <= $tanggalSelesai) {
+            if (! in_array($tanggal, $tanggalAdaJadwal, true)) {
+                $tanggalTidakAdaJadwal[] = tanggal_indonesia($tanggal);
+            }
+
+            $tanggal = date('Y-m-d', strtotime($tanggal . ' +1 day'));
+        }
+
+        if (! empty($tanggalTidakAdaJadwal)) {
+            $pesan = 'Tidak bisa ' . $methodLabel .
+                ' pengajuan izin/sakit karena belum ada jadwal pada tanggal: ' .
+                implode(', ', $tanggalTidakAdaJadwal);
+
+            if ($fields[0] === 'general') {
+                return $this->hasilGagal([], $pesan);
+            }
+
+            return $this->hasilGagal([
+                $fields[0] => $pesan,
+                $fields[1] => $pesan,
+            ]);
+        }
+
+        return $this->hasilSukses();
+    }
+
+    protected function validasiPresensiLengkapDalamRentang(
+        int $pegawaiId,
+        string $tanggalMulai,
+        string $tanggalSelesai,
+        string $method
+    ): array {
+        $presensiList = $this->presensiModel->getPresensiPegawaiDalamRentang(
+            $pegawaiId,
+            $tanggalMulai,
+            $tanggalSelesai
+        );
+
+        $methodLabel = match ($method) {
+            'simpan'  => 'menyimpan',
+            'ubah'    => 'mengubah',
+            'approve' => 'menyetujui',
+            'cancel'  => 'membatalkan',
+            'hapus'   => 'menghapus',
+            default   => 'memproses',
+        };
+
+        $fields = match ($method) {
+            'simpan' => ['tanggal_mulai', 'tanggal_selesai'],
+            'ubah'   => ['edit-tanggal_mulai', 'edit-tanggal_selesai'],
+            default  => ['general', 'general'],
+        };
+
+        $tanggalListPresensi = [];
+
+        foreach ($presensiList as $presensi) {
+            $tanggalListPresensi[] = (string) $presensi->tanggal;
+        }
+
+        $tanggalListPresensi = array_unique($tanggalListPresensi);
+
+        $tanggalAdaPresensi = [];
+        $tanggal = $tanggalMulai;
+
+        while ($tanggal <= $tanggalSelesai) {
+            if (in_array($tanggal, $tanggalListPresensi, true)) {
+                $tanggalAdaPresensi[] = tanggal_indonesia($tanggal);
+            }
+
+            $tanggal = date('Y-m-d', strtotime($tanggal . ' +1 day'));
+        }
+
+        if (! empty($tanggalAdaPresensi)) {
+            $pesan = 'Tidak bisa ' . $methodLabel .
+                ' pengajuan izin/sakit karena sudah ada presensi pada tanggal: ' .
+                implode(', ', $tanggalAdaPresensi);
+
+            if ($fields[0] === 'general') {
+                return $this->hasilGagal([], $pesan);
+            }
+
+            return $this->hasilGagal([
+                $fields[0] => $pesan,
+                $fields[1] => $pesan,
             ]);
         }
 

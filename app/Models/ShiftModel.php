@@ -75,4 +75,16 @@ class ShiftModel extends Model
             ->where('is_active', 1)
             ->first();
     }
+
+    public function getShiftDropdown(): array
+    {
+        $shift = $this->db->table('shift')
+            ->select('shift.id, shift.kode_shift, shift.nama_shift')
+            ->where('shift.is_active', 1)
+            ->orderBy('shift.nama_shift', 'ASC')
+            ->get()
+            ->getResult();
+
+        return $shift;
+    }
 }

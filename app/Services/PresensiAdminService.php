@@ -284,12 +284,12 @@ class PresensiAdminService extends BaseService
         $batasTimestamp = strtotime($tanggal . ' ' . $batasAkhir);
         $sekarang = time();
 
-        if ($sekarang <= $batasTimestamp) {
-            return $this->hasilGagal(
-                [],
-                'Sinkron presensi hari ini hanya bisa setelah batas akhir pulang: ' . substr($batasAkhir, 0, 5)
-            );
-        }
+        // if ($sekarang <= $batasTimestamp) {
+        //     return $this->hasilGagal(
+        //         [],
+        //         'Sinkron presensi hari ini hanya bisa setelah batas akhir pulang: ' . substr($batasAkhir, 0, 5)
+        //     );
+        // }
 
         return null;
     }

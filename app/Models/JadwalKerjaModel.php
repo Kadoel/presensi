@@ -161,4 +161,18 @@ class JadwalKerjaModel extends Model
 
         return $row->batas_akhir_pulang ?? null;
     }
+
+    public function jumlahJadwalPadaTanggal(string $tanggal): int
+    {
+        return (int) $this->where('tanggal', $tanggal)->countAllResults();
+    }
+
+    public function getJadwalPegawaiDalamRentang(int $pegawaiId, string $tanggalMulai, string $tanggalSelesai): array
+    {
+        return $this->where('pegawai_id', $pegawaiId)
+            ->where('tanggal >=', $tanggalMulai)
+            ->where('tanggal <=', $tanggalSelesai)
+            ->orderBy('tanggal', 'ASC')
+            ->findAll();
+    }
 }

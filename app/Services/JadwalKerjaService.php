@@ -19,6 +19,7 @@ class JadwalKerjaService extends BaseService
     public function __construct()
     {
         parent::__construct();
+
         $this->jadwalKerjaModel = new JadwalKerjaModel();
         $this->pegawaiModel     = new PegawaiModel();
         $this->shiftModel       = new ShiftModel();
@@ -34,15 +35,10 @@ class JadwalKerjaService extends BaseService
     public function getPegawaiDropdown(): array
     {
         return $this->eksekusi(function () {
-            $pegawai = $this->pegawaiModel->db->table('pegawai')
-                ->select('pegawai.id, pegawai.kode_pegawai, pegawai.nama_pegawai')
-                ->where('pegawai.is_active', 1)
-                ->orderBy('pegawai.nama_pegawai', 'ASC')
-                ->get()
-                ->getResult();
+            $pegawai = $this->pegawaiModel->getPegawaiDropdown();
 
             return $this->hasilData([
-                'pegawai' => $pegawai
+                'pegawai' => $pegawai,
             ]);
         });
     }
@@ -50,209 +46,113 @@ class JadwalKerjaService extends BaseService
     public function getShiftDropdown(): array
     {
         return $this->eksekusi(function () {
-            $shift = $this->shiftModel->db->table('shift')
-                ->select('shift.id, shift.kode_shift, shift.nama_shift')
-                ->where('shift.is_active', 1)
-                ->orderBy('shift.nama_shift', 'ASC')
-                ->get()
-                ->getResult();
+            $shift = $this->shiftModel->getShiftDropdown();
 
             return $this->hasilData([
-                'shift' => $shift
+                'shift' => $shift,
             ]);
         });
     }
 
+    /**
+     * Generate jadwal kerja multiple tanggal.
+     * Payload:
+     * - tanggal: "YYYY-MM-DD,YYYY-MM-DD"
+     * - shift_pegawai[shift_id][]: pegawai_id
+     * - libur_pegawai[]: pegawai_id
+     * - catatan: optional
+     *
+     * Rule utama:
+     * - semua pegawai aktif wajib dipilih tepat satu section
+     * - section boleh kosong
+     */
     public function simpan(array $post): array
     {
         return $this->transaksi(function () use ($post) {
-            $post['pegawai_id_validasi'] = '1';
-            $hariIni = date("Y-m-d");
+            $hariIni   = date('Y-m-d');
+            $createdBy = $this->intAtauNull(session()->get('user_id'));
+            $catatan   = $this->stringAtauNull($post['catatan'] ?? '');
 
-            $rules = [
-                'pegawai_id_validasi' => [
-                    'label' => 'Pegawai',
-                    'rules' => [
-                        static function ($value, array $data, ?string &$error): bool {
-                            if (
-                                ! isset($data['pegawai_id']) ||
-                                ! is_array($data['pegawai_id']) ||
-                                count($data['pegawai_id']) < 1
-                            ) {
-                                $error = 'Pegawai harus dipilih';
-                                return false;
-                            }
+            $tanggalList = $this->parseTanggalList($post['tanggal'] ?? '');
 
-                            foreach ($data['pegawai_id'] as $pegawaiId) {
-                                if (! ctype_digit((string) $pegawaiId)) {
-                                    $error = 'Data pegawai tidak valid';
-                                    return false;
-                                }
-                            }
-
-                            return true;
-                        }
-                    ],
-                    'errors' => []
-                ],
-                'tanggal' => [
-                    'label' => 'Tanggal',
-                    'rules' => [
-                        static function ($value, array $data, ?string &$error): bool {
-                            $tanggalList = array_values(array_filter(array_map('trim', explode(',', (string) $value))));
-
-                            if (count($tanggalList) < 1) {
-                                $error = 'Tanggal harus dipilih';
-                                return false;
-                            }
-
-                            foreach ($tanggalList as $tanggal) {
-                                if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal)) {
-                                    $error = 'Format tanggal tidak valid';
-                                    return false;
-                                }
-                            }
-
-                            return true;
-                        }
-                    ],
-                    'errors' => []
-                ],
-                'status_hari' => [
-                    'label'  => 'Status Hari',
-                    'rules'  => 'required|in_list[kerja,libur]',
-                    'errors' => [
-                        'required' => '{field} harus dipilih',
-                        'in_list'  => '{field} tidak valid',
-                    ]
-                ],
-                'shift_id' => [
-                    'label'  => 'Shift',
-                    'rules'  => 'permit_empty|integer',
-                    'errors' => [
-                        'integer' => '{field} tidak valid',
-                    ]
-                ],
-                'catatan' => [
-                    'label'  => 'Catatan',
-                    'rules'  => 'permit_empty|max_length[255]',
-                    'errors' => [
-                        'max_length' => '{field} maksimal 255 karakter',
-                    ]
-                ],
-            ];
-
-            $validasi = $this->validasi($rules, $post);
-
-            if (! $validasi['sukses']) {
-                if (isset($validasi['errors']['pegawai_id_validasi'])) {
-                    $validasi['errors']['pegawai_id'] = $validasi['errors']['pegawai_id_validasi'];
-                    unset($validasi['errors']['pegawai_id_validasi']);
-                }
-
-                return $validasi;
-            }
-
-            $pegawaiIdsRaw = $post['pegawai_id'] ?? [];
-            $tanggalRaw    = $this->stringWajib($post['tanggal'] ?? '');
-            $statusHari    = $this->stringWajib($post['status_hari'] ?? '');
-            $shiftId       = $this->intAtauNull($post['shift_id'] ?? null);
-            $catatan       = $this->stringAtauNull($post['catatan'] ?? '');
-            $createdBy     = $this->intAtauNull(session()->get('user_id'));
-
-            $pegawaiIds = array_values(array_unique(array_map('intval', $pegawaiIdsRaw)));
-            $tanggalList = array_values(array_unique(array_filter(array_map('trim', explode(',', $tanggalRaw)))));
-
-            if ($post['tanggal'] < $hariIni) {
-                return $this->hasilGagal([], 'Tidak diizinkan membuat jadwal sebelum hari ini');
-            }
-
-            $validasiStatus = $this->validasiStatusDanShift(
-                $statusHari,
-                $shiftId,
-                'status_hari',
-                'shift_id'
-            );
-
-            if (! $validasiStatus['sukses']) {
-                return $validasiStatus;
-            }
-
-            if ($statusHari === 'kerja') {
-                $validasiShift = $this->validasiShiftAktif($shiftId, 'shift_id');
-
-                if (! $validasiShift['sukses']) {
-                    return $validasiShift;
-                }
-            } else {
-                $shiftId = null;
-            }
-
-            foreach ($pegawaiIds as $pegawaiId) {
-                $validasiPegawai = $this->validasiPegawaiAktif($pegawaiId, 'pegawai_id');
-
-                if (! $validasiPegawai['sukses']) {
-                    return $validasiPegawai;
-                }
-            }
-
-            $duplikat = [];
-
-            foreach ($pegawaiIds as $pegawaiId) {
-                foreach ($tanggalList as $tanggal) {
-                    $bentrok = $this->jadwalKerjaModel->jumlahBentrokJadwal($pegawaiId, $tanggal);
-
-                    if ($bentrok > 0) {
-                        $duplikat[] = $tanggal;
-                    }
-                }
-            }
-
-            if (! empty($duplikat)) {
-                $duplikat = array_values(array_unique($duplikat));
-
+            if (empty($tanggalList)) {
                 return $this->hasilGagal([
-                    'tanggal' => 'Sebagian tanggal sudah memiliki jadwal kerja: ' . implode(', ', $duplikat)
+                    'tanggal' => 'Tanggal harus dipilih',
                 ]);
             }
 
-            foreach ($pegawaiIds as $pegawaiId) {
-                foreach ($tanggalList as $tanggal) {
-                    $simpan = $this->jadwalKerjaModel->insert([
-                        'pegawai_id'             => $pegawaiId,
+            foreach ($tanggalList as $tanggal) {
+                if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal)) {
+                    return $this->hasilGagal([
+                        'tanggal' => 'Format tanggal tidak valid',
+                    ]);
+                }
+
+                if ($tanggal < $hariIni) {
+                    return $this->hasilGagal([
+                        'tanggal' => 'Tidak diizinkan membuat jadwal sebelum hari ini',
+                    ]);
+                }
+            }
+
+            $items = $this->bangunItemGenerate($post['shift_pegawai'] ?? [], $post['libur_pegawai'] ?? []);
+
+            $validasiCoverage = $this->validasiCoveragePegawaiAktif($items);
+            if (! $validasiCoverage['sukses']) {
+                return $validasiCoverage;
+            }
+
+            $validasiShift = $this->validasiSemuaShiftGenerate($items);
+            if (! $validasiShift['sukses']) {
+                return $validasiShift;
+            }
+
+            $duplikatJadwal = $this->cariDuplikatJadwalGenerate($items, $tanggalList);
+            if (! empty($duplikatJadwal)) {
+                return $this->hasilGagal([
+                    'tanggal' => 'Sebagian pegawai sudah memiliki jadwal: ' . implode(', ', array_slice($duplikatJadwal, 0, 10)),
+                ]);
+            }
+
+            $rows = [];
+            $now  = date('Y-m-d H:i:s');
+
+            foreach ($tanggalList as $tanggal) {
+                foreach ($items as $item) {
+                    $rows[] = [
+                        'pegawai_id'             => (int) $item['pegawai_id'],
                         'tanggal'                => $tanggal,
-                        'shift_id'               => $shiftId,
-                        'status_hari'            => $statusHari,
+                        'shift_id'               => $item['shift_id'],
+                        'status_hari'            => $item['status_hari'],
                         'sumber_data'            => 'manual',
                         'pengajuan_izin_id'      => null,
+                        'hari_libur_id'          => null,
                         'shift_id_sebelumnya'    => null,
                         'status_hari_sebelumnya' => null,
                         'catatan_sebelumnya'     => null,
                         'sumber_data_sebelumnya' => null,
                         'catatan'                => $catatan,
                         'created_by'             => $createdBy,
-                    ]);
-
-                    if (! $simpan) {
-                        return $this->hasilGagal([
-                            'general' => 'Data jadwal kerja gagal disimpan'
-                        ]);
-                    }
+                        'created_at'             => $now,
+                        'updated_at'             => $now,
+                    ];
                 }
+            }
+
+            if (! $this->jadwalKerjaModel->insertBatch($rows)) {
+                return $this->hasilGagal([
+                    'general' => 'Data jadwal kerja gagal disimpan',
+                ]);
             }
 
             $this->catatAudit(
                 'create',
                 'jadwal_kerja',
                 null,
-                'Menambahkan jadwal kerja untuk '
-                    . count($pegawaiIds) . ' pegawai dengan ID (' . implode(', ', $pegawaiIds) . ') '
-                    . 'pada ' . count($tanggalList) . ' tanggal (' . implode(', ', $tanggalList) . ') '
-                    . 'dengan status hari ' . $statusHari
+                'Generate jadwal kerja untuk ' . count($tanggalList) . ' tanggal dan ' . count($items) . ' pegawai aktif'
             );
 
             $hariLiburTerdeteksi = [];
-
             foreach ($tanggalList as $tanggal) {
                 $hariLibur = $this->getInfoHariLiburPadaTanggal($tanggal);
 
@@ -264,10 +164,13 @@ class JadwalKerjaService extends BaseService
                 }
             }
 
-            return $this->hasilSukses('Data Jadwal Kerja Berhasil Ditambahkan', [
-                'warning_hari_libur' => ! empty($hariLiburTerdeteksi),
-                'hari_libur'         => $hariLiburTerdeteksi,
-                'status_hari_kerja'  => $statusHari == 'kerja' ? true : false
+            return $this->hasilSukses('Jadwal kerja berhasil digenerate', [
+                'jumlah_tanggal'      => count($tanggalList),
+                'jumlah_pegawai'      => count($items),
+                'jumlah_data'         => count($rows),
+                'warning_hari_libur'  => ! empty($hariLiburTerdeteksi),
+                'hari_libur'          => $hariLiburTerdeteksi,
+                'status_hari_kerja'   => true,
             ]);
         });
     }
@@ -283,6 +186,12 @@ class JadwalKerjaService extends BaseService
 
             if (($jadwal->sumber_data ?? 'manual') !== 'manual') {
                 return $this->hasilGagal([], 'Data jadwal hasil override sistem tidak dapat diubah manual');
+            }
+
+            if ($jadwal->tanggal < date('Y-m-d')) {
+                return $this->hasilGagal([
+                    'edit-tanggal' => 'Tidak diizinkan mengubah jadwal sebelum hari ini',
+                ]);
             }
 
             $rules = $this->rulesUbah();
@@ -320,22 +229,22 @@ class JadwalKerjaService extends BaseService
             $bentrok = $this->jadwalKerjaModel->jumlahBentrokJadwal($pegawaiId, $tanggal, $id);
             if ($bentrok > 0) {
                 return $this->hasilGagal([
-                    'edit-tanggal' => 'Jadwal pegawai pada tanggal tersebut sudah ada'
+                    'edit-tanggal' => 'Jadwal pegawai pada tanggal tersebut sudah ada',
                 ]);
             }
 
             $simpan = $this->jadwalKerjaModel->save([
-                'id'                       => $id,
-                'pegawai_id'               => $pegawaiId,
-                'tanggal'                  => $tanggal,
-                'shift_id'                 => $shiftId,
-                'status_hari'              => $statusHari,
-                'catatan'                  => $catatan,
+                'id'          => $id,
+                'pegawai_id'  => $pegawaiId,
+                'tanggal'     => $tanggal,
+                'shift_id'    => $shiftId,
+                'status_hari' => $statusHari,
+                'catatan'     => $catatan,
             ]);
 
             if (! $simpan) {
                 return $this->hasilGagal([
-                    'general' => 'Data jadwal kerja gagal diubah'
+                    'general' => 'Data jadwal kerja gagal diubah',
                 ]);
             }
 
@@ -359,7 +268,7 @@ class JadwalKerjaService extends BaseService
             return $this->hasilSukses('Data Jadwal Kerja Berhasil Diubah', [
                 'warning_hari_libur' => ! empty($hariLiburTerdeteksi),
                 'hari_libur'         => $hariLiburTerdeteksi,
-                'status_hari_kerja'  => $statusHari == 'kerja' ? true : false
+                'status_hari_kerja'  => $statusHari === 'kerja',
             ]);
         });
     }
@@ -378,6 +287,10 @@ class JadwalKerjaService extends BaseService
                 return $this->hasilGagal([], 'Tidak diizinkan mengubah jadwal sebelum hari ini');
             }
 
+            if ($this->presensiModel->sudahAdaPresensi($jadwal->pegawai_id, $jadwal->tanggal)) {
+                return $this->hasilGagal([], 'Tidak diizinkan mengubah jadwal yang sudah presensi');
+            }
+
             $hariLibur = $this->hariLiburModel->where('tanggal', $jadwal->tanggal)->first();
 
             return $this->hasilData([
@@ -387,87 +300,142 @@ class JadwalKerjaService extends BaseService
         });
     }
 
-    public function hapus(int $id): array
+    protected function parseTanggalList($value): array
     {
-        return $this->eksekusi(function () use ($id) {
-            $hariIni = date('Y-m-d');
-            $jadwal = $this->jadwalKerjaModel->getJadwalById($id);
-
-            if ($jadwal === null) {
-                return $this->hasilTidakDitemukan('Data Jadwal Kerja Tidak Ada Di Database');
-            }
-
-            if ($jadwal->tanggal < $hariIni) {
-                return $this->hasilGagal([], 'Tidak diizinkan menghapus jadwal sebelum hari ini');
-            }
-
-            if (($jadwal->sumber_data ?? 'manual') !== 'manual') {
-                return $this->hasilGagal([], 'Data jadwal hasil override sistem tidak dapat diubah manual');
-            }
-
-            if ($this->presensiModel->sudahAdaPresensi($jadwal->pegawai_id, $jadwal->tanggal)) {
-                return $this->hasilGagal([], 'Tidak diizinkan menghapus jadwal yang sudah presensi');
-            }
-
-            $hapus = $this->jadwalKerjaModel->delete($id);
-
-            if (! $hapus) {
-                return $this->hasilGagal([], 'Data Jadwal Kerja Gagal Dihapus');
-            }
-
-            $this->catatAudit(
-                'delete',
-                'jadwal_kerja',
-                $id,
-                'Menghapus data jadwal kerja pegawai ID ' . (string) $jadwal->pegawai_id . ' pada tanggal ' . (string) $jadwal->tanggal
-            );
-
-            return $this->hasilSukses('Data Jadwal Kerja Berhasil Dihapus');
-        });
+        return array_values(array_unique(array_filter(array_map('trim', explode(',', (string) $value)))));
     }
 
-    protected function rulesSimpan(): array
+    protected function bangunItemGenerate(array $shiftPegawai, array $liburPegawai): array
     {
-        return [
-            'pegawai_id' => [
-                'label'  => 'Pegawai',
-                'rules'  => 'required|integer',
-                'errors' => [
-                    'required' => '{field} harus dipilih',
-                    'integer'  => '{field} tidak valid',
-                ]
-            ],
-            'tanggal' => [
-                'label'  => 'Tanggal',
-                'rules'  => 'required|valid_date[Y-m-d]',
-                'errors' => [
-                    'required'   => '{field} harus diisi',
-                    'valid_date' => '{field} tidak valid',
-                ]
-            ],
-            'shift_id' => [
-                'label'  => 'Shift',
-                'rules'  => 'permit_empty|integer',
-                'errors' => [
-                    'integer' => '{field} tidak valid',
-                ]
-            ],
-            'status_hari' => [
-                'label'  => 'Status Hari',
-                'rules'  => 'required|in_list[kerja,libur]',
-                'errors' => [
-                    'required' => '{field} harus dipilih',
-                    'in_list'  => '{field} tidak valid',
-                ]
-            ],
-            'catatan' => [
-                'label'  => 'Catatan',
-                'rules'  => 'permit_empty|max_length[255]',
-                'errors' => [
-                    'max_length' => '{field} maksimal 255 karakter',
-                ]
-            ],
-        ];
+        $items = [];
+
+        foreach ($shiftPegawai as $shiftId => $pegawaiIds) {
+            $shiftId = (int) $shiftId;
+
+            if ($shiftId <= 0) {
+                continue;
+            }
+
+            foreach ((array) $pegawaiIds as $pegawaiId) {
+                $pegawaiId = (int) $pegawaiId;
+
+                if ($pegawaiId <= 0) {
+                    continue;
+                }
+
+                $items[] = [
+                    'pegawai_id'  => $pegawaiId,
+                    'shift_id'    => $shiftId,
+                    'status_hari' => 'kerja',
+                ];
+            }
+        }
+
+        foreach ((array) $liburPegawai as $pegawaiId) {
+            $pegawaiId = (int) $pegawaiId;
+
+            if ($pegawaiId <= 0) {
+                continue;
+            }
+
+            $items[] = [
+                'pegawai_id'  => $pegawaiId,
+                'shift_id'    => null,
+                'status_hari' => 'libur',
+            ];
+        }
+
+        return $items;
+    }
+
+    protected function validasiCoveragePegawaiAktif(array $items): array
+    {
+        $pegawaiAktif = $this->pegawaiModel
+            ->select('id, kode_pegawai, nama_pegawai')
+            ->where('is_active', 1)
+            ->orderBy('nama_pegawai', 'ASC')
+            ->findAll();
+
+        if (empty($pegawaiAktif)) {
+            return $this->hasilGagal([
+                'pegawai' => 'Tidak ada pegawai aktif untuk dijadwalkan',
+            ]);
+        }
+
+        $pegawaiAktifIds = array_map(static fn($row) => (int) $row->id, $pegawaiAktif);
+        $pegawaiTerpilih = array_map('intval', array_column($items, 'pegawai_id'));
+
+        $duplikatPegawai = array_values(array_unique(array_diff_assoc($pegawaiTerpilih, array_unique($pegawaiTerpilih))));
+
+        if (! empty($duplikatPegawai)) {
+            return $this->hasilGagal([
+                'pegawai' => 'Pegawai tidak boleh dipilih lebih dari satu section',
+            ]);
+        }
+
+        $pegawaiTidakAktifDipilih = array_values(array_diff($pegawaiTerpilih, $pegawaiAktifIds));
+        if (! empty($pegawaiTidakAktifDipilih)) {
+            return $this->hasilGagal([
+                'pegawai' => 'Terdapat pegawai tidak aktif atau tidak valid yang dipilih',
+            ]);
+        }
+
+        $pegawaiBelumDipilih = array_values(array_diff($pegawaiAktifIds, $pegawaiTerpilih));
+        if (! empty($pegawaiBelumDipilih)) {
+            $namaBelumDipilih = [];
+
+            foreach ($pegawaiAktif as $pegawai) {
+                if (in_array((int) $pegawai->id, $pegawaiBelumDipilih, true)) {
+                    $namaBelumDipilih[] = '<li>' . $pegawai->nama_pegawai . '</li>';
+                }
+            }
+
+            return $this->hasilGagal([
+                'pegawai' => '<strong>Semua pegawai aktif harus dijadwalkan. Belum dipilih: </strong><br /><ul>' . implode('', $namaBelumDipilih) . '</ul>',
+            ]);
+        }
+
+        return $this->hasilSukses();
+    }
+
+    protected function validasiSemuaShiftGenerate(array $items): array
+    {
+        $shiftIds = [];
+
+        foreach ($items as $item) {
+            if (($item['status_hari'] ?? '') === 'kerja') {
+                $shiftIds[] = (int) $item['shift_id'];
+            }
+        }
+
+        $shiftIds = array_values(array_unique($shiftIds));
+
+        foreach ($shiftIds as $shiftId) {
+            $validasiShift = $this->validasiShiftAktif($shiftId, 'shift_pegawai');
+
+            if (! $validasiShift['sukses']) {
+                return $validasiShift;
+            }
+        }
+
+        return $this->hasilSukses();
+    }
+
+    protected function cariDuplikatJadwalGenerate(array $items, array $tanggalList): array
+    {
+        $duplikat = [];
+
+        foreach ($items as $item) {
+            foreach ($tanggalList as $tanggal) {
+                $bentrok = $this->jadwalKerjaModel->jumlahBentrokJadwal((int) $item['pegawai_id'], $tanggal);
+
+                if ($bentrok > 0) {
+                    $duplikat[] = $tanggal . ' - Pegawai ID ' . $item['pegawai_id'];
+                }
+            }
+        }
+
+        return array_values(array_unique($duplikat));
     }
 
     protected function rulesUbah(): array
@@ -479,7 +447,7 @@ class JadwalKerjaService extends BaseService
                 'errors' => [
                     'required' => '{field} harus dipilih',
                     'integer'  => '{field} tidak valid',
-                ]
+                ],
             ],
             'edit-tanggal' => [
                 'label'  => 'Tanggal',
@@ -487,14 +455,14 @@ class JadwalKerjaService extends BaseService
                 'errors' => [
                     'required'   => '{field} harus diisi',
                     'valid_date' => '{field} tidak valid',
-                ]
+                ],
             ],
             'edit-shift_id' => [
                 'label'  => 'Shift',
                 'rules'  => 'permit_empty|integer',
                 'errors' => [
                     'integer' => '{field} tidak valid',
-                ]
+                ],
             ],
             'edit-status_hari' => [
                 'label'  => 'Status Hari',
@@ -502,14 +470,14 @@ class JadwalKerjaService extends BaseService
                 'errors' => [
                     'required' => '{field} harus dipilih',
                     'in_list'  => '{field} tidak valid',
-                ]
+                ],
             ],
             'edit-catatan' => [
                 'label'  => 'Catatan',
                 'rules'  => 'permit_empty|max_length[255]',
                 'errors' => [
                     'max_length' => '{field} maksimal 255 karakter',
-                ]
+                ],
             ],
         ];
     }
@@ -518,7 +486,7 @@ class JadwalKerjaService extends BaseService
     {
         if ($pegawaiId === null) {
             return $this->hasilGagal([
-                $field => 'Pegawai harus dipilih'
+                $field => 'Pegawai harus dipilih',
             ]);
         }
 
@@ -526,13 +494,13 @@ class JadwalKerjaService extends BaseService
 
         if ($pegawai === null) {
             return $this->hasilGagal([
-                $field => 'Data pegawai tidak ditemukan'
+                $field => 'Data pegawai tidak ditemukan',
             ]);
         }
 
         if ((int) ($pegawai->is_active ?? 0) !== 1) {
             return $this->hasilGagal([
-                $field => 'Pegawai tidak aktif'
+                $field => 'Pegawai tidak aktif',
             ]);
         }
 
@@ -543,7 +511,7 @@ class JadwalKerjaService extends BaseService
     {
         if ($shiftId === null) {
             return $this->hasilGagal([
-                $field => 'Shift harus dipilih'
+                $field => 'Shift harus dipilih',
             ]);
         }
 
@@ -551,13 +519,13 @@ class JadwalKerjaService extends BaseService
 
         if ($shift === null) {
             return $this->hasilGagal([
-                $field => 'Data shift tidak ditemukan'
+                $field => 'Data shift tidak ditemukan',
             ]);
         }
 
         if ((int) ($shift->is_active ?? 0) !== 1) {
             return $this->hasilGagal([
-                $field => 'Shift tidak aktif'
+                $field => 'Shift tidak aktif',
             ]);
         }
 
@@ -570,15 +538,21 @@ class JadwalKerjaService extends BaseService
         string $fieldStatus,
         string $fieldShift
     ): array {
+        if (! in_array($statusHari, ['kerja', 'libur'], true)) {
+            return $this->hasilGagal([
+                $fieldStatus => 'Status hari tidak valid',
+            ]);
+        }
+
         if ($statusHari === 'kerja' && $shiftId === null) {
             return $this->hasilGagal([
-                $fieldShift => 'Shift wajib dipilih jika status hari kerja'
+                $fieldShift => 'Shift wajib dipilih jika status hari kerja',
             ]);
         }
 
         if ($statusHari === 'libur' && $shiftId !== null) {
             return $this->hasilGagal([
-                $fieldShift => 'Shift harus dikosongkan jika status hari libur'
+                $fieldShift => 'Shift harus dikosongkan jika status hari libur',
             ]);
         }
 

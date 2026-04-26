@@ -4,17 +4,20 @@ namespace App\Services;
 
 use App\Models\HariLiburModel;
 use App\Models\JadwalKerjaModel;
+use App\Models\PresensiModel;
 
 class HariLiburService extends BaseService
 {
     protected HariLiburModel $hariLiburModel;
     protected JadwalKerjaModel $jadwalKerjaModel;
+    protected PresensiModel $presensiModel;
 
     public function __construct()
     {
         parent::__construct();
         $this->hariLiburModel   = new HariLiburModel();
         $this->jadwalKerjaModel = new JadwalKerjaModel();
+        $this->presensiModel = new PresensiModel();
     }
 
     public function dataTabel()
@@ -74,6 +77,18 @@ class HariLiburService extends BaseService
             }
 
             $tanggal = $this->stringWajib($post['tanggal'] ?? '');
+
+            $cekJadwal = $this->validasiJadwalAdaPadaTanggal($tanggal, 'tanggal');
+
+            if ($cekJadwal !== null) {
+                return $cekJadwal;
+            }
+
+            $cekPresensi = $this->validasiBelumAdaPresensiPadaTanggal((string) $tanggal, (string) 'simpan');
+
+            if ($cekPresensi !== null) {
+                return $cekPresensi;
+            }
 
             $insert = $this->hariLiburModel->insert([
                 'tanggal'    => $tanggal,
@@ -218,6 +233,17 @@ class HariLiburService extends BaseService
             $tanggalLama = (string) $hariLibur->tanggal;
             $tanggalBaru = $this->stringWajib($post['edit-tanggal'] ?? '');
 
+            $cekJadwal = $this->validasiJadwalAdaPadaTanggal($tanggalBaru, 'edit-tanggal');
+
+            if ($cekJadwal !== null) {
+                return $cekJadwal;
+            }
+
+            $cekPresensi = $this->validasiBelumAdaPresensiPadaTanggal((string) $tanggalBaru, (string) 'ubah');
+            if ($cekPresensi !== null) {
+                return $cekPresensi;
+            }
+
             if ($tanggalLama !== $tanggalBaru) {
                 return $this->hasilGagal([
                     'edit-tanggal' => 'Perubahan tanggal hari libur tidak didukung. Hapus lalu buat ulang.'
@@ -280,6 +306,11 @@ class HariLiburService extends BaseService
             }
 
             $tanggal = (string) $hariLibur->tanggal;
+
+            $cekPresensi = $this->validasiBelumAdaPresensiPadaTanggal((string) $tanggal, (string) 'ambil');
+            if ($cekPresensi !== null) {
+                return $cekPresensi;
+            }
 
             // 1. Pegawai yang saat ini masih kerja pada tanggal tersebut
             $pegawaiKerjaSekarang = $this->jadwalKerjaModel->getJadwalKerjaAktifPadaTanggalUntukLibur($tanggal);
@@ -348,6 +379,12 @@ class HariLiburService extends BaseService
 
             if ($hariLibur === null) {
                 return $this->hasilTidakDitemukan('Data Hari Libur Tidak Ada Di Database');
+            }
+
+            $cekPresensi = $this->validasiBelumAdaPresensiPadaTanggal((string) $hariLibur->tanggal, (string) 'hapus');
+
+            if ($cekPresensi !== null) {
+                return $cekPresensi;
             }
 
             $rollback = $this->rollbackOverrideHariLibur($id);
@@ -451,5 +488,47 @@ class HariLiburService extends BaseService
     protected function sudahPernahOverride(int $hariLiburId): bool
     {
         return count($this->jadwalKerjaModel->getJadwalByHariLiburId($hariLiburId)) > 0;
+    }
+
+    protected function validasiJadwalAdaPadaTanggal(string $tanggal, string $field = 'tanggal'): ?array
+    {
+        $jumlahJadwal = $this->jadwalKerjaModel->jumlahJadwalPadaTanggal($tanggal);
+
+        if ($jumlahJadwal < 1) {
+            return $this->hasilGagal([
+                $field => 'Hari libur tidak dapat dibuat karena belum ada jadwal kerja pada tanggal tersebut'
+            ]);
+        }
+
+        return null;
+    }
+
+    protected function validasiBelumAdaPresensiPadaTanggal(string $tanggal, string $method): ?array
+    {
+        $jumlahPresensi = $this->presensiModel->countByTanggal($tanggal);
+        $mtd = match ($method) {
+            'simpan'  => 'simpan',
+            'ubah' => 'ubah',
+            'ambil' => 'ubah',
+            'hapus' => 'hapus',
+            default => '',
+        };
+
+        $field = match ($method) {
+            'simpan'  => 'tanggal',
+            'ubah' => 'edit-tanggal',
+            default => '',
+        };
+        if ($jumlahPresensi > 0) {
+            if ($method == 'simpan' || $method == 'ubah') {
+                return $this->hasilGagal([
+                    $field => 'Hari libur tidak dapat di' . $mtd . ' karena sudah ada presensi pada tanggal tersebut'
+                ]);
+            }
+
+            return $this->hasilGagal([], 'Hari libur tidak dapat di' . $mtd . ' karena sudah ada presensi pada tanggal tersebut');
+        }
+
+        return null;
     }
 }
