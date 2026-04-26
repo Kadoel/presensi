@@ -72,6 +72,7 @@ const KadoelAjax = {
         const clearFields = options.clearFields || [];
 
         this.clearErrors(clearFields);
+        console.log(result);
 
         if (!result || typeof result !== 'object') {
             return;
@@ -83,6 +84,11 @@ const KadoelAjax = {
 
         if (result.pesan) {
             this.showNotif(type, position, result.pesan);
+            return;
+        }
+
+        if (result.errors && result.errors.exception) {
+            this.showNotif(type, position, result.errors.exception);
             return;
         }
 

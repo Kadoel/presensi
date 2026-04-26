@@ -46,19 +46,12 @@
         }
 
         function handleGagal(result) {
-            if (result.errors && Object.keys(result.errors).length > 0) {
-                tampilkanErrors(result.errors);
-                return;
-            }
-
-            if (result.pesan) {
-                notifikasi('danger', 'right', result.pesan);
-                return;
-            }
-
             if (typeof KadoelAjax !== 'undefined') {
                 KadoelAjax.handleError(result);
+                return;
             }
+
+            notifikasi('danger', 'right', result?.pesan || 'Terjadi kesalahan pada sistem');
         }
 
         function resetFormLupa() {

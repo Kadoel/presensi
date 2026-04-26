@@ -178,7 +178,7 @@ class JadwalKerjaModel extends Model
 
     public function countStatusKerjaByTanggal($tanggal)
     {
-        return $this->jadwalKerjaModel
+        return $this
             ->where('tanggal', $tanggal)
             ->where('status_hari', 'kerja')
             ->countAllResults();
