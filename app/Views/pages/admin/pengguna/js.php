@@ -267,7 +267,7 @@
                             let dataPegawai = dropdownResult['pegawai'] || [];
 
                             dataPegawai.forEach(function(item) {
-                                options += `<option value="${item.id}">${item.kode_pegawai} - ${item.nama_pegawai}</option>`;
+                                options += `<option value="${item.id}">${item.nama_pegawai}</option>`;
                             });
 
                             $('#edit-pegawai_id').html(options);

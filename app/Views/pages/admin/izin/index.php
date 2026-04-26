@@ -16,7 +16,7 @@
                             <option></option>
                             <?php foreach ($pegawai as $item) : ?>
                                 <option value="<?= $item->id; ?>">
-                                    <?= esc($item->kode_pegawai . ' - ' . $item->nama_pegawai); ?>
+                                    <?= esc($item->nama_pegawai); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -114,7 +114,7 @@
                                 <option></option>
                                 <?php foreach ($pegawai as $item) : ?>
                                     <option value="<?= $item->id; ?>">
-                                        <?= esc($item->kode_pegawai . ' - ' . $item->nama_pegawai); ?>
+                                        <?= esc($item->nama_pegawai); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
