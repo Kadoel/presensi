@@ -1,4 +1,5 @@
 <script src="/assets/plugins/select2/js/select2.full.min.js"></script>
+<script src="/assets/plugins/fullcalender/index.global.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
         let csrfToken = '<?= csrf_token(); ?>';
