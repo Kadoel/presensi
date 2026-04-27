@@ -102,6 +102,8 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
         $routes->match(['GET', 'POST'], '/', 'Admin\JadwalKerja::index');
         $routes->post('simpan', 'Admin\JadwalKerja::simpan');
         $routes->post('edit', 'Admin\JadwalKerja::edit');
+        $routes->post('copy', 'Admin\JadwalKerja::copy');
+        $routes->post('individu', 'Admin\JadwalKerja::individu');
         $routes->post('update/(:num)', 'Admin\JadwalKerja::update/$1');
     });
 

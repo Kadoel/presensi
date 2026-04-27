@@ -220,4 +220,11 @@ class PresensiModel extends Model
             ->where('DATE_FORMAT(tanggal, "%Y-%m") =', $bulan)
             ->countAllResults();
     }
+
+    public function countSudahSinkronByTanggal(string $tanggal): int
+    {
+        return (int) $this->where('tanggal', $tanggal)
+            ->where('hasil_presensi IS NOT NULL', null, false)
+            ->countAllResults();
+    }
 }

@@ -102,9 +102,13 @@ class PresensiAdminService extends BaseService
             $tanggal = $this->stringWajib($tanggal ?: date('Y-m-d'));
 
             $cek = $this->validasiWaktuSinkron($tanggal);
-
             if ($cek !== null) {
                 return $cek;
+            }
+
+            $validasiJumlahJadwal = $this->validasiJumlahJadwalSesuaiPegawaiAktif($tanggal);
+            if ($validasiJumlahJadwal !== null) {
+                return $validasiJumlahJadwal;
             }
 
             $jadwalList = $this->jadwalKerjaModel
@@ -639,5 +643,23 @@ class PresensiAdminService extends BaseService
             'libur' => '<span class="badge bg-secondary">Libur</span>',
             default => '<span class="badge bg-light text-dark">Belum Sinkron</span>',
         };
+    }
+
+    protected function validasiJumlahJadwalSesuaiPegawaiAktif(string $tanggal): ?array
+    {
+        $jumlahPegawaiAktif = $this->pegawaiModel->countAktif();
+
+        $jumlahJadwal = $this->jadwalKerjaModel->jumlahJadwalPadaTanggal($tanggal);
+
+        if ($jumlahJadwal !== $jumlahPegawaiAktif) {
+            return $this->hasilGagal(
+                [],
+                'Sinkron ditolak. Jumlah jadwal pada tanggal ' . tanggal_indonesia($tanggal) .
+                    ' tidak sesuai dengan jumlah pegawai aktif. Jadwal: ' . $jumlahJadwal .
+                    ', Pegawai aktif: ' . $jumlahPegawaiAktif
+            );
+        }
+
+        return null;
     }
 }

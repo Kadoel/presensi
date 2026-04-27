@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\JabatanModel;
+use App\Models\JadwalKerjaModel;
 use App\Models\PegawaiModel;
 use App\Models\PresensiModel;
 use Endroid\QrCode\QrCode;
@@ -16,6 +17,7 @@ class PegawaiService extends BaseService
     protected JabatanModel $jabatanModel;
     protected SettingsService $settingsService;
     protected PresensiModel $presensiModel;
+    protected JadwalKerjaModel $jadwalKerjaModel;
 
     public function __construct()
     {
@@ -24,6 +26,7 @@ class PegawaiService extends BaseService
         $this->jabatanModel = new JabatanModel();
         $this->settingsService = new SettingsService();
         $this->presensiModel = new PresensiModel();
+        $this->jadwalKerjaModel = new JadwalKerjaModel();
     }
 
     public function dataJabatanSelect()
@@ -299,10 +302,14 @@ class PegawaiService extends BaseService
 
             if ($statusLama === 1 && $statusBaru === 0) {
                 $bulanIni = date('Y-m');
+                $jumlahJadwalBulanIni = $this->jadwalKerjaModel->countByPegawaiDanBulan($id, $bulanIni);
+                if ($jumlahJadwalBulanIni > 0) {
+                    return $this->hasilGagal([
+                        'edit-is_active' => 'Pegawai tidak dapat dinonaktifkan karena masih memiliki jadwal kerja pada bulan ini'
+                    ]);
+                }
 
-                $jumlahPresensiBulanIni = $this->presensiModel
-                    ->countByPegawaiDanBulan($id, $bulanIni);
-
+                $jumlahPresensiBulanIni = $this->presensiModel->countByPegawaiDanBulan($id, $bulanIni);
                 if ($jumlahPresensiBulanIni > 0) {
                     return $this->hasilGagal([
                         'edit-is_active' => 'Pegawai tidak dapat dinonaktifkan karena sudah memiliki data presensi pada bulan ini'

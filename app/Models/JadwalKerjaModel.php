@@ -183,4 +183,18 @@ class JadwalKerjaModel extends Model
             ->where('status_hari', 'kerja')
             ->countAllResults();
     }
+
+    public function jumlahJadwalSelainPegawaiPadaTanggal(int $pegawaiId, string $tanggal): int
+    {
+        return (int) $this->where('tanggal', $tanggal)
+            ->where('pegawai_id !=', $pegawaiId)
+            ->countAllResults();
+    }
+
+    public function countByPegawaiDanBulan(int $pegawaiId, string $bulan): int
+    {
+        return (int) $this->where('pegawai_id', $pegawaiId)
+            ->where('DATE_FORMAT(tanggal, "%Y-%m") =', $bulan)
+            ->countAllResults();
+    }
 }

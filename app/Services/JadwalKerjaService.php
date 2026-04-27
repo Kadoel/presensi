@@ -300,6 +300,313 @@ class JadwalKerjaService extends BaseService
         });
     }
 
+    public function copyJadwalPegawai(array $post): array
+    {
+        return $this->transaksi(function () use ($post) {
+            $pegawaiSumberId = $this->intAtauNull($post['copy-pegawai_sumber_id'] ?? null);
+            $pegawaiTujuanId = $this->intAtauNull($post['copy-pegawai_tujuan_id'] ?? null);
+            $tanggalMulai    = $this->stringWajib($post['copy-tanggal_mulai'] ?? '');
+            $tanggalSelesai  = $this->stringWajib($post['copy-tanggal_selesai'] ?? '');
+            $catatan         = $this->stringAtauNull($post['copy-catatan'] ?? '');
+            $createdBy       = $this->intAtauNull(session()->get('user_id'));
+            $hariIni         = date('Y-m-d');
+
+            if ($pegawaiSumberId === null) {
+                return $this->hasilGagal([
+                    'copy-pegawai_sumber_id' => 'Pegawai sumber harus dipilih'
+                ]);
+            }
+
+            if ($pegawaiTujuanId === null) {
+                return $this->hasilGagal([
+                    'copy-pegawai_tujuan_id' => 'Pegawai tujuan harus dipilih'
+                ]);
+            }
+
+            if ($pegawaiSumberId === $pegawaiTujuanId) {
+                return $this->hasilGagal([
+                    'copy-pegawai_tujuan_id' => 'Pegawai tujuan tidak boleh sama dengan pegawai sumber'
+                ]);
+            }
+
+            if ($tanggalMulai === '' || $tanggalSelesai === '') {
+                return $this->hasilGagal([
+                    'copy-tanggal_mulai'   => 'Tanggal mulai harus diisi',
+                    'copy-tanggal_selesai' => 'Tanggal selesai harus diisi',
+                ]);
+            }
+
+            if ($tanggalMulai < $hariIni) {
+                return $this->hasilGagal([
+                    'copy-tanggal_mulai' => 'Tanggal mulai tidak boleh sebelum hari ini'
+                ]);
+            }
+
+            if ($tanggalMulai > $tanggalSelesai) {
+                return $this->hasilGagal([
+                    'copy-tanggal_mulai'   => 'Tanggal mulai tidak boleh melebihi tanggal selesai',
+                    'copy-tanggal_selesai' => 'Tanggal selesai tidak boleh lebih kecil dari tanggal mulai',
+                ]);
+            }
+
+            $validasiSumber = $this->validasiPegawaiAktif($pegawaiSumberId, 'copy-pegawai_sumber_id');
+            if (! $validasiSumber['sukses']) {
+                return $validasiSumber;
+            }
+
+            $validasiTujuan = $this->validasiPegawaiAktif($pegawaiTujuanId, 'copy-pegawai_tujuan_id');
+            if (! $validasiTujuan['sukses']) {
+                return $validasiTujuan;
+            }
+
+            $jadwalSumber = $this->jadwalKerjaModel->getJadwalPegawaiDalamRentang(
+                $pegawaiSumberId,
+                $tanggalMulai,
+                $tanggalSelesai
+            );
+
+            if (empty($jadwalSumber)) {
+                return $this->hasilGagal([
+                    'copy-tanggal_mulai'   => 'Pegawai sumber belum memiliki jadwal pada rentang tanggal tersebut',
+                    'copy-tanggal_selesai' => 'Pegawai sumber belum memiliki jadwal pada rentang tanggal tersebut',
+                ]);
+            }
+
+            $validasiLengkap = $this->validasiJadwalSumberLengkap(
+                $jadwalSumber,
+                $tanggalMulai,
+                $tanggalSelesai
+            );
+
+            if (! $validasiLengkap['sukses']) {
+                return $validasiLengkap;
+            }
+
+            $duplikatTujuan = [];
+
+            foreach ($jadwalSumber as $jadwal) {
+                $tanggal = (string) $jadwal->tanggal;
+
+                if ($this->jadwalKerjaModel->jumlahBentrokJadwal($pegawaiTujuanId, $tanggal) > 0) {
+                    $duplikatTujuan[] = tanggal_indonesia($tanggal);
+                }
+            }
+
+            if (! empty($duplikatTujuan)) {
+                return $this->hasilGagal([
+                    'copy-tanggal_mulai'   => 'Pegawai tujuan sudah memiliki jadwal pada tanggal: ' . implode(', ', $duplikatTujuan),
+                    'copy-tanggal_selesai' => 'Pegawai tujuan sudah memiliki jadwal pada tanggal: ' . implode(', ', $duplikatTujuan),
+                ]);
+            }
+
+            $validasiSudahAdaSinkron = $this->validasiSudahSinkronTanggal($jadwalSumber);
+            if (! $validasiSudahAdaSinkron['sukses']) {
+                return $validasiSudahAdaSinkron;
+            }
+
+            $rows = [];
+
+            foreach ($jadwalSumber as $jadwal) {
+                $rows[] = [
+                    'pegawai_id'             => $pegawaiTujuanId,
+                    'tanggal'                => $jadwal->tanggal,
+                    'shift_id'               => $jadwal->shift_id,
+                    'status_hari'            => $jadwal->status_hari,
+                    'sumber_data'            => 'manual',
+                    'pengajuan_izin_id'      => null,
+                    'hari_libur_id'          => null,
+                    'shift_id_sebelumnya'    => null,
+                    'status_hari_sebelumnya' => null,
+                    'catatan_sebelumnya'     => null,
+                    'sumber_data_sebelumnya' => null,
+                    'catatan'                => $catatan ?: $jadwal->catatan,
+                    'created_by'             => $createdBy,
+                    'created_at'             => date('Y-m-d H:i:s'),
+                    'updated_at'             => date('Y-m-d H:i:s'),
+                ];
+            }
+
+            if (! $this->jadwalKerjaModel->insertBatch($rows)) {
+                return $this->hasilGagal([
+                    'general' => 'Copy jadwal pegawai gagal disimpan'
+                ]);
+            }
+
+            $this->catatAudit(
+                'copy',
+                'jadwal_kerja',
+                null,
+                'Copy jadwal dari pegawai ID ' . $pegawaiSumberId .
+                    ' ke pegawai ID ' . $pegawaiTujuanId .
+                    ' tanggal ' . $tanggalMulai . ' s.d. ' . $tanggalSelesai
+            );
+
+            return $this->hasilSukses('Copy jadwal pegawai berhasil', [
+                'jumlah_data' => count($rows),
+            ]);
+        });
+    }
+
+    public function simpanIndividu(array $post): array
+    {
+        return $this->transaksi(function () use ($post) {
+            $pegawaiId  = $this->intAtauNull($post['individu-pegawai_id'] ?? null);
+            $tanggalRaw = $this->stringWajib($post['individu-tanggal'] ?? '');
+            $statusHari = $this->stringWajib($post['individu-status_hari'] ?? '');
+            $shiftId    = $this->intAtauNull($post['individu-shift_id'] ?? null);
+            $catatan    = $this->stringAtauNull($post['individu-catatan'] ?? '');
+            $createdBy  = $this->intAtauNull(session()->get('user_id'));
+            $hariIni    = date('Y-m-d');
+
+            $tanggalList = array_values(array_unique(array_filter(array_map('trim', explode(',', $tanggalRaw)))));
+
+            if ($pegawaiId === null) {
+                return $this->hasilGagal([
+                    'individu-pegawai_id' => 'Pegawai harus dipilih'
+                ]);
+            }
+
+            if (empty($tanggalList)) {
+                return $this->hasilGagal([
+                    'individu-tanggal' => 'Tanggal harus dipilih'
+                ]);
+            }
+
+            if (! in_array($statusHari, ['kerja', 'libur'], true)) {
+                return $this->hasilGagal([
+                    'individu-status_hari' => 'Status hari tidak valid'
+                ]);
+            }
+
+            if ($statusHari === 'kerja' && $shiftId === null) {
+                return $this->hasilGagal([
+                    'individu-shift_id' => 'Shift wajib dipilih jika status kerja'
+                ]);
+            }
+
+            if ($statusHari === 'libur') {
+                $shiftId = null;
+            }
+
+            $validasiPegawai = $this->validasiPegawaiAktif($pegawaiId, 'individu-pegawai_id');
+
+            if (! $validasiPegawai['sukses']) {
+                return $validasiPegawai;
+            }
+
+            if ($statusHari === 'kerja') {
+                $validasiShift = $this->validasiShiftAktif($shiftId, 'individu-shift_id');
+
+                if (! $validasiShift['sukses']) {
+                    return $validasiShift;
+                }
+            }
+
+            $tanggalTidakValid = [];
+            $tanggalLampau = [];
+            $tanggalBelumAdaJadwalLain = [];
+            $tanggalBentrok = [];
+            $tanggalSudahSinkron = [];
+
+            foreach ($tanggalList as $tanggal) {
+                if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal)) {
+                    $tanggalTidakValid[] = $tanggal;
+                    continue;
+                }
+
+                if ($tanggal < $hariIni) {
+                    $tanggalLampau[] = tanggal_indonesia($tanggal);
+                    continue;
+                }
+
+                if ($this->presensiModel->countSudahSinkronByTanggal($tanggal) > 0) {
+                    $tanggalSudahSinkron[] = tanggal_indonesia($tanggal);
+                    continue;
+                }
+
+                if ($this->jadwalKerjaModel->jumlahJadwalSelainPegawaiPadaTanggal($pegawaiId, $tanggal) < 1) {
+                    $tanggalBelumAdaJadwalLain[] = tanggal_indonesia($tanggal);
+                    continue;
+                }
+
+                if ($this->jadwalKerjaModel->jumlahBentrokJadwal($pegawaiId, $tanggal) > 0) {
+                    $tanggalBentrok[] = tanggal_indonesia($tanggal);
+                }
+            }
+
+            if (! empty($tanggalTidakValid)) {
+                return $this->hasilGagal([
+                    'individu-tanggal' => 'Format tanggal tidak valid: ' . implode(', ', $tanggalTidakValid)
+                ]);
+            }
+
+            if (! empty($tanggalLampau)) {
+                return $this->hasilGagal([
+                    'individu-tanggal' => 'Tidak boleh membuat jadwal untuk tanggal lampau: ' . implode(', ', $tanggalLampau)
+                ]);
+            }
+
+            if (! empty($tanggalSudahSinkron)) {
+                return $this->hasilGagal([
+                    'individu-tanggal' => 'Tidak bisa menambahkan jadwal karena tanggal sudah disinkron: ' . implode(', ', $tanggalSudahSinkron)
+                ]);
+            }
+
+            if (! empty($tanggalBelumAdaJadwalLain)) {
+                return $this->hasilGagal([
+                    'individu-tanggal' => 'Tidak bisa menambahkan jadwal individu karena belum ada jadwal pegawai lain pada tanggal: ' . implode(', ', $tanggalBelumAdaJadwalLain)
+                ]);
+            }
+
+            if (! empty($tanggalBentrok)) {
+                return $this->hasilGagal([
+                    'individu-tanggal' => 'Pegawai sudah memiliki jadwal pada tanggal: ' . implode(', ', $tanggalBentrok)
+                ]);
+            }
+
+            $rows = [];
+
+            foreach ($tanggalList as $tanggal) {
+                $rows[] = [
+                    'pegawai_id'             => $pegawaiId,
+                    'tanggal'                => $tanggal,
+                    'shift_id'               => $shiftId,
+                    'status_hari'            => $statusHari,
+                    'sumber_data'            => 'manual',
+                    'pengajuan_izin_id'      => null,
+                    'hari_libur_id'          => null,
+                    'shift_id_sebelumnya'    => null,
+                    'status_hari_sebelumnya' => null,
+                    'catatan_sebelumnya'     => null,
+                    'sumber_data_sebelumnya' => null,
+                    'catatan'                => $catatan,
+                    'created_by'             => $createdBy,
+                    'created_at'             => date('Y-m-d H:i:s'),
+                    'updated_at'             => date('Y-m-d H:i:s'),
+                ];
+            }
+
+            if (! $this->jadwalKerjaModel->insertBatch($rows)) {
+                return $this->hasilGagal([
+                    'general' => 'Jadwal individu gagal disimpan'
+                ]);
+            }
+
+            $this->catatAudit(
+                'create individu',
+                'jadwal_kerja',
+                null,
+                'Menambahkan jadwal individu pegawai ID ' . $pegawaiId .
+                    ' pada tanggal ' . implode(', ', $tanggalList) .
+                    ' dengan status ' . $statusHari
+            );
+
+            return $this->hasilSukses('Jadwal individu berhasil ditambahkan', [
+                'jumlah_data' => count($rows),
+            ]);
+        });
+    }
+
     protected function parseTanggalList($value): array
     {
         return array_values(array_unique(array_filter(array_map('trim', explode(',', (string) $value)))));
@@ -562,5 +869,59 @@ class JadwalKerjaService extends BaseService
     protected function getInfoHariLiburPadaTanggal(string $tanggal): ?object
     {
         return $this->hariLiburModel->where('tanggal', $tanggal)->first();
+    }
+
+    protected function validasiJadwalSumberLengkap(
+        array $jadwalSumber,
+        string $tanggalMulai,
+        string $tanggalSelesai
+    ): array {
+        $tanggalAda = [];
+
+        foreach ($jadwalSumber as $jadwal) {
+            $tanggalAda[] = (string) $jadwal->tanggal;
+        }
+
+        $tanggalKosong = [];
+        $tanggal = $tanggalMulai;
+
+        while ($tanggal <= $tanggalSelesai) {
+            if (! in_array($tanggal, $tanggalAda, true)) {
+                $tanggalKosong[] = tanggal_indonesia($tanggal);
+            }
+
+            $tanggal = date('Y-m-d', strtotime($tanggal . ' +1 day'));
+        }
+
+        if (! empty($tanggalKosong)) {
+            return $this->hasilGagal([
+                'copy-tanggal_mulai'   => 'Jadwal sumber belum lengkap. Tanggal belum terjadwal: ' . implode(', ', $tanggalKosong),
+                'copy-tanggal_selesai' => 'Jadwal sumber belum lengkap. Tanggal belum terjadwal: ' . implode(', ', $tanggalKosong),
+            ]);
+        }
+
+        return $this->hasilSukses();
+    }
+
+    protected function validasiSudahSinkronTanggal(array $jadwalSumber)
+    {
+        $tanggalSudahSinkron = [];
+
+        foreach ($jadwalSumber as $jadwal) {
+            $tanggal = (string) $jadwal->tanggal;
+
+            if ($this->presensiModel->countSudahSinkronByTanggal($tanggal) > 0) {
+                $tanggalSudahSinkron[] = tanggal_indonesia($tanggal);
+            }
+        }
+
+        if (! empty($tanggalSudahSinkron)) {
+            return $this->hasilGagal([
+                'copy-tanggal_mulai'   => 'Tidak bisa copy jadwal karena tanggal sudah disinkron: ' . implode(', ', $tanggalSudahSinkron),
+                'copy-tanggal_selesai' => 'Tidak bisa copy jadwal karena tanggal sudah disinkron: ' . implode(', ', $tanggalSudahSinkron),
+            ]);
+        }
+
+        return $this->hasilSukses();
     }
 }

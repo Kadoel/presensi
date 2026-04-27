@@ -113,7 +113,19 @@
     <div class="col-12">
         <div id="block-tabel" class="block block-themed block-rounded">
             <div class="block-header">
-                <h3 class="block-title text-white"><i class="fa fa-file-lines"></i> <b>DATA JADWAL KERJA</b></h3>
+                <h3 class="block-title text-white">
+                    <i class="fa fa-file-lines"></i> <b>DATA JADWAL KERJA</b>
+                </h3>
+
+                <div class="block-options">
+                    <button type="button" id="btn-copy-jadwal" class="btn btn-sm btn-alt-primary me-1">
+                        <i class="fa fa-copy me-1"></i> Copy
+                    </button>
+
+                    <button type="button" id="btn-individu-jadwal" class="btn btn-sm btn-alt-success me-1">
+                        <i class="fa fa-user-plus me-1"></i> Individu
+                    </button>
+                </div>
             </div>
 
             <div class="block-content block-content-full">
@@ -216,4 +228,185 @@
     </div>
 </div>
 
+<div class="modal" id="modal-copy-jadwal" tabindex="-1" role="dialog" aria-labelledby="modal-copy-jadwal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div id="block-content-copy-jadwal" class="block block-themed block-rounded shadow-none mb-0">
+                <div class="block-header">
+                    <h3 class="block-title text-white">
+                        <i class="fa fa-copy"></i> <b>COPY JADWAL PEGAWAI</b>
+                    </h3>
+                </div>
+
+                <form id="form-copy-jadwal" autocomplete="off">
+                    <div class="block-content">
+                        <div class="alert alert-info">
+                            <i class="fa fa-circle-info me-1"></i>
+                            Copy jadwal hanya menyalin jadwal pada rentang tanggal yang dipilih. Pegawai sumber harus memiliki jadwal lengkap pada seluruh rentang tanggal.
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label" for="copy-pegawai_sumber_id">
+                                    Pegawai Sumber <span class="text-danger">*</span>
+                                </label>
+                                <select class="js-select2 form-select" id="copy-pegawai_sumber_id" name="copy-pegawai_sumber_id" style="width: 100%;" data-placeholder="-- Pilih Pegawai Sumber --">
+                                    <option></option>
+                                    <?php foreach ($pegawai as $item) : ?>
+                                        <option value="<?= esc($item->id); ?>">
+                                            <?= esc($item->nama_pegawai); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div id="error-copy-pegawai_sumber_id" class="invalid-feedback animated fadeIn"></div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label" for="copy-pegawai_tujuan_id">
+                                    Pegawai Tujuan <span class="text-danger">*</span>
+                                </label>
+                                <select class="js-select2 form-select" id="copy-pegawai_tujuan_id" name="copy-pegawai_tujuan_id" style="width: 100%;" data-placeholder="-- Pilih Pegawai Tujuan --">
+                                    <option></option>
+                                    <?php foreach ($pegawai as $item) : ?>
+                                        <option value="<?= esc($item->id); ?>">
+                                            <?= esc($item->nama_pegawai); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div id="error-copy-pegawai_tujuan_id" class="invalid-feedback animated fadeIn"></div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label" for="copy-tanggal_mulai">
+                                    Tanggal Mulai <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="js-flatpickr form-control" id="copy-tanggal_mulai" name="copy-tanggal_mulai" autocomplete="off">
+                                <div id="error-copy-tanggal_mulai" class="invalid-feedback animated fadeIn"></div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label" for="copy-tanggal_selesai">
+                                    Tanggal Selesai <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="js-flatpickr form-control" id="copy-tanggal_selesai" name="copy-tanggal_selesai" autocomplete="off">
+                                <div id="error-copy-tanggal_selesai" class="invalid-feedback animated fadeIn"></div>
+                            </div>
+
+                            <div class="col-12 mb-4">
+                                <label class="form-label" for="copy-catatan">Catatan</label>
+                                <input type="text" class="form-control" id="copy-catatan" name="copy-catatan" autocomplete="off" placeholder="Kosongkan untuk memakai catatan dari jadwal sumber">
+                                <div id="error-copy-catatan" class="invalid-feedback animated fadeIn"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="block-content block-content-full block-content-sm text-end border-top">
+                        <button type="button" id="tutup-modal-copy-jadwal" class="btn btn-danger">
+                            <i class="fa fa-times opacity-50 me-1"></i> Batal
+                        </button>
+                        <button type="submit" id="submit-copy-jadwal" class="btn btn-primary text-white">
+                            <i class="fa fa-copy"></i> Copy Jadwal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="modal-individu-jadwal" tabindex="-1" role="dialog" aria-labelledby="modal-individu-jadwal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div id="block-content-individu-jadwal" class="block block-themed block-rounded shadow-none mb-0">
+                <div class="block-header">
+                    <h3 class="block-title text-white">
+                        <i class="fa fa-user-plus"></i> <b>TAMBAH JADWAL INDIVIDU</b>
+                    </h3>
+                </div>
+
+                <form id="form-individu-jadwal" autocomplete="off">
+                    <div class="block-content">
+                        <div class="alert alert-info">
+                            <i class="fa fa-circle-info me-1"></i>
+                            Tambah jadwal individu hanya bisa dilakukan pada tanggal yang sudah memiliki jadwal pegawai lain dan belum disinkron.
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label" for="individu-pegawai_id">
+                                    Pegawai <span class="text-danger">*</span>
+                                </label>
+                                <select class="js-select2 form-select" id="individu-pegawai_id" name="individu-pegawai_id" style="width: 100%;" data-placeholder="-- Pilih Pegawai --">
+                                    <option></option>
+                                    <?php foreach ($pegawai as $item) : ?>
+                                        <option value="<?= esc($item->id); ?>">
+                                            <?= esc($item->nama_pegawai); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div id="error-individu-pegawai_id" class="invalid-feedback animated fadeIn"></div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label" for="individu-tanggal">
+                                    Tanggal <span class="text-danger">*</span>
+                                </label>
+                                <input type="text"
+                                    class="js-flatpickr form-control"
+                                    id="individu-tanggal"
+                                    name="individu-tanggal"
+                                    data-mode="multiple"
+                                    data-date-format="Y-m-d"
+                                    autocomplete="off">
+                                <div id="error-individu-tanggal" class="invalid-feedback animated fadeIn"></div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label" for="individu-status_hari">
+                                    Status Hari <span class="text-danger">*</span>
+                                </label>
+                                <select class="js-select2 form-select" id="individu-status_hari" name="individu-status_hari" style="width: 100%;" data-placeholder="-- Pilih Status Hari --">
+                                    <option></option>
+                                    <option value="kerja">Kerja</option>
+                                    <option value="libur">Libur</option>
+                                </select>
+                                <div id="error-individu-status_hari" class="invalid-feedback animated fadeIn"></div>
+                            </div>
+
+                            <div class="col-md-6 mb-4" id="wrap-individu-shift_id">
+                                <label class="form-label" for="individu-shift_id">
+                                    Shift <span class="text-danger">*</span>
+                                </label>
+                                <select class="js-select2 form-select" id="individu-shift_id" name="individu-shift_id" style="width: 100%;" data-placeholder="-- Pilih Shift --">
+                                    <option></option>
+                                    <?php foreach ($shift as $item) : ?>
+                                        <option value="<?= esc($item->id); ?>">
+                                            <?= esc($item->nama_shift); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div id="error-individu-shift_id" class="invalid-feedback animated fadeIn"></div>
+                            </div>
+
+                            <div class="col-12 mb-4">
+                                <label class="form-label" for="individu-catatan">Catatan</label>
+                                <input type="text" class="form-control" id="individu-catatan" name="individu-catatan" autocomplete="off">
+                                <div id="error-individu-catatan" class="invalid-feedback animated fadeIn"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="block-content block-content-full block-content-sm text-end border-top">
+                        <button type="button" id="tutup-modal-individu-jadwal" class="btn btn-danger">
+                            <i class="fa fa-times opacity-50 me-1"></i> Batal
+                        </button>
+                        <button type="submit" id="submit-individu-jadwal" class="btn btn-primary text-white">
+                            <i class="fa fa-save me-1"></i> Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <?= $this->endSection('content'); ?>

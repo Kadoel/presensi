@@ -17,6 +17,13 @@
         <?= select2_modal('edit-status_hari', 'modal-ubah'); ?>
         <?= select2_modal('edit-shift_id', 'modal-ubah'); ?>
 
+        <?= select2_modal('copy-pegawai_sumber_id', 'modal-copy-jadwal'); ?>
+        <?= select2_modal('copy-pegawai_tujuan_id', 'modal-copy-jadwal'); ?>
+
+        <?= select2_modal('individu-pegawai_id', 'modal-individu-jadwal'); ?>
+        <?= select2_modal('individu-status_hari', 'modal-individu-jadwal'); ?>
+        <?= select2_modal('individu-shift_id', 'modal-individu-jadwal'); ?>
+
         function toggleShiftEdit() {
             let status = $('#edit-status_hari').val();
 
@@ -436,9 +443,222 @@
             });
         });
 
+        function clear_errors_copy() {
+            const fields = [
+                'copy-pegawai_sumber_id',
+                'copy-pegawai_tujuan_id',
+                'copy-tanggal_mulai',
+                'copy-tanggal_selesai',
+                'copy-catatan'
+            ];
+
+            fields.forEach(function(field) {
+                $('#' + field).removeClass('is-invalid');
+                $('#error-' + field).html('').hide();
+            });
+        }
+
+        function resetCopyJadwal() {
+            $('#copy-pegawai_sumber_id').val('').trigger('change');
+            $('#copy-pegawai_tujuan_id').val('').trigger('change');
+            $('#copy-tanggal_mulai').val('');
+            $('#copy-tanggal_selesai').val('');
+            $('#copy-catatan').val('');
+
+            if (document.querySelector('#copy-tanggal_mulai')?._flatpickr) {
+                document.querySelector('#copy-tanggal_mulai')._flatpickr.clear();
+            }
+
+            if (document.querySelector('#copy-tanggal_selesai')?._flatpickr) {
+                document.querySelector('#copy-tanggal_selesai')._flatpickr.clear();
+            }
+
+            clear_errors_copy();
+        }
+
+        $('#btn-copy-jadwal').on('click', function() {
+            resetCopyJadwal();
+            $('#modal-copy-jadwal').modal('show');
+        });
+
+        $('#tutup-modal-copy-jadwal').on('click', function() {
+            $('#modal-copy-jadwal').modal('hide');
+        });
+
+        $('#form-copy-jadwal').on('submit', function(e) {
+            e.preventDefault();
+
+            $('#submit-copy-jadwal').prop('disabled', true);
+            $('#block-content-copy-jadwal').LoadingOverlay('show');
+            clear_errors_copy();
+
+            let fd = new FormData(this);
+            fd.append(csrfToken, csrfHash);
+
+            $.ajax({
+                type: 'POST',
+                url: '<?= base_url('admin/jadwal/copy') ?>',
+                dataType: 'JSON',
+                data: fd,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(result) {
+                    $('#block-content-copy-jadwal').LoadingOverlay('hide');
+                    $('#submit-copy-jadwal').prop('disabled', false);
+
+                    if (result.sukses) {
+                        $('#modal-copy-jadwal').modal('hide');
+                        notifikasi('success', 'right', result.pesan);
+
+                        if (typeof data_jadwal !== 'undefined') {
+                            data_jadwal.ajax.reload();
+                        }
+                    } else {
+                        KadoelAjax.handleError(result, {
+                            clearFields: [
+                                'copy-pegawai_sumber_id',
+                                'copy-pegawai_tujuan_id',
+                                'copy-tanggal_mulai',
+                                'copy-tanggal_selesai',
+                                'copy-catatan'
+                            ]
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    $('#block-content-copy-jadwal').LoadingOverlay('hide');
+                    $('#submit-copy-jadwal').prop('disabled', false);
+
+                    if (xhr.status == 403) {
+                        notifikasi('info', 'right', 'Token Kadaluarsa, Silahkan Reload Halaman Terlebih Dahulu');
+                        return;
+                    }
+
+                    const res = xhr.responseJSON;
+                    KadoelAjax.handleError(res || {
+                        pesan: 'Terjadi kesalahan server'
+                    });
+                }
+            });
+        });
+
+        function clear_errors_individu() {
+            const fields = [
+                'individu-pegawai_id',
+                'individu-tanggal',
+                'individu-status_hari',
+                'individu-shift_id',
+                'individu-catatan'
+            ];
+
+            fields.forEach(function(field) {
+                $('#' + field).removeClass('is-invalid');
+                $('#error-' + field).html('').hide();
+            });
+        }
+
+        function toggleShiftIndividu() {
+            const status = $('#individu-status_hari').val();
+
+            if (status === 'kerja') {
+                $('#wrap-individu-shift_id').show();
+            } else {
+                $('#wrap-individu-shift_id').hide();
+                $('#individu-shift_id').val('').trigger('change');
+            }
+        }
+
+        $('#individu-status_hari').on('change', function() {
+            toggleShiftIndividu();
+        });
+
+        function resetIndividuJadwal() {
+            $('#individu-pegawai_id').val('').trigger('change');
+            $('#individu-tanggal').val('');
+            $('#individu-status_hari').val('').trigger('change');
+            $('#individu-shift_id').val('').trigger('change');
+            $('#individu-catatan').val('');
+
+            const el = document.querySelector('#individu-tanggal');
+            if (el && el._flatpickr) {
+                el._flatpickr.clear();
+            }
+
+            toggleShiftIndividu();
+            clear_errors_individu();
+        }
+
+        $('#btn-individu-jadwal').on('click', function() {
+            resetIndividuJadwal();
+            $('#modal-individu-jadwal').modal('show');
+        });
+
+        $('#tutup-modal-individu-jadwal').on('click', function() {
+            $('#modal-individu-jadwal').modal('hide');
+        });
+
+        $('#form-individu-jadwal').on('submit', function(e) {
+            e.preventDefault();
+
+            $('#submit-individu-jadwal').prop('disabled', true);
+            $('#block-content-individu-jadwal').LoadingOverlay('show');
+            clear_errors_individu();
+
+            let fd = new FormData(this);
+            fd.append(csrfToken, csrfHash);
+
+            $.ajax({
+                type: 'POST',
+                url: '<?= base_url('admin/jadwal/individu') ?>',
+                dataType: 'JSON',
+                data: fd,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(result) {
+                    $('#block-content-individu-jadwal').LoadingOverlay('hide');
+                    $('#submit-individu-jadwal').prop('disabled', false);
+
+                    if (result.sukses) {
+                        $('#modal-individu-jadwal').modal('hide');
+                        notifikasi('success', 'right', result.pesan);
+
+                        if (typeof data_jadwal !== 'undefined') {
+                            data_jadwal.ajax.reload();
+                        }
+                    } else {
+                        KadoelAjax.handleError(result, {
+                            clearFields: [
+                                'individu-pegawai_id',
+                                'individu-tanggal',
+                                'individu-status_hari',
+                                'individu-shift_id',
+                                'individu-catatan'
+                            ]
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    $('#block-content-individu-jadwal').LoadingOverlay('hide');
+                    $('#submit-individu-jadwal').prop('disabled', false);
+
+                    if (xhr.status == 403) {
+                        notifikasi('info', 'right', 'Token Kadaluarsa, Silahkan Reload Halaman Terlebih Dahulu');
+                        return;
+                    }
+
+                    const res = xhr.responseJSON;
+                    KadoelAjax.handleError(res || {
+                        pesan: 'Terjadi kesalahan server'
+                    });
+                }
+            });
+        });
 
         toggleShiftEdit();
         syncDisabledPegawaiOptions();
+        toggleShiftIndividu();
     });
 </script>
 <script>
@@ -459,6 +679,22 @@
                 minDate: minTanggal,
                 clickOpens: false,
                 allowInput: false
+            });
+
+            flatpickr('#copy-tanggal_mulai', {
+                dateFormat: 'Y-m-d',
+                minDate: minTanggal
+            });
+
+            flatpickr('#copy-tanggal_selesai', {
+                dateFormat: 'Y-m-d',
+                minDate: minTanggal
+            });
+
+            flatpickr('#individu-tanggal', {
+                dateFormat: 'Y-m-d',
+                mode: 'multiple',
+                minDate: minTanggal
             });
         }
     });

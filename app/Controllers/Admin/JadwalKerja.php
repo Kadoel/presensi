@@ -218,4 +218,18 @@ class JadwalKerja extends BaseController
 
         return $this->response->setJSON($result);
     }
+
+    public function copy()
+    {
+        $result = $this->jadwalKerjaService->copyJadwalPegawai($this->request->getPost());
+
+        return $this->response->setJSON($result);
+    }
+
+    public function individu()
+    {
+        $result = $this->jadwalKerjaService->simpanIndividu($this->request->getPost());
+
+        return $this->response->setJSON($result);
+    }
 }
