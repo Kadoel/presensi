@@ -2,12 +2,19 @@
 <script src="/assets/plugins/fullcalender/index.global.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
+        // =========================================================
+        // GLOBAL CONFIG & HELPERS FROM TEMPLATE
+        // =========================================================
         let csrfToken = '<?= csrf_token(); ?>';
         let csrfHash = '<?= csrf_hash(); ?>';
+        let calendarJadwal = null;
 
         <?= loadingoverlay_fa(); ?>
         <?= notifikasi(); ?>
 
+        // =========================================================
+        // INIT SELECT2
+        // =========================================================
         $('.section-pegawai').select2({
             placeholder: '-- Pilih Pegawai --',
             allowClear: true,
@@ -25,21 +32,84 @@
         <?= select2_modal('individu-status_hari', 'modal-individu-jadwal'); ?>
         <?= select2_modal('individu-shift_id', 'modal-individu-jadwal'); ?>
 
-        function toggleShiftEdit() {
-            let status = $('#edit-status_hari').val();
+        // =========================================================
+        // HELPER: GENERAL UI
+        // =========================================================
+        function escapeHtml(value) {
+            return $('<div>').text(value).html();
+        }
 
-            if (status === 'kerja') {
-                $('#wrap-edit-shift_id').show();
+        function badgeStatusHari(status) {
+            const map = {
+                kerja: '<span class="badge bg-success">Kerja</span>',
+                libur: '<span class="badge bg-danger">Libur</span>',
+                izin: '<span class="badge bg-warning text-dark">Izin</span>',
+                sakit: '<span class="badge bg-info text-dark">Sakit</span>'
+            };
+
+            return map[status] || '<span class="badge bg-secondary">-</span>';
+        }
+
+        function badgeSumberData(sumber) {
+            const map = {
+                manual: '<span class="badge bg-primary">Manual</span>',
+                pengajuan_izin: '<span class="badge bg-dark">Pengajuan Izin</span>',
+                hari_libur: '<span class="badge bg-danger">Hari Libur</span>'
+            };
+
+            return map[sumber] || '<span class="badge bg-secondary">-</span>';
+        }
+
+        function setFlatpickrTanggal(selector, value) {
+            const el = document.querySelector(selector);
+
+            if (!el) return;
+
+            if (el._flatpickr) {
+                if (value) {
+                    el._flatpickr.setDate(value, true, 'Y-m-d');
+                } else {
+                    el._flatpickr.clear();
+                }
             } else {
-                $('#wrap-edit-shift_id').hide();
-                $('#edit-shift_id').val('').trigger('change');
+                $(selector).val(value || '');
             }
         }
 
-        $('#edit-status_hari').on('change', function() {
-            toggleShiftEdit();
-        });
+        // =========================================================
+        // HELPER: FILTER BULAN + SYNC DATATABLE & CALENDAR
+        // =========================================================
+        function ambilBulanJadwal() {
+            return $('#filter-bulan-jadwal').val() || '<?= date('Y-m'); ?>';
+        }
 
+        function setFilterBulanDariTanggal(tanggal) {
+            if (!tanggal || tanggal.length < 7) return;
+
+            const bulan = tanggal.substring(0, 7);
+
+            $('#filter-bulan-jadwal').val(bulan);
+
+            if (typeof data_jadwal !== 'undefined') {
+                data_jadwal.ajax.reload();
+            }
+
+            syncKalenderDenganFilterBulan();
+        }
+
+        function updateBulanDariField(selector) {
+            const val = $(selector).val();
+
+            if (!val) return;
+
+            const tanggalPertama = val.split(',')[0].trim();
+
+            setFilterBulanDariTanggal(tanggalPertama);
+        }
+
+        // =========================================================
+        // HELPER: GENERATE FORM - PEGAWAI UNIQUE PER SECTION
+        // =========================================================
         function selectedPegawaiValues() {
             let selected = [];
 
@@ -69,10 +139,183 @@
             });
         }
 
-        $('.section-pegawai').on('change', function() {
-            syncDisabledPegawaiOptions();
-        });
+        // =========================================================
+        // HELPER: TOGGLE SHIFT FIELD
+        // =========================================================
+        function toggleShiftEdit() {
+            let status = $('#edit-status_hari').val();
 
+            if (status === 'kerja') {
+                $('#wrap-edit-shift_id').show();
+            } else {
+                $('#wrap-edit-shift_id').hide();
+                $('#edit-shift_id').val('').trigger('change');
+            }
+        }
+
+        function toggleShiftIndividu() {
+            const status = $('#individu-status_hari').val();
+
+            if (status === 'kerja') {
+                $('#wrap-individu-shift_id').show();
+            } else {
+                $('#wrap-individu-shift_id').hide();
+                $('#individu-shift_id').val('').trigger('change');
+            }
+        }
+
+        // =========================================================
+        // HELPER: CLEAR ERRORS
+        // =========================================================
+        function clear_errors_tambah() {
+            const fields = ['tanggal', 'catatan'];
+
+            fields.forEach(function(field) {
+                $('#' + field).removeClass('is-invalid');
+                $('#error-' + field).html('').hide();
+            });
+
+            $('#error-pegawai').addClass('d-none').html('');
+            $('#error-shift_pegawai').addClass('d-none').html('');
+        }
+
+        function clear_errors_edit() {
+            const fields = [
+                'edit-pegawai_id',
+                'edit-tanggal',
+                'edit-status_hari',
+                'edit-shift_id',
+                'edit-catatan'
+            ];
+
+            fields.forEach(function(field) {
+                $('#' + field).removeClass('is-invalid');
+                $('#error-' + field).html('').hide();
+            });
+        }
+
+        function clear_errors_copy() {
+            const fields = [
+                'copy-pegawai_sumber_id',
+                'copy-pegawai_tujuan_id',
+                'copy-tanggal_mulai',
+                'copy-tanggal_selesai',
+                'copy-catatan'
+            ];
+
+            fields.forEach(function(field) {
+                $('#' + field).removeClass('is-invalid');
+                $('#error-' + field).html('').hide();
+            });
+        }
+
+        function clear_errors_individu() {
+            const fields = [
+                'individu-pegawai_id',
+                'individu-tanggal',
+                'individu-status_hari',
+                'individu-shift_id',
+                'individu-catatan'
+            ];
+
+            fields.forEach(function(field) {
+                $('#' + field).removeClass('is-invalid');
+                $('#error-' + field).html('').hide();
+            });
+        }
+
+        function tampilkanErrorGenerate(result) {
+            const errors = result.errors || {};
+
+            if (errors.tanggal) {
+                $('#tanggal').addClass('is-invalid');
+                $('#error-tanggal').html(errors.tanggal).show();
+            }
+
+            if (errors.catatan) {
+                $('#catatan').addClass('is-invalid');
+                $('#error-catatan').html(errors.catatan).show();
+            }
+
+            if (errors.pegawai) {
+                $('#error-pegawai').removeClass('d-none').html(errors.pegawai);
+            }
+
+            if (errors.shift_pegawai) {
+                $('#error-shift_pegawai').removeClass('d-none').html(errors.shift_pegawai);
+            }
+
+            if (!Object.keys(errors).length && result.pesan) {
+                notifikasi('danger', 'right', result.pesan);
+            }
+        }
+
+        // =========================================================
+        // HELPER: RESET FORMS
+        // =========================================================
+        function resetGenerateForm() {
+            $('#tanggal').val('');
+            $('#catatan').val('');
+            $('.section-pegawai').val([]).trigger('change');
+
+            const el = document.querySelector('#tanggal');
+            if (el && el._flatpickr) {
+                el._flatpickr.clear();
+            }
+
+            clear_errors_tambah();
+            syncDisabledPegawaiOptions();
+        }
+
+        function resetCopyJadwal() {
+            $('#copy-pegawai_sumber_id').val('').trigger('change');
+            $('#copy-pegawai_tujuan_id').val('').trigger('change');
+            $('#copy-tanggal_mulai').val('');
+            $('#copy-tanggal_selesai').val('');
+            $('#copy-catatan').val('');
+
+            if (document.querySelector('#copy-tanggal_mulai')?._flatpickr) {
+                document.querySelector('#copy-tanggal_mulai')._flatpickr.clear();
+            }
+
+            if (document.querySelector('#copy-tanggal_selesai')?._flatpickr) {
+                document.querySelector('#copy-tanggal_selesai')._flatpickr.clear();
+            }
+
+            clear_errors_copy();
+        }
+
+        function resetIndividuJadwal() {
+            $('#individu-pegawai_id').val('').trigger('change');
+            $('#individu-tanggal').val('');
+            $('#individu-status_hari').val('').trigger('change');
+            $('#individu-shift_id').val('').trigger('change');
+            $('#individu-catatan').val('');
+
+            const el = document.querySelector('#individu-tanggal');
+            if (el && el._flatpickr) {
+                el._flatpickr.clear();
+            }
+
+            toggleShiftIndividu();
+            clear_errors_individu();
+        }
+
+        function tutup_modal() {
+            $('#edit-id').val('');
+            $('#edit-pegawai_id').val('').trigger('change');
+            $('#edit-tanggal').val('');
+            $('#edit-status_hari').val('').trigger('change');
+            $('#edit-shift_id').val('').trigger('change');
+            $('#edit-catatan').val('');
+
+            toggleShiftEdit();
+            jQuery('#modal-ubah').modal('hide');
+        }
+
+        // =========================================================
+        // DATATABLE: JADWAL KERJA
+        // =========================================================
         let data_jadwal = $('#jadwal-kerja-tabel').DataTable({
             destroy: true,
             processing: true,
@@ -89,8 +332,9 @@
             ajax: {
                 url: '<?= base_url("admin/jadwal"); ?>',
                 method: 'POST',
-                data: {
-                    [csrfToken]: csrfHash
+                data: function(d) {
+                    d[csrfToken] = csrfHash;
+                    d.bulan = ambilBulanJadwal();
                 },
                 async: true,
                 error: function(xhr, error, code) {
@@ -158,77 +402,202 @@
             ]
         });
 
-        function clear_errors_tambah() {
-            const fields = ['tanggal', 'catatan'];
+        // =========================================================
+        // FULLCALENDAR: KALENDER JADWAL KERJA
+        // =========================================================
+        const calendarEl = document.getElementById('kalender-jadwal');
 
-            fields.forEach(function(field) {
-                $('#' + field).removeClass('is-invalid');
-                $('#error-' + field).html('').hide();
+        if (calendarEl && typeof FullCalendar !== 'undefined') {
+            calendarJadwal = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'multiMonthYear',
+                height: 'auto',
+                locale: 'id',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'multiMonthYear,dayGridMonth,listMonth'
+                },
+                buttonText: {
+                    today: 'Hari Ini',
+                    month: 'Bulan',
+                    year: 'Tahun',
+                    list: 'Daftar'
+                },
+                views: {
+                    dayGridMonth: {
+                        buttonText: 'Bulan'
+                    },
+                    multiMonthYear: {
+                        buttonText: 'Tahun',
+                        multiMonthMaxColumns: 3
+                    },
+                    listMonth: {
+                        buttonText: 'Daftar'
+                    }
+                },
+                events: '<?= base_url('admin/jadwal/kalender'); ?>',
+                eventClick: function(info) {
+                    const tanggal = info.event.extendedProps.tanggal || info.event.startStr;
+                    loadDetailTanggal(tanggal);
+                },
+                dateClick: function(info) {
+                    loadDetailTanggal(info.dateStr);
+                },
+                eventContent: function(arg) {
+                    const p = arg.event.extendedProps;
+                    let warning = '';
+
+                    if (p.bermasalah) {
+                        warning = `
+                            <div class="fw-bold">
+                                ⚠ ${p.kurang_jadwal > 0 ? 'Kurang ' + p.kurang_jadwal : 'Lebih ' + p.lebih_jadwal}
+                            </div>
+                        `;
+                    }
+
+                    return {
+                        html: `
+                            <div class="fc-jadwal-detail">
+                                <div><b>${p.total_jadwal || 0}</b> / ${p.total_pegawai_aktif || 0}</div>
+                                <div>K:${p.total_kerja || 0} L:${p.total_libur || 0}</div>
+                                ${warning}
+                            </div>
+                        `
+                    };
+                },
+                datesSet: function() {
+                    highlightBulanFilter();
+                },
             });
 
-            $('#error-pegawai').addClass('d-none').html('');
-            $('#error-shift_pegawai').addClass('d-none').html('');
+            calendarJadwal.render();
+
+            window.reloadKalenderJadwal = function() {
+                calendarJadwal.refetchEvents();
+                highlightBulanFilter();
+            };
         }
 
-        function clear_errors_edit() {
-            const fields = [
-                'edit-pegawai_id',
-                'edit-tanggal',
-                'edit-status_hari',
-                'edit-shift_id',
-                'edit-catatan'
-            ];
+        function highlightBulanFilter() {
+            const bulan = $('#filter-bulan-jadwal').val();
 
-            fields.forEach(function(field) {
-                $('#' + field).removeClass('is-invalid');
-                $('#error-' + field).html('').hide();
+            if (!bulan) {
+                return;
+            }
+
+            setTimeout(function() {
+                $('.fc-daygrid-day').removeClass('fc-bulan-filter-aktif');
+                $('.fc-daygrid-day[data-date^="' + bulan + '"]').addClass('fc-bulan-filter-aktif');
+            }, 100);
+        }
+
+        function syncKalenderDenganFilterBulan() {
+            const bulan = $('#filter-bulan-jadwal').val();
+
+            if (!bulan || !calendarJadwal) {
+                return;
+            }
+
+            calendarJadwal.gotoDate(bulan + '-01');
+            highlightBulanFilter();
+        }
+
+        function loadDetailTanggal(tanggal) {
+            $('#detail-tanggal-title').text(KadoelHelper.toTanggalIndonesia(tanggal));
+            $('#detail-tanggal-body').html(`
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Memuat data...</td>
+                </tr>
+            `);
+
+            $('#modal-detail-tanggal').modal('show');
+            $('#block-detail-tanggal').LoadingOverlay('show');
+
+            $.ajax({
+                type: 'GET',
+                url: '<?= base_url('admin/jadwal/detail-tanggal'); ?>',
+                dataType: 'JSON',
+                data: {
+                    tanggal: tanggal
+                },
+                success: function(result) {
+                    $('#block-detail-tanggal').LoadingOverlay('hide');
+
+                    if (!result.sukses) {
+                        KadoelAjax.handleError(result);
+                        return;
+                    }
+
+                    const items = result.items || [];
+                    let html = '';
+
+                    if (items.length < 1) {
+                        html = `
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">
+                                    Tidak ada jadwal pada tanggal ini
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        items.forEach(function(item) {
+                            html += `
+                                <tr>
+                                    <td>${escapeHtml(item.kode_pegawai || '-')}</td>
+                                    <td>${escapeHtml(item.nama_pegawai || '-')}</td>
+                                    <td>${badgeStatusHari(item.status_hari)}</td>
+                                    <td>${escapeHtml(item.nama_shift || '-')}</td>
+                                    <td>${badgeSumberData(item.sumber_data)}</td>
+                                    <td>${escapeHtml(item.catatan || '-')}</td>
+                                </tr>
+                            `;
+                        });
+                    }
+
+                    $('#detail-tanggal-body').html(html);
+                },
+                error: function(xhr) {
+                    $('#block-detail-tanggal').LoadingOverlay('hide');
+
+                    if (xhr.status == 403) {
+                        notifikasi('info', 'right', 'Token Kadaluarsa, Silahkan Reload Halaman Terlebih Dahulu');
+                        return;
+                    }
+
+                    KadoelAjax.handleError(xhr.responseJSON || {
+                        pesan: 'Gagal memuat detail jadwal'
+                    });
+                }
             });
         }
 
-        function tampilkanErrorGenerate(result) {
-            const errors = result.errors || {};
+        // =========================================================
+        // EVENT: GLOBAL FILTERS & FORM UI
+        // =========================================================
+        $('#filter-bulan-jadwal').on('change', function() {
+            data_jadwal.ajax.reload();
+            syncKalenderDenganFilterBulan();
+        });
 
-            if (errors.tanggal) {
-                $('#tanggal').addClass('is-invalid');
-                $('#error-tanggal').html(errors.tanggal).show();
-            }
-
-            if (errors.catatan) {
-                $('#catatan').addClass('is-invalid');
-                $('#error-catatan').html(errors.catatan).show();
-            }
-
-            if (errors.pegawai) {
-                $('#error-pegawai').removeClass('d-none').html(errors.pegawai);
-            }
-
-            if (errors.shift_pegawai) {
-                $('#error-shift_pegawai').removeClass('d-none').html(errors.shift_pegawai);
-            }
-
-            if (!Object.keys(errors).length && result.pesan) {
-                notifikasi('danger', 'right', result.pesan);
-            }
-        }
-
-        function resetGenerateForm() {
-            $('#tanggal').val('');
-            $('#catatan').val('');
-            $('.section-pegawai').val([]).trigger('change');
-
-            const el = document.querySelector('#tanggal');
-            if (el && el._flatpickr) {
-                el._flatpickr.clear();
-            }
-
-            clear_errors_tambah();
+        $('.section-pegawai').on('change', function() {
             syncDisabledPegawaiOptions();
-        }
+        });
+
+        $('#edit-status_hari').on('change', function() {
+            toggleShiftEdit();
+        });
+
+        $('#individu-status_hari').on('change', function() {
+            toggleShiftIndividu();
+        });
 
         $('#reset-generate').on('click', function() {
             resetGenerateForm();
         });
 
+        // =========================================================
+        // FORM: GENERATE JADWAL MASSAL
+        // =========================================================
         $('#form_tambah_jadwal').on('submit', function(e) {
             e.preventDefault();
 
@@ -250,9 +619,14 @@
                     $('#block-konten-tambah').LoadingOverlay('hide');
 
                     if (result.sukses) {
+                        updateBulanDariField('#tanggal');
                         resetGenerateForm();
                         notifikasi('success', 'right', result.pesan);
                         data_jadwal.ajax.reload();
+
+                        if (typeof window.reloadKalenderJadwal === 'function') {
+                            window.reloadKalenderJadwal();
+                        }
 
                         if (result.warning_hari_libur && result.hari_libur && result.hari_libur.length) {
                             let infoLibur = result.hari_libur.map(function(item) {
@@ -262,10 +636,12 @@
                             Swal.fire({
                                 title: 'Info Hari Libur Global',
                                 html: `
-                                    <p>Jadwal berhasil digenerate, tetapi tanggal berikut merupakan <b>hari libur global</b>:</p>
-                                    <ul style="text-align:left;">${infoLibur}</ul>
-                                    <p>Pastikan jadwal yang dibuat memang sesuai kebutuhan operasional. Jika ingin dioverride ke libur global
-                                    Silahkan buka <b>menu Hari Libur</b>, edit hari libur dengan tanggal <b>${infoLibur}</b> untuk menetapkan apakah pegawai tetap <b>kerja</b> atau <b>libur</b>. pada tanggal di atas</p>
+                                    <div class="text-start">
+                                        <p>Jadwal berhasil digenerate, tetapi tanggal berikut merupakan <b>hari libur global</b>:</p>
+                                        <ul>${infoLibur}</ul>
+                                        <p>Pastikan jadwal yang dibuat memang sesuai kebutuhan operasional.</p>
+                                        <p>Jika ingin dioverride ke libur global, buka <b>menu Hari Libur</b> lalu edit hari libur pada tanggal terkait.</p>
+                                    </div>
                                 `,
                                 icon: 'warning',
                                 confirmButtonText: 'Mengerti'
@@ -287,22 +663,9 @@
             });
         });
 
-        function setFlatpickrTanggal(selector, value) {
-            const el = document.querySelector(selector);
-
-            if (!el) return;
-
-            if (el._flatpickr) {
-                if (value) {
-                    el._flatpickr.setDate(value, true, 'Y-m-d');
-                } else {
-                    el._flatpickr.clear();
-                }
-            } else {
-                $(selector).val(value || '');
-            }
-        }
-
+        // =========================================================
+        // MODAL + FORM: EDIT JADWAL
+        // =========================================================
         $('#jadwal-kerja-tabel').on('click', '#act-edit', function() {
             let id = $(this).data('id');
 
@@ -355,18 +718,6 @@
             });
         });
 
-        function tutup_modal() {
-            $('#edit-id').val('');
-            $('#edit-pegawai_id').val('').trigger('change');
-            $('#edit-tanggal').val('');
-            $('#edit-status_hari').val('').trigger('change');
-            $('#edit-shift_id').val('').trigger('change');
-            $('#edit-catatan').val('');
-
-            toggleShiftEdit();
-            jQuery('#modal-ubah').modal('hide');
-        }
-
         $('#modal-ubah').on('click', '#tutup-modal', function() {
             $('#modal-ubah').addClass('fade');
             tutup_modal();
@@ -394,12 +745,18 @@
                 data: fd,
                 success: function(result) {
                     $('#block-content-ubah').LoadingOverlay('hide');
+                    $('#update-data').prop('disabled', false);
 
                     if (result.sukses) {
+                        updateBulanDariField('#edit-tanggal');
                         tutup_modal();
                         clear_errors_edit();
                         notifikasi('success', 'right', result.pesan);
                         data_jadwal.ajax.reload();
+
+                        if (typeof window.reloadKalenderJadwal === 'function') {
+                            window.reloadKalenderJadwal();
+                        }
 
                         if (result.warning_hari_libur && result.hari_libur && result.status_hari_kerja && result.hari_libur.length) {
                             let infoLibur = result.hari_libur.map(function(item) {
@@ -409,18 +766,15 @@
                             Swal.fire({
                                 title: 'Info Hari Libur Global',
                                 html: `
-                                        <div class="text-start">
-                                            <p>Jadwal berhasil diubah, tetapi tanggal <b>${infoLibur}</b> merupakan <b>hari libur global</b>, jadi pastikan jadwal sesuai kebutuhan operasional. Jika ingin dioverride ke libur global:</p>
-
-                                            <ul>
-                                                <li>Buka <b>menu Hari Libur</b></li>
-                                                <li>Edit hari libur pada tanggal <b>${infoLibur}</b></li>
-                                                <li>Atur apakah pegawai tetap <b>kerja</b> atau <b>libur</b> dengan mencentang / tidak mencentang daftar pegawai</li>
-                                            </ul>
-
-                                            <p></p>
-                                        </div>
-                                    `,
+                                    <div class="text-start">
+                                        <p>Jadwal berhasil diubah, tetapi tanggal <b>${infoLibur}</b> merupakan <b>hari libur global</b>.</p>
+                                        <ul>
+                                            <li>Buka <b>menu Hari Libur</b></li>
+                                            <li>Edit hari libur pada tanggal <b>${infoLibur}</b></li>
+                                            <li>Atur apakah pegawai tetap <b>kerja</b> atau <b>libur</b></li>
+                                        </ul>
+                                    </div>
+                                `,
                                 icon: 'warning',
                                 confirmButtonText: 'Mengerti'
                             });
@@ -428,8 +782,6 @@
                     } else {
                         KadoelAjax.handleError(result);
                     }
-
-                    $('#update-data').prop('disabled', false);
                 },
                 error: function(xhr) {
                     $('#block-content-ubah').LoadingOverlay('hide');
@@ -444,39 +796,9 @@
             });
         });
 
-        function clear_errors_copy() {
-            const fields = [
-                'copy-pegawai_sumber_id',
-                'copy-pegawai_tujuan_id',
-                'copy-tanggal_mulai',
-                'copy-tanggal_selesai',
-                'copy-catatan'
-            ];
-
-            fields.forEach(function(field) {
-                $('#' + field).removeClass('is-invalid');
-                $('#error-' + field).html('').hide();
-            });
-        }
-
-        function resetCopyJadwal() {
-            $('#copy-pegawai_sumber_id').val('').trigger('change');
-            $('#copy-pegawai_tujuan_id').val('').trigger('change');
-            $('#copy-tanggal_mulai').val('');
-            $('#copy-tanggal_selesai').val('');
-            $('#copy-catatan').val('');
-
-            if (document.querySelector('#copy-tanggal_mulai')?._flatpickr) {
-                document.querySelector('#copy-tanggal_mulai')._flatpickr.clear();
-            }
-
-            if (document.querySelector('#copy-tanggal_selesai')?._flatpickr) {
-                document.querySelector('#copy-tanggal_selesai')._flatpickr.clear();
-            }
-
-            clear_errors_copy();
-        }
-
+        // =========================================================
+        // MODAL + FORM: COPY JADWAL PEGAWAI
+        // =========================================================
         $('#btn-copy-jadwal').on('click', function() {
             resetCopyJadwal();
             $('#modal-copy-jadwal').modal('show');
@@ -509,11 +831,16 @@
                     $('#submit-copy-jadwal').prop('disabled', false);
 
                     if (result.sukses) {
+                        updateBulanDariField('#copy-tanggal_mulai');
                         $('#modal-copy-jadwal').modal('hide');
                         notifikasi('success', 'right', result.pesan);
 
                         if (typeof data_jadwal !== 'undefined') {
                             data_jadwal.ajax.reload();
+                        }
+
+                        if (typeof window.reloadKalenderJadwal === 'function') {
+                            window.reloadKalenderJadwal();
                         }
                     } else {
                         KadoelAjax.handleError(result, {
@@ -544,52 +871,9 @@
             });
         });
 
-        function clear_errors_individu() {
-            const fields = [
-                'individu-pegawai_id',
-                'individu-tanggal',
-                'individu-status_hari',
-                'individu-shift_id',
-                'individu-catatan'
-            ];
-
-            fields.forEach(function(field) {
-                $('#' + field).removeClass('is-invalid');
-                $('#error-' + field).html('').hide();
-            });
-        }
-
-        function toggleShiftIndividu() {
-            const status = $('#individu-status_hari').val();
-
-            if (status === 'kerja') {
-                $('#wrap-individu-shift_id').show();
-            } else {
-                $('#wrap-individu-shift_id').hide();
-                $('#individu-shift_id').val('').trigger('change');
-            }
-        }
-
-        $('#individu-status_hari').on('change', function() {
-            toggleShiftIndividu();
-        });
-
-        function resetIndividuJadwal() {
-            $('#individu-pegawai_id').val('').trigger('change');
-            $('#individu-tanggal').val('');
-            $('#individu-status_hari').val('').trigger('change');
-            $('#individu-shift_id').val('').trigger('change');
-            $('#individu-catatan').val('');
-
-            const el = document.querySelector('#individu-tanggal');
-            if (el && el._flatpickr) {
-                el._flatpickr.clear();
-            }
-
-            toggleShiftIndividu();
-            clear_errors_individu();
-        }
-
+        // =========================================================
+        // MODAL + FORM: TAMBAH JADWAL INDIVIDU
+        // =========================================================
         $('#btn-individu-jadwal').on('click', function() {
             resetIndividuJadwal();
             $('#modal-individu-jadwal').modal('show');
@@ -622,8 +906,13 @@
                     $('#submit-individu-jadwal').prop('disabled', false);
 
                     if (result.sukses) {
+                        updateBulanDariField('#individu-tanggal');
                         $('#modal-individu-jadwal').modal('hide');
                         notifikasi('success', 'right', result.pesan);
+
+                        if (typeof window.reloadKalenderJadwal === 'function') {
+                            window.reloadKalenderJadwal();
+                        }
 
                         if (typeof data_jadwal !== 'undefined') {
                             data_jadwal.ajax.reload();
@@ -657,12 +946,19 @@
             });
         });
 
+        // =========================================================
+        // INITIAL STATE
+        // =========================================================
         toggleShiftEdit();
         syncDisabledPegawaiOptions();
         toggleShiftIndividu();
     });
 </script>
+
 <script>
+    // =========================================================
+    // FLATPICKR INIT
+    // =========================================================
     Codebase.helpersOnLoad(['jq-select2', 'js-flatpickr']);
 
     const minTanggal = '<?= date('Y-m-d'); ?>';

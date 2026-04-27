@@ -117,13 +117,19 @@
                     <i class="fa fa-file-lines"></i> <b>DATA JADWAL KERJA</b>
                 </h3>
 
-                <div class="block-options">
-                    <button type="button" id="btn-copy-jadwal" class="btn btn-sm btn-alt-primary me-1">
-                        <i class="fa fa-copy me-1"></i> Copy
+                <div class="block-options d-flex gap-2">
+                    <input type="month"
+                        class="form-control form-control-sm"
+                        id="filter-bulan-jadwal"
+                        value="<?= date('Y-m'); ?>"
+                        style="width: 160px;">
+
+                    <button type="button" id="btn-individu-jadwal" class="btn btn-sm btn-alt-success">
+                        <i class="fa fa-user-plus me-1"></i> Individu
                     </button>
 
-                    <button type="button" id="btn-individu-jadwal" class="btn btn-sm btn-alt-success me-1">
-                        <i class="fa fa-user-plus me-1"></i> Individu
+                    <button type="button" id="btn-copy-jadwal" class="btn btn-sm btn-alt-primary">
+                        <i class="fa fa-copy me-1"></i> Copy Jadwal
                     </button>
                 </div>
             </div>
@@ -148,6 +154,19 @@
                         <tbody></tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div id="block-kalender-jadwal" class="block block-themed block-rounded">
+            <div class="block-header">
+                <h3 class="block-title text-white">
+                    <i class="fa fa-calendar-days"></i> <b>KALENDER JADWAL KERJA</b>
+                </h3>
+            </div>
+            <div class="block-content block-content-full">
+                <div id="kalender-jadwal"></div>
             </div>
         </div>
     </div>
@@ -405,6 +424,49 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="modal-detail-tanggal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div id="block-detail-tanggal" class="block block-themed block-rounded shadow-none mb-0">
+                <div class="block-header">
+                    <h3 class="block-title text-white">
+                        <i class="fa fa-calendar-day"></i>
+                        <b>DETAIL JADWAL</b> <span id="detail-tanggal-title"></span>
+                    </h3>
+                </div>
+
+                <div class="block-content block-content-full">
+                    <div class="table-responsive">
+                        <table class="table table-vcenter table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Nama Pegawai</th>
+                                    <th>Status</th>
+                                    <th>Shift</th>
+                                    <th>Sumber</th>
+                                    <th>Catatan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detail-tanggal-body">
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">Memuat data...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="block-content block-content-full block-content-sm text-end border-top">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                        Tutup
+                    </button>
+                </div>
             </div>
         </div>
     </div>

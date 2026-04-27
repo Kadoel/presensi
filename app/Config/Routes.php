@@ -104,6 +104,8 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
         $routes->post('edit', 'Admin\JadwalKerja::edit');
         $routes->post('copy', 'Admin\JadwalKerja::copy');
         $routes->post('individu', 'Admin\JadwalKerja::individu');
+        $routes->get('kalender', 'Admin\JadwalKerja::kalender');
+        $routes->get('detail-tanggal', 'Admin\JadwalKerja::detailTanggal');
         $routes->post('update/(:num)', 'Admin\JadwalKerja::update/$1');
     });
 

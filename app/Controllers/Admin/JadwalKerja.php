@@ -29,7 +29,9 @@ class JadwalKerja extends BaseController
             ]);
         }
 
-        $builder = $this->jadwalKerjaService->dataTabel();
+        $builder = $this->jadwalKerjaService->dataTabel(
+            $this->request->getPost('bulan')
+        );
 
         return DataTable::of($builder)
             ->filter(function ($builder, $request) {
@@ -231,5 +233,24 @@ class JadwalKerja extends BaseController
         $result = $this->jadwalKerjaService->simpanIndividu($this->request->getPost());
 
         return $this->response->setJSON($result);
+    }
+
+    public function kalender()
+    {
+        return $this->response->setJSON(
+            $this->jadwalKerjaService->kalender(
+                $this->request->getVar('start') ?: date('Y-m-01'),
+                $this->request->getVar('end') ?: date('Y-m-t')
+            )
+        );
+    }
+
+    public function detailTanggal()
+    {
+        return $this->response->setJSON(
+            $this->jadwalKerjaService->detailTanggal(
+                $this->request->getVar('tanggal') ?: date('Y-m-d')
+            )
+        );
     }
 }

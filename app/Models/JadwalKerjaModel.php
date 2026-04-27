@@ -28,31 +28,37 @@ class JadwalKerjaModel extends Model
 
     protected $useTimestamps = true;
 
-    public function selectData()
+    public function selectData(?string $bulan = null)
     {
-        return $this->db->table('jadwal_kerja')
+        $builder = $this->db->table('jadwal_kerja')
             ->select('
-                jadwal_kerja.id,
-                jadwal_kerja.pegawai_id,
-                jadwal_kerja.tanggal,
-                jadwal_kerja.shift_id,
-                jadwal_kerja.status_hari,
-                jadwal_kerja.sumber_data,
-                jadwal_kerja.pengajuan_izin_id,
-                jadwal_kerja.catatan,
-                jadwal_kerja.created_by,
-                jadwal_kerja.created_at,
-                jadwal_kerja.updated_at,
-                pegawai.kode_pegawai,
-                pegawai.nama_pegawai,
-                shift.kode_shift,
-                shift.nama_shift,
-                users.username AS dibuat_oleh,
-                DATE_FORMAT(jadwal_kerja.tanggal, "%Y-%m") AS bulan_jadwal
-            ')
+            jadwal_kerja.id,
+            jadwal_kerja.pegawai_id,
+            jadwal_kerja.tanggal,
+            jadwal_kerja.shift_id,
+            jadwal_kerja.status_hari,
+            jadwal_kerja.sumber_data,
+            jadwal_kerja.pengajuan_izin_id,
+            jadwal_kerja.catatan,
+            jadwal_kerja.created_by,
+            jadwal_kerja.created_at,
+            jadwal_kerja.updated_at,
+            pegawai.kode_pegawai,
+            pegawai.nama_pegawai,
+            shift.kode_shift,
+            shift.nama_shift,
+            users.username AS dibuat_oleh,
+            DATE_FORMAT(jadwal_kerja.tanggal, "%Y-%m") AS bulan_jadwal
+        ')
             ->join('pegawai', 'pegawai.id = jadwal_kerja.pegawai_id', 'left')
             ->join('shift', 'shift.id = jadwal_kerja.shift_id', 'left')
             ->join('users', 'users.id = jadwal_kerja.created_by', 'left');
+
+        if (! empty($bulan)) {
+            $builder->where('DATE_FORMAT(jadwal_kerja.tanggal, "%Y-%m") =', $bulan);
+        }
+
+        return $builder;
     }
 
     public function getJadwalById(int $id)
@@ -196,5 +202,45 @@ class JadwalKerjaModel extends Model
         return (int) $this->where('pegawai_id', $pegawaiId)
             ->where('DATE_FORMAT(tanggal, "%Y-%m") =', $bulan)
             ->countAllResults();
+    }
+
+    public function getKalenderRingkasan(string $start, string $end): array
+    {
+        return $this->db->table($this->table)
+            ->select('
+            tanggal,
+            COUNT(*) AS total_jadwal,
+            SUM(CASE WHEN status_hari = "kerja" THEN 1 ELSE 0 END) AS total_kerja,
+            SUM(CASE WHEN status_hari = "libur" THEN 1 ELSE 0 END) AS total_libur,
+            SUM(CASE WHEN status_hari = "izin" THEN 1 ELSE 0 END) AS total_izin,
+            SUM(CASE WHEN status_hari = "sakit" THEN 1 ELSE 0 END) AS total_sakit
+        ')
+            ->where('tanggal >=', $start)
+            ->where('tanggal <=', $end)
+            ->groupBy('tanggal')
+            ->orderBy('tanggal', 'ASC')
+            ->get()
+            ->getResult();
+    }
+
+    public function getDetailByTanggal(string $tanggal): array
+    {
+        return $this->db->table($this->table)
+            ->select('
+            jadwal_kerja.id,
+            jadwal_kerja.tanggal,
+            jadwal_kerja.status_hari,
+            jadwal_kerja.sumber_data,
+            jadwal_kerja.catatan,
+            pegawai.kode_pegawai,
+            pegawai.nama_pegawai,
+            shift.nama_shift
+        ')
+            ->join('pegawai', 'pegawai.id = jadwal_kerja.pegawai_id', 'left')
+            ->join('shift', 'shift.id = jadwal_kerja.shift_id', 'left')
+            ->where('jadwal_kerja.tanggal', $tanggal)
+            ->orderBy('pegawai.nama_pegawai', 'ASC')
+            ->get()
+            ->getResult();
     }
 }

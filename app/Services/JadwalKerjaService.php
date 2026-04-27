@@ -27,9 +27,9 @@ class JadwalKerjaService extends BaseService
         $this->presensiModel    = new PresensiModel();
     }
 
-    public function dataTabel()
+    public function dataTabel(?string $bulan = null)
     {
-        return $this->jadwalKerjaModel->selectData();
+        return $this->jadwalKerjaModel->selectData($bulan);
     }
 
     public function getPegawaiDropdown(): array
@@ -603,6 +603,72 @@ class JadwalKerjaService extends BaseService
 
             return $this->hasilSukses('Jadwal individu berhasil ditambahkan', [
                 'jumlah_data' => count($rows),
+            ]);
+        });
+    }
+
+    public function kalender(string $start, string $end): array
+    {
+        return $this->eksekusi(function () use ($start, $end) {
+            $rows = $this->jadwalKerjaModel->getKalenderRingkasan($start, $end);
+
+            $totalPegawaiAktif = (int) $this->pegawaiModel
+                ->where('is_active', 1)
+                ->countAllResults();
+
+            $events = [];
+
+            foreach ($rows as $row) {
+                $totalJadwal = (int) $row->total_jadwal;
+                $totalKerja  = (int) $row->total_kerja;
+                $totalLibur  = (int) $row->total_libur;
+                $totalIzin   = (int) $row->total_izin;
+                $totalSakit  = (int) $row->total_sakit;
+
+                $bermasalah = $totalJadwal !== $totalPegawaiAktif;
+
+                $classNames = ['fc-jadwal-event'];
+
+                if ($bermasalah) {
+                    $classNames[] = 'fc-jadwal-bermasalah';
+                } elseif ($totalLibur === $totalJadwal) {
+                    $classNames[] = 'fc-jadwal-libur';
+                } elseif ($totalKerja === $totalJadwal) {
+                    $classNames[] = 'fc-jadwal-kerja';
+                } else {
+                    $classNames[] = 'fc-jadwal-campuran';
+                }
+
+                $events[] = [
+                    'title'      => $totalJadwal . ' Jadwal',
+                    'start'      => $row->tanggal,
+                    'allDay'     => true,
+                    'classNames' => $classNames,
+                    'extendedProps' => [
+                        'tanggal'             => $row->tanggal,
+                        'total_jadwal'        => $totalJadwal,
+                        'total_pegawai_aktif' => $totalPegawaiAktif,
+                        'total_kerja'         => $totalKerja,
+                        'total_libur'         => $totalLibur,
+                        'total_izin'          => $totalIzin,
+                        'total_sakit'         => $totalSakit,
+                        'bermasalah'          => $bermasalah,
+                        'kurang_jadwal'       => max($totalPegawaiAktif - $totalJadwal, 0),
+                        'lebih_jadwal'        => max($totalJadwal - $totalPegawaiAktif, 0),
+                    ],
+                ];
+            }
+
+            return $events;
+        });
+    }
+
+    public function detailTanggal(string $tanggal): array
+    {
+        return $this->eksekusi(function () use ($tanggal) {
+            return $this->hasilData([
+                'tanggal' => $tanggal,
+                'items' => $this->jadwalKerjaModel->getDetailByTanggal($tanggal),
             ]);
         });
     }
