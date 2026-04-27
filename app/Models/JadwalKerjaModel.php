@@ -258,4 +258,16 @@ class JadwalKerjaModel extends Model
             ->where('tanggal', $tanggal)
             ->countAllResults();
     }
+
+    public function getGrafikJadwalMingguan(string $tanggalMulai, string $tanggalSelesai): array
+    {
+        return $this->db->table($this->table)
+            ->select('tanggal, COUNT(*) AS total_jadwal')
+            ->where('tanggal >=', $tanggalMulai)
+            ->where('tanggal <=', $tanggalSelesai)
+            ->groupBy('tanggal')
+            ->orderBy('tanggal', 'ASC')
+            ->get()
+            ->getResult();
+    }
 }

@@ -158,6 +158,62 @@
     </div>
 
     <div class="row">
+        <div class="col-xl-6">
+            <div id="block-grafik-hasil-presensi" class="block block-rounded">
+                <div class="block-header block-header-default">
+                    <h3 class="block-title">
+                        <i class="fa fa-chart-pie me-1"></i> Grafik Hasil Presensi Hari Ini
+                    </h3>
+                </div>
+                <div class="block-content block-content-full">
+                    <canvas id="chart-hasil-presensi" height="140"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6">
+            <div id="block-grafik-status-presensi" class="block block-rounded">
+                <div class="block-header block-header-default">
+                    <h3 class="block-title">
+                        <i class="fa fa-chart-column me-1"></i> Grafik Status Datang & Pulang
+                    </h3>
+                </div>
+                <div class="block-content block-content-full">
+                    <canvas id="chart-status-presensi" height="140"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-8">
+            <div id="block-grafik-mingguan" class="block block-rounded">
+                <div class="block-header block-header-default">
+                    <h3 class="block-title">
+                        <i class="fa fa-chart-line me-1"></i> Grafik Mingguan Jadwal vs Presensi
+                    </h3>
+                </div>
+                <div class="block-content block-content-full">
+                    <canvas id="chart-mingguan" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4">
+            <div id="block-grafik-bulanan" class="block block-rounded">
+                <div class="block-header block-header-default">
+                    <h3 class="block-title">
+                        <i class="fa fa-chart-pie me-1"></i> Grafik Bulanan
+                    </h3>
+                </div>
+                <div class="block-content block-content-full">
+                    <canvas id="chart-bulanan" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-xl-8">
             <div id="block-presensi-hari-ini" class="block block-themed block-rounded">
                 <div class="block-header">
@@ -203,8 +259,10 @@
                 </div>
 
                 <div class="block-content">
-                    <div id="aktivitas-terbaru-list">
-                        <div class="text-center text-muted py-4">Memuat data...</div>
+                    <div id="aktivitas-terbaru-wrapper" style="height:390px; overflow:hidden; position:relative;">
+                        <div id="aktivitas-terbaru-list">
+                            <div class="text-center text-muted py-4">Memuat data...</div>
+                        </div>
                     </div>
                 </div>
             </div>

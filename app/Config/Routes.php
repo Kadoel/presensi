@@ -26,6 +26,8 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('summary', 'Admin\Beranda::summary');
     $routes->get('presensi-hari-ini', 'Admin\Beranda::presensiHariIni');
     $routes->get('aktivitas-terbaru', 'Admin\Beranda::aktivitasTerbaru');
+    $routes->get('grafik-mingguan', 'Admin\Beranda::grafikMingguan');
+    $routes->get('grafik-bulanan', 'Admin\Beranda::grafikBulanan');
     $routes->GET("logout", "Admin\Beranda::logout");
 
     //Pengaturan

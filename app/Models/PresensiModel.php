@@ -227,4 +227,30 @@ class PresensiModel extends Model
             ->where('hasil_presensi IS NOT NULL', null, false)
             ->countAllResults();
     }
+
+    public function getGrafikPresensiMingguan(string $tanggalMulai, string $tanggalSelesai): array
+    {
+        return $this->db->table($this->table)
+            ->select('tanggal, COUNT(*) AS total_presensi')
+            ->where('tanggal >=', $tanggalMulai)
+            ->where('tanggal <=', $tanggalSelesai)
+            ->groupBy('tanggal')
+            ->orderBy('tanggal', 'ASC')
+            ->get()
+            ->getResult();
+    }
+
+    public function getGrafikHasilPresensiBulanan(string $bulan): array
+    {
+        return $this->db->table($this->table)
+            ->select('
+            hasil_presensi,
+            COUNT(*) AS total
+        ')
+            ->where('DATE_FORMAT(tanggal, "%Y-%m") =', $bulan)
+            ->where('hasil_presensi IS NOT NULL', null, false)
+            ->groupBy('hasil_presensi')
+            ->get()
+            ->getResult();
+    }
 }

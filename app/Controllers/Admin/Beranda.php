@@ -44,6 +44,20 @@ class Beranda extends BaseController
         );
     }
 
+    public function grafikMingguan()
+    {
+        return $this->response->setJSON(
+            $this->berandaService->getGrafikMingguan()
+        );
+    }
+
+    public function grafikBulanan()
+    {
+        return $this->response->setJSON(
+            $this->berandaService->getGrafikBulanan()
+        );
+    }
+
     public function logout()
     {
         session()->destroy();

@@ -91,4 +91,74 @@ class BerandaService extends BaseService
     {
         return $this->auditLogModel->getAktivitasTerbaru(10);
     }
+
+    public function getGrafikMingguan(): array
+    {
+        $tanggalSelesai = date('Y-m-d');
+        $tanggalMulai   = date('Y-m-d', strtotime('-6 days'));
+
+        $jadwalRows   = $this->jadwalKerjaModel->getGrafikJadwalMingguan($tanggalMulai, $tanggalSelesai);
+        $presensiRows = $this->presensiModel->getGrafikPresensiMingguan($tanggalMulai, $tanggalSelesai);
+
+        $jadwalMap = [];
+        foreach ($jadwalRows as $row) {
+            $jadwalMap[$row->tanggal] = (int) $row->total_jadwal;
+        }
+
+        $presensiMap = [];
+        foreach ($presensiRows as $row) {
+            $presensiMap[$row->tanggal] = (int) $row->total_presensi;
+        }
+
+        $labels = [];
+        $jadwal = [];
+        $presensi = [];
+
+        for ($i = 6; $i >= 0; $i--) {
+            $tanggal = date('Y-m-d', strtotime("-{$i} days"));
+
+            $labels[]   = date('d/m', strtotime($tanggal));
+            $jadwal[]   = $jadwalMap[$tanggal] ?? 0;
+            $presensi[] = $presensiMap[$tanggal] ?? 0;
+        }
+
+        return [
+            'labels'   => $labels,
+            'jadwal'   => $jadwal,
+            'presensi' => $presensi,
+        ];
+    }
+
+    public function getGrafikBulanan(): array
+    {
+        $bulan = date('Y-m');
+
+        $rows = $this->presensiModel->getGrafikHasilPresensiBulanan($bulan);
+
+        $data = [
+            'hadir' => 0,
+            'izin'  => 0,
+            'sakit' => 0,
+            'libur' => 0,
+            'alpa'  => 0,
+        ];
+
+        foreach ($rows as $row) {
+            if (array_key_exists($row->hasil_presensi, $data)) {
+                $data[$row->hasil_presensi] = (int) $row->total;
+            }
+        }
+
+        return [
+            'bulan'  => $bulan,
+            'labels' => ['Hadir', 'Izin', 'Sakit', 'Libur', 'Alpa'],
+            'data'   => [
+                $data['hadir'],
+                $data['izin'],
+                $data['sakit'],
+                $data['libur'],
+                $data['alpa'],
+            ],
+        ];
+    }
 }
