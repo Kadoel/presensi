@@ -14,7 +14,7 @@ class RoleFilter implements FilterInterface
         $role    = session()->get('role');
 
         if ($isLogin !== true || !$role) {
-            return redirect()->to('/')->with('error', 'Silakan login terlebih dahulu.');
+            return redirect()->to('/')->with('error', 'Silahkan login terlebih dahulu.');
         }
 
         if (empty($arguments)) {
