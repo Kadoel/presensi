@@ -4,38 +4,157 @@
 <?php $tanggal = date('Y-m-d'); ?>
 
 <div class="content">
-    <div id="block-ringkasan-beranda" class="row">
-        <?php
-        $cards = [
-            ['id' => 'total-pegawai', 'label' => 'Total Pegawai', 'icon' => 'fa-users', 'class' => 'text-primary'],
-            ['id' => 'hadir-hari-ini', 'label' => 'Hadir Hari Ini', 'icon' => 'fa-user-check', 'class' => 'text-success'],
-            ['id' => 'alpa-hari-ini', 'label' => 'Alpa Hari Ini', 'icon' => 'fa-user-xmark', 'class' => 'text-danger'],
-            ['id' => 'izin-hari-ini', 'label' => 'Izin Hari Ini', 'icon' => 'fa-file-signature', 'class' => 'text-info'],
-            ['id' => 'sakit-hari-ini', 'label' => 'Sakit Hari Ini', 'icon' => 'fa-notes-medical', 'class' => 'text-primary'],
-            ['id' => 'telat-hari-ini', 'label' => 'Datang Telat', 'icon' => 'fa-clock', 'class' => 'text-warning'],
-            ['id' => 'pulang-cepat-hari-ini', 'label' => 'Pulang Cepat', 'icon' => 'fa-person-walking-arrow-right', 'class' => 'text-warning'],
-            ['id' => 'belum-sinkron', 'label' => 'Belum Sinkron', 'icon' => 'fa-clock-rotate-left', 'class' => 'text-danger'],
-            ['id' => 'izin-pending', 'label' => 'Izin Pending', 'icon' => 'fa-file-circle-question', 'class' => 'text-warning'],
-            ['id' => 'tukar-jadwal-pending', 'label' => 'Tukar Jadwal Pending', 'icon' => 'fa-right-left', 'class' => 'text-warning'],
-        ];
-        ?>
+    <div id="block-ringkasan-beranda" class="mb-4">
+        <div class="row">
+            <?php
+            $kpi = [
+                ['id' => 'total-pegawai', 'label' => 'Total Pegawai', 'icon' => 'fa-users', 'class' => 'text-primary'],
+                ['id' => 'izin-pending', 'label' => 'Izin Pending', 'icon' => 'fa-file-circle-question', 'class' => 'text-warning'],
+                ['id' => 'tukar-jadwal-pending', 'label' => 'Tukar Jadwal Pending', 'icon' => 'fa-right-left', 'class' => 'text-warning'],
+            ];
+            ?>
 
-        <?php foreach ($cards as $card): ?>
-            <div class="col-6 col-xl-3">
-                <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                    <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                        <div class="d-none d-sm-block">
-                            <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
-                        </div>
-                        <div>
-                            <div class=" fs-3 fw-semibold <?= esc($card['class']); ?>" id="<?= esc($card['id']); ?>">0
+            <?php foreach ($kpi as $card): ?>
+                <div class="col-6 col-xl-4">
+                    <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
+                            <div class="d-none d-sm-block">
+                                <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
                             </div>
-                            <div class="fs-sm fw-semibold text-uppercase text-muted"><?= esc($card['label']); ?></div>
+                            <div>
+                                <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="<?= esc($card['id']); ?>">
+                                    0
+                                </div>
+                                <div class="fs-sm fw-semibold text-uppercase text-muted"><?= esc($card['label']); ?></div>
+                            </div>
                         </div>
+                    </a>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="row">
+            <?php
+            $jadwalHariIni = [
+                ['id' => 'jadwal-kerja', 'label' => 'Jadwal Kerja', 'icon' => 'fa-briefcase', 'class' => 'text-success'],
+                ['id' => 'jadwal-izin', 'label' => 'Izin', 'icon' => 'fa-file-signature', 'class' => 'text-info'],
+                ['id' => 'jadwal-sakit', 'label' => 'Sakit', 'icon' => 'fa-notes-medical', 'class' => 'text-primary'],
+                ['id' => 'jadwal-libur', 'label' => 'Libur', 'icon' => 'fa-umbrella-beach', 'class' => 'text-secondary'],
+                ['id' => 'total-jadwal', 'label' => 'Total Jadwal', 'icon' => 'fa-calendar-days', 'class' => 'text-dark'],
+            ];
+            ?>
+
+            <?php foreach ($jadwalHariIni as $card): ?>
+                <div class="col-6 col-xl">
+                    <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
+                            <div class="d-none d-sm-block">
+                                <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
+                            </div>
+                            <div>
+                                <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="<?= esc($card['id']); ?>">
+                                    0
+                                </div>
+                                <div class="fs-sm fw-semibold text-uppercase text-muted"><?= esc($card['label']); ?></div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="row">
+            <?php
+            $presensiHariIni = [
+                ['id' => 'total-presensi', 'label' => 'Total Presensi', 'icon' => 'fa-clipboard-check', 'class' => 'text-success'],
+                ['id' => 'tepat-datang', 'label' => 'Datang Tepat', 'icon' => 'fa-user-check', 'class' => 'text-success'],
+                ['id' => 'telat-datang', 'label' => 'Datang Telat', 'icon' => 'fa-clock', 'class' => 'text-warning'],
+                ['id' => 'tepat-pulang', 'label' => 'Pulang Tepat', 'icon' => 'fa-arrow-right-from-bracket', 'class' => 'text-success'],
+                ['id' => 'pulang-cepat', 'label' => 'Pulang Cepat', 'icon' => 'fa-person-walking-arrow-right', 'class' => 'text-warning'],
+            ];
+            ?>
+
+            <?php foreach ($presensiHariIni as $card): ?>
+                <div class="col-6 col-xl">
+                    <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
+                            <div class="d-none d-sm-block">
+                                <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
+                            </div>
+                            <div>
+                                <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="<?= esc($card['id']); ?>">
+                                    0
+                                </div>
+                                <div class="fs-sm fw-semibold text-uppercase text-muted"><?= esc($card['label']); ?></div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="row">
+            <?php
+            $sinkron = [
+                ['id' => 'belum-sinkron', 'label' => 'Belum Sinkron', 'icon' => 'fa-clock-rotate-left', 'class' => 'text-danger'],
+                ['id' => 'hadir', 'label' => 'Hadir', 'icon' => 'fa-user-check', 'class' => 'text-success'],
+                ['id' => 'izin', 'label' => 'Izin', 'icon' => 'fa-file-signature', 'class' => 'text-info'],
+                ['id' => 'sakit', 'label' => 'Sakit', 'icon' => 'fa-notes-medical', 'class' => 'text-primary'],
+                ['id' => 'libur', 'label' => 'Libur', 'icon' => 'fa-umbrella-beach', 'class' => 'text-secondary'],
+                ['id' => 'alpa', 'label' => 'Alpa', 'icon' => 'fa-user-xmark', 'class' => 'text-danger'],
+            ];
+            ?>
+
+            <?php foreach ($sinkron as $card): ?>
+                <div class="col-6 col-xl-4">
+                    <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
+                            <div class="d-none d-sm-block">
+                                <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
+                            </div>
+                            <div>
+                                <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="<?= esc($card['id']); ?>">
+                                    0
+                                </div>
+                                <div class="fs-sm fw-semibold text-uppercase text-muted"><?= esc($card['label']); ?></div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div id="block-progress-presensi" class="block block-rounded">
+                <div class="block-content block-content-full">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="fw-semibold"><i class="fa fa-chart-simple me-1"></i> Jadwal vs Presensi</span>
+                        <span id="progress-presensi-label" class="fw-semibold">0%</span>
                     </div>
-                </a>
+                    <div class="progress push" style="height: 10px;">
+                        <div id="progress-presensi-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%;"></div>
+                    </div>
+                    <div id="progress-presensi-text" class="fs-sm text-muted">0 presensi dari 0 jadwal</div>
+                </div>
             </div>
-        <?php endforeach; ?>
+        </div>
+
+        <div class="col-md-6">
+            <div id="block-progress-sinkron" class="block block-rounded">
+                <div class="block-content block-content-full">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="fw-semibold"><i class="fa fa-rotate me-1"></i> Status Sinkron</span>
+                        <span id="progress-sinkron-label" class="fw-semibold">0%</span>
+                    </div>
+                    <div class="progress push" style="height: 10px;">
+                        <div id="progress-sinkron-bar" class="progress-bar bg-primary" role="progressbar" style="width: 0%;"></div>
+                    </div>
+                    <div id="progress-sinkron-text" class="fs-sm text-muted">0 selesai, 0 belum sinkron</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row">
@@ -67,7 +186,7 @@
                         </thead>
                         <tbody id="presensi-hari-ini-body">
                             <tr>
-                                <td colspan="8" class="text-center text-muted">Memuat data...</td>
+                                <td colspan="9" class="text-center text-muted">Memuat data...</td>
                             </tr>
                         </tbody>
                     </table>

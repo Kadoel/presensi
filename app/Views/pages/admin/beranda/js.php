@@ -13,30 +13,72 @@
                 url: '<?= base_url('admin/summary'); ?>',
                 dataType: 'json',
                 beforeSend: function() {
-                    $('#block-ringkasan-beranda, #block-presensi-hari-ini, #block-aktivitas-terbaru').LoadingOverlay('show');
+                    $('#block-ringkasan-beranda').LoadingOverlay('show');
                 },
                 success: function(res) {
+                    // KPI
                     $('#total-pegawai').text(res.total_pegawai ?? 0);
-
-                    $('#hadir-hari-ini').text(res.hadir_hari_ini ?? 0);
-                    $('#alpa-hari-ini').text(res.alpa_hari_ini ?? 0);
-                    $('#izin-hari-ini').text(res.izin_hari_ini ?? 0);
-                    $('#sakit-hari-ini').text(res.sakit_hari_ini ?? 0);
-
-                    $('#telat-hari-ini').text(res.telat_hari_ini ?? 0);
-                    $('#pulang-cepat-hari-ini').text(res.pulang_cepat_hari_ini ?? 0);
-                    $('#belum-sinkron').text(res.belum_sinkron ?? 0);
-
                     $('#izin-pending').text(res.izin_pending ?? 0);
                     $('#tukar-jadwal-pending').text(res.tukar_jadwal_pending ?? 0);
+
+                    // Jadwal Hari Ini
+                    $('#jadwal-kerja').text(res.jadwal_kerja ?? 0);
+                    $('#jadwal-izin').text(res.jadwal_izin ?? 0);
+                    $('#jadwal-sakit').text(res.jadwal_sakit ?? 0);
+                    $('#jadwal-libur').text(res.jadwal_libur ?? 0);
+                    $('#total-jadwal').text(res.total_jadwal ?? 0);
+
+                    // Presensi Hari Ini
+                    $('#total-presensi').text(res.total_presensi ?? 0);
+                    $('#tepat-datang').text(res.tepat_datang ?? 0);
+                    $('#telat-datang').text(res.telat_datang ?? 0);
+                    $('#tepat-pulang').text(res.tepat_pulang ?? 0);
+                    $('#pulang-cepat').text(res.pulang_cepat ?? 0);
+
+                    // Sinkron Hari Ini
+                    $('#belum-sinkron').text(res.belum_sinkron ?? 0);
+                    $('#hadir').text(res.hadir ?? 0);
+                    $('#izin').text(res.izin ?? 0);
+                    $('#sakit').text(res.sakit ?? 0);
+                    $('#libur').text(res.libur ?? 0);
+                    $('#alpa').text(res.alpa ?? 0);
+
+                    updateProgress(res);
                 },
-                error: function() {
+                error: function(xhr) {
+                    const res = xhr.responseJSON;
+
+                    if (typeof KadoelAjax !== 'undefined') {
+                        KadoelAjax.handleError(res || {
+                            pesan: 'Gagal memuat ringkasan beranda'
+                        });
+                        return;
+                    }
+
                     notifikasi('danger', 'right', 'Gagal memuat ringkasan beranda');
                 },
                 complete: function() {
-                    $('#block-ringkasan-beranda, #block-presensi-hari-ini, #block-aktivitas-terbaru').LoadingOverlay('hide');
+                    $('#block-ringkasan-beranda').LoadingOverlay('hide');
                 }
             });
+        }
+
+        function updateProgress(res) {
+            const totalJadwal = res.total_jadwal ?? 0;
+            const totalPresensi = res.total_presensi ?? 0;
+            const belumSinkron = res.belum_sinkron ?? 0;
+            const sudahSinkron = res.sudah_sinkron ?? Math.max(totalJadwal - belumSinkron, 0);
+
+            const progressPresensi = res.progress_presensi ?? 0;
+            const progressSinkron = res.progress_sinkron ?? 0;
+
+            $('#progress-presensi-label').text(progressPresensi + '%');
+            $('#progress-presensi-bar').css('width', progressPresensi + '%');
+            $('#progress-presensi-text').text(totalPresensi + ' presensi dari ' + totalJadwal + ' jadwal');
+
+            $('#progress-sinkron-label').text(progressSinkron + '%');
+            $('#progress-sinkron-bar').css('width', progressSinkron + '%');
+            $('#progress-sinkron-text').text(sudahSinkron + ' selesai, ' + belumSinkron + ' belum sinkron');
         }
 
         function loadPresensiHariIni() {

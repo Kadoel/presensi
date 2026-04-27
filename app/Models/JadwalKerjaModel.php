@@ -243,4 +243,19 @@ class JadwalKerjaModel extends Model
             ->get()
             ->getResult();
     }
+
+    public function countStatusHariIni(string $tanggal, string $status): int
+    {
+        return (int) $this
+            ->where('tanggal', $tanggal)
+            ->where('status_hari', $status)
+            ->countAllResults();
+    }
+
+    public function countJadwalHariIni(string $tanggal): int
+    {
+        return (int) $this
+            ->where('tanggal', $tanggal)
+            ->countAllResults();
+    }
 }
