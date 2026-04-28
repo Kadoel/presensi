@@ -235,6 +235,10 @@
     height: 330px;
 }
 
+.img-avatar {
+    object-fit: cover;
+}
+
 #block-grafik-mingguan,
 #block-grafik-bulanan {
     overflow: hidden;
@@ -250,5 +254,9 @@
     .chart-box-lg,
     .chart-box-md {
         height: 280px;
+    }
+
+    .border-md-start {
+        border-left: 1px solid rgba(0, 0, 0, .08);
     }
 }

@@ -26,32 +26,50 @@ $segment_header['3'] = $totalSegment_header > 2 ? current_url(true)->getSegment(
                 <li class="nav-main-item">
                     <a class="nav-main-link" href="<?= base_url('pegawai') ?>">
                         <i class="nav-main-link-icon fa fa-house-user"></i>
-                        <span class="nav-main-link-name">Dashboard</span>
+                        <span class="nav-main-link-name">Beranda</span>
                     </a>
                 </li>
-                <li class="nav-main-heading">Layout</li>
                 <li class="nav-main-item">
-                    <a class="nav-main-link active nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="true" href="#">
+                    <a class="nav-main-link nav-main-link-submenu active" data-toggle="submenu" aria-haspopup="true" aria-expanded="true" href="#">
                         <i class="nav-main-link-icon fa fa-puzzle-piece"></i>
-                        <span class="nav-main-link-name">Variations</span>
+                        <span class="nav-main-link-name">Data Saya</span>
                     </a>
                     <ul class="nav-main-submenu">
                         <li class="nav-main-item">
-                            <a class="nav-main-link" href="bd_variations_hero_simple_4.html">
-                                <span class="nav-main-link-name">Hero Simple 4</span>
+                            <a class="nav-main-link active" href="bd_variations_hero_simple_4.html">
+                                <span class="nav-main-link-name">Jadwal Kerja</span>
                             </a>
                         </li>
                         <li class="nav-main-item">
                             <a class="nav-main-link" href="bd_variations_hero_image_1.html">
-                                <span class="nav-main-link-name">Hero Image 1</span>
-                            </a>
-                        </li>
-                        <li class="nav-main-item">
-                            <a class="nav-main-link active" href="bd_variations_hero_image_2.html">
-                                <span class="nav-main-link-name">Hero Image 2</span>
+                                <span class="nav-main-link-name">Riwayat Presensi</span>
                             </a>
                         </li>
                     </ul>
+                </li>
+                <li class="nav-main-item">
+                    <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="true" href="#">
+                        <i class="nav-main-link-icon fa fa-puzzle-piece"></i>
+                        <span class="nav-main-link-name">Pengajuan</span>
+                    </a>
+                    <ul class="nav-main-submenu">
+                        <li class="nav-main-item">
+                            <a class="nav-main-link" href="bd_variations_hero_simple_4.html">
+                                <span class="nav-main-link-name">Izin / Sakit</span>
+                            </a>
+                        </li>
+                        <li class="nav-main-item">
+                            <a class="nav-main-link" href="bd_variations_hero_image_1.html">
+                                <span class="nav-main-link-name">Tukar Jadwal</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-main-item">
+                    <a class="nav-main-link" href="<?= base_url('pegawai/profil') ?>">
+                        <i class="nav-main-link-icon fa fa-house-user"></i>
+                        <span class="nav-main-link-name">Profil</span>
+                    </a>
                 </li>
             </ul>
             <!-- END Header Navigation -->

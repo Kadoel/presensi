@@ -52,29 +52,47 @@ $segment_sidebar['3'] = $totalSegment_sidebar > 2 ? current_url(true)->getSegmen
                             <span class="nav-main-link-name">Beranda</span>
                         </a>
                     </li>
-                    <li class="nav-main-heading">Layout</li>
                     <li class="nav-main-item open">
                         <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="true" href="#">
                             <i class="nav-main-link-icon fa fa-puzzle-piece"></i>
-                            <span class="nav-main-link-name">Variations</span>
+                            <span class="nav-main-link-name">Data Saya</span>
                         </a>
                         <ul class="nav-main-submenu">
                             <li class="nav-main-item">
                                 <a class="nav-main-link" href="bd_variations_hero_image_1.html">
-                                    <span class="nav-main-link-name">Hero Image 1</span>
+                                    <span class="nav-main-link-name">Jadwal Kerja</span>
                                 </a>
                             </li>
                             <li class="nav-main-item">
                                 <a class="nav-main-link active" href="bd_variations_hero_image_2.html">
-                                    <span class="nav-main-link-name">Hero Image 2</span>
-                                </a>
-                            </li>
-                            <li class="nav-main-item">
-                                <a class="nav-main-link" href="bd_variations_hero_image_3.html">
-                                    <span class="nav-main-link-name">Hero Image 3</span>
+                                    <span class="nav-main-link-name">Riwayat Presensi</span>
                                 </a>
                             </li>
                         </ul>
+                    </li>
+                    <li class="nav-main-item">
+                        <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="true" href="#">
+                            <i class="nav-main-link-icon fa fa-puzzle-piece"></i>
+                            <span class="nav-main-link-name">Pengajuan</span>
+                        </a>
+                        <ul class="nav-main-submenu">
+                            <li class="nav-main-item">
+                                <a class="nav-main-link" href="bd_variations_hero_image_1.html">
+                                    <span class="nav-main-link-name">Izin / Sakit</span>
+                                </a>
+                            </li>
+                            <li class="nav-main-item">
+                                <a class="nav-main-link" href="bd_variations_hero_image_2.html">
+                                    <span class="nav-main-link-name">Tukar Jadwal</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-main-item">
+                        <a class="nav-main-link" href="<?= base_url('pegawai/profil') ?>">
+                            <i class="nav-main-link-icon fa fa-house-user"></i>
+                            <span class="nav-main-link-name">Profil</span>
+                        </a>
                     </li>
                     <li class="nav-main-item">
                         <a class="nav-main-link" href="<?= base_url('pegawai/logout'); ?>">

@@ -253,4 +253,49 @@ class PresensiModel extends Model
             ->get()
             ->getResult();
     }
+
+    public function countByPegawaiBulanDanHasil(int $pegawaiId, string $bulan, string $hasil): int
+    {
+        return (int) $this->where('pegawai_id', $pegawaiId)
+            ->where('DATE_FORMAT(tanggal, "%Y-%m") =', $bulan)
+            ->where('hasil_presensi', $hasil)
+            ->countAllResults();
+    }
+
+    public function countByPegawaiBulanDanStatusDatang(int $pegawaiId, string $bulan, string $status): int
+    {
+        return (int) $this->where('pegawai_id', $pegawaiId)
+            ->where('DATE_FORMAT(tanggal, "%Y-%m") =', $bulan)
+            ->where('status_datang', $status)
+            ->countAllResults();
+    }
+
+    public function countByPegawaiBulanDanStatusPulang(int $pegawaiId, string $bulan, string $status): int
+    {
+        return (int) $this->where('pegawai_id', $pegawaiId)
+            ->where('DATE_FORMAT(tanggal, "%Y-%m") =', $bulan)
+            ->where('status_pulang', $status)
+            ->countAllResults();
+    }
+
+    public function getRiwayatByPegawai(int $pegawaiId, int $limit = 5): array
+    {
+        return $this->db->table($this->table)
+            ->select('
+            presensi.id,
+            presensi.tanggal,
+            presensi.jam_datang,
+            presensi.jam_pulang,
+            presensi.status_datang,
+            presensi.status_pulang,
+            presensi.hasil_presensi,
+            shift.nama_shift
+        ')
+            ->join('shift', 'shift.id = presensi.shift_id', 'left')
+            ->where('presensi.pegawai_id', $pegawaiId)
+            ->orderBy('presensi.tanggal', 'DESC')
+            ->limit($limit)
+            ->get()
+            ->getResult();
+    }
 }
