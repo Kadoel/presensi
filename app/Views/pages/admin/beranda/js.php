@@ -242,25 +242,85 @@
                     datasets: [{
                             label: 'Jadwal',
                             data: res.jadwal ?? [],
-                            backgroundColor: '#0665d0',
-                            borderRadius: 6
+                            backgroundColor: 'rgba(6, 101, 208, 0.85)',
+                            borderColor: '#0665d0',
+                            borderWidth: 1,
+                            borderRadius: 10,
+                            borderSkipped: false,
+                            maxBarThickness: 42
                         },
                         {
                             label: 'Presensi',
                             data: res.presensi ?? [],
-                            backgroundColor: '#82b54b',
-                            borderRadius: 6
+                            backgroundColor: 'rgba(130, 181, 75, 0.85)',
+                            borderColor: '#82b54b',
+                            borderWidth: 1,
+                            borderRadius: 10,
+                            borderSkipped: false,
+                            maxBarThickness: 42
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 18,
+                                boxWidth: 8,
+                                font: {
+                                    size: 12,
+                                    weight: '600'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#111827',
+                            titleFont: {
+                                size: 13,
+                                weight: '700'
+                            },
+                            bodyFont: {
+                                size: 12
+                            },
+                            padding: 12,
+                            cornerRadius: 10,
+                            displayColors: true
+                        }
+                    },
                     scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#6b7280',
+                                font: {
+                                    size: 12,
+                                    weight: '600'
+                                }
+                            }
+                        },
                         y: {
                             beginAtZero: true,
+                            grid: {
+                                color: 'rgba(107, 114, 128, 0.12)'
+                            },
                             ticks: {
-                                precision: 0
+                                precision: 0,
+                                color: '#6b7280',
+                                font: {
+                                    size: 12,
+                                    weight: '600'
+                                }
                             }
                         }
                     }
@@ -290,16 +350,43 @@
                             '#6c757d',
                             '#e04f1a'
                         ],
-                        borderWidth: 0
+                        hoverOffset: 8,
+                        borderColor: '#ffffff',
+                        borderWidth: 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '65%',
+                    cutout: '68%',
                     plugins: {
                         legend: {
-                            position: 'bottom'
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 16,
+                                boxWidth: 8,
+                                font: {
+                                    size: 12,
+                                    weight: '600'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#111827',
+                            padding: 12,
+                            cornerRadius: 10,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((sum, item) => sum + item, 0);
+                                    const percent = total > 0 ? Math.round((value / total) * 100) : 0;
+
+                                    return `${label}: ${value} pegawai (${percent}%)`;
+                                }
+                            }
                         }
                     }
                 }

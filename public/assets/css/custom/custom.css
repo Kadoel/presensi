@@ -221,3 +221,34 @@
     font-weight: 700;
     color: #0d6efd;
 }
+
+.chart-box {
+    position: relative;
+    width: 100%;
+}
+
+.chart-box-lg {
+    height: 330px;
+}
+
+.chart-box-md {
+    height: 330px;
+}
+
+#block-grafik-mingguan,
+#block-grafik-bulanan {
+    overflow: hidden;
+}
+
+#block-grafik-mingguan .block-header,
+#block-grafik-bulanan .block-header {
+    background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+}
+
+@media (max-width: 768px) {
+
+    .chart-box-lg,
+    .chart-box-md {
+        height: 280px;
+    }
+}
