@@ -83,21 +83,3 @@ $segment['3'] = $totalSegment > 2 ? current_url(true)->getSegment(3) : '';
         <span class="nav-main-link-name">Audit Logs</span>
     </a>
 </li>
-
-<!-- <li class="nav-main-item <?= (($segment['2'] == 'krama') || ($segment['2'] == 'krama' && ($segment['3'] == 'aktif' || $segment['3'] == 'nonaktif' || $segment['3'] == 'import'))) ? 'open' : ' ' ?>">
-    <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
-        <i class="nav-main-link-icon fa fa-people-group"></i>
-        <span class="nav-main-link-name">Krama</span>
-    </a>
-    <ul class="nav-main-submenu">
-        <li class="nav-main-item">
-            <a href="<?= base_url('kelihan/krama/import'); ?>" class="nav-main-link <?= ($totalSegment == 3 && $segment['3'] == 'import') ? 'active' : ' ' ?>"><span class="nav-main-link-name">Import</span></a>
-        </li>
-        <li class="nav-main-item">
-            <a href="<?= base_url('kelihan/krama/aktif'); ?>" class="nav-main-link <?= ($totalSegment == 3 && $segment['3'] == 'aktif') ? 'active' : ' ' ?>"><span class="nav-main-link-name">Aktif</span></a>
-        </li>
-        <li class="nav-main-item">
-            <a href="<?= base_url('kelihan/krama/nonaktif'); ?>" class="nav-main-link <?= ($totalSegment == 3 && $segment['3'] == 'nonaktif') ? 'active' : ' ' ?>"><span class="nav-main-link-name">Non Aktif</span></a>
-        </li>
-    </ul>
-</li> -->

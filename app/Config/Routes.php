@@ -140,6 +140,7 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     });
 });
 
+
 /* --------- ROLE PEGAWAI -------------*/
 $routes->group('pegawai', ['filter' => 'role:pegawai'], function ($routes) {
     $routes->GET("/", "Pegawai\Beranda::index");
