@@ -115,8 +115,8 @@
 
 
 
-    <?= $this->include('theme/sidebar'); ?>
-    <?= $this->include('theme/header'); ?>
+    <?= $this->include('theme/admin/sidebar'); ?>
+    <?= $this->include('theme/admin/header'); ?>
     <!-- Main Container -->
     <main id="main-container">
       <!-- Page Content -->

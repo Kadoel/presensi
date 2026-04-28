@@ -1,4 +1,4 @@
-<?= $this->extend('theme/body'); ?>
+<?= $this->extend('theme/admin/body'); ?>
 
 <?= $this->section('content'); ?>
 <?php $minTanggal = date('Y-m-01'); ?>

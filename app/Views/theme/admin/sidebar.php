@@ -59,7 +59,7 @@
             <div class="content-side content-side-full">
                 <ul class="nav-main">
                     <?php
-                    echo $this->include('theme/menus/admin');
+                    echo $this->include('theme/admin/menus/admin');
                     ?>
                 </ul>
             </div>

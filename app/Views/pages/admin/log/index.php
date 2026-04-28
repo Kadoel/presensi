@@ -1,4 +1,4 @@
-<?= $this->extend('theme/body'); ?>
+<?= $this->extend('theme/admin/body'); ?>
 
 <?= $this->section('content'); ?>
 <div class="row">
