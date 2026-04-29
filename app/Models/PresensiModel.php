@@ -298,4 +298,28 @@ class PresensiModel extends Model
             ->get()
             ->getResult();
     }
+
+    public function dataRekapBulanan(?string $bulan = null)
+    {
+        $bulan = $bulan ?: date('Y-m');
+
+        return $this->db->table('pegawai')
+            ->select("
+            pegawai.id,
+            pegawai.nama_pegawai,
+            COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'hadir' THEN 1 ELSE 0 END), 0) AS hadir,
+            COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'izin' THEN 1 ELSE 0 END), 0) AS izin,
+            COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'sakit' THEN 1 ELSE 0 END), 0) AS sakit,
+            COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'libur' THEN 1 ELSE 0 END), 0) AS libur,
+            COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'alpa' THEN 1 ELSE 0 END), 0) AS alpa
+        ")
+            ->join(
+                'presensi',
+                'presensi.pegawai_id = pegawai.id 
+            AND DATE_FORMAT(presensi.tanggal, "%Y-%m") = ' . $this->db->escape($bulan),
+                'left'
+            )
+            ->where('pegawai.is_active', 1)
+            ->groupBy('pegawai.id, pegawai.nama_pegawai');
+    }
 }

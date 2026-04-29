@@ -249,6 +249,14 @@
     background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
 }
 
+#rekap-tabel tbody tr.row-hadir-terbanyak>* {
+    background-color: rgba(25, 135, 84, 0.12) !important;
+}
+
+#rekap-tabel tbody tr.row-alpa-terbanyak>* {
+    background-color: rgba(220, 53, 69, 0.12) !important;
+}
+
 @media (max-width: 768px) {
 
     .chart-box-lg,

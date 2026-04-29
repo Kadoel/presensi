@@ -213,6 +213,96 @@
             ]
         });
 
+        let maxHadir = 0;
+        let maxAlpa = 0;
+
+        let data_rekap = $('#rekap-tabel').DataTable({
+            destroy: true,
+            processing: true,
+            serverSide: true,
+            searching: true,
+            paging: true,
+            info: true,
+            scrollX: true,
+            order: [
+                [1, 'asc']
+            ],
+            language: {
+                url: '<?= base_url("assets/plugins/DataTablesbs5/plugins/id.json"); ?>'
+            },
+            ajax: {
+                url: '<?= base_url("admin/presensi/rekap-bulanan"); ?>',
+                method: 'POST',
+                data: function(d) {
+                    d[csrfToken] = csrfHash;
+                    d.bulan = $('#filter-bulan').val();
+                },
+                dataSrc: function(json) {
+                    maxHadir = 0;
+                    maxAlpa = 0;
+
+                    (json.data || []).forEach(function(item) {
+                        maxHadir = Math.max(maxHadir, parseInt(item.hadir || 0));
+                        maxAlpa = Math.max(maxAlpa, parseInt(item.alpa || 0));
+                    });
+
+                    return json.data;
+                }
+            },
+            columns: [{
+                    data: '#'
+                },
+                {
+                    data: 'nama_pegawai'
+                },
+                {
+                    data: 'hadir'
+                },
+                {
+                    data: 'izin'
+                },
+                {
+                    data: 'sakit'
+                },
+                {
+                    data: 'libur'
+                },
+                {
+                    data: 'alpa'
+                }
+            ],
+            columnDefs: [{
+                    targets: [0],
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center'
+                },
+                {
+                    targets: [2, 3, 4, 5, 6],
+                    className: 'text-center'
+                }
+            ],
+            createdRow: function(row, data) {
+                const hadir = parseInt(data.hadir || 0);
+                const alpa = parseInt(data.alpa || 0);
+
+                $(row).removeClass('row-hadir-terbanyak row-alpa-terbanyak');
+
+                if (alpa > 0 && alpa === maxAlpa) {
+                    $(row).addClass('row-alpa-terbanyak');
+                    return;
+                }
+
+                if (hadir > 0 && hadir === maxHadir) {
+                    $(row).addClass('row-hadir-terbanyak');
+                }
+            }
+        });
+
+        $('#filter-bulan').on('change', function() {
+            data_rekap.ajax.reload();
+        });
+
         if (typeof flatpickr !== 'undefined') {
             flatpickr('#filter-tanggal', {
                 dateFormat: 'Y-m-d',
@@ -313,6 +403,7 @@
                             if (result.sukses) {
                                 notifikasi('success', 'right', result.pesan);
                                 data_presensi.ajax.reload();
+                                data_rekap.ajax.reload();
                                 refreshRingkasan();
                             } else {
                                 handleGagal(result);

@@ -135,8 +135,9 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
         $routes->post('generate-alpa', 'Admin\Presensi::generateAlpa'); // alias lama
         $routes->post('ringkasan', 'Admin\Presensi::ringkasan');
         $routes->post('lupa/simpan', 'Admin\Presensi::simpanLupa');
-        $routes->post('lupa/update/(:num)', 'Admin\Presensi::updateLupa/$1');
         $routes->post('lupa/delete', 'Admin\Presensi::deleteLupa');
+        $routes->post('rekap-bulanan', 'Admin\Presensi::rekapBulanan');
+        $routes->post('lupa/update/(:num)', 'Admin\Presensi::updateLupa/$1');
     });
 });
 

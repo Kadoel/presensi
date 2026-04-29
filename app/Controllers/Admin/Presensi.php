@@ -65,6 +65,17 @@ class Presensi extends BaseController
             ->toJson(true);
     }
 
+    public function rekapBulanan()
+    {
+        $builder = $this->presensiAdminService->dataRekapBulanan(
+            $this->request->getPost('bulan')
+        );
+
+        return DataTable::of($builder)
+            ->addNumbering('#')
+            ->toJson(true);
+    }
+
     public function detail()
     {
         return $this->response->setJSON(

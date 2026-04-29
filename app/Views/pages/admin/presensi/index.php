@@ -147,6 +147,38 @@
     </div>
 </div>
 
+<div class="block block-themed block-rounded mt-4">
+    <div class="block-header">
+        <h3 class="block-title text-white">
+            <i class="fa fa-chart-column"></i> <b>REKAP PRESENSI BULANAN</b>
+        </h3>
+    </div>
+
+    <div class="block-content">
+        <div class="row mb-4 justify-content-center">
+            <div class="col-auto" style="min-width: 250px;">
+                <input type="month" id="filter-bulan" class="form-control" value="<?= date('Y-m'); ?>">
+            </div>
+        </div>
+    </div>
+
+    <div class="block-content block-content-full overflow-x-auto">
+        <table id="rekap-tabel" class="table table-vcenter table-hover nowrap w-100">
+            <thead>
+                <tr>
+                    <th class="text-center"><b>#</b></th>
+                    <th><b>NAMA PEGAWAI</b></th>
+                    <th class="text-center"><b>HADIR</b></th>
+                    <th class="text-center"><b>IZIN</b></th>
+                    <th class="text-center"><b>SAKIT</b></th>
+                    <th class="text-center"><b>LIBUR</b></th>
+                    <th class="text-center"><b>ALPA</b></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
 <div class="modal" id="modal-lupa-presensi" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">

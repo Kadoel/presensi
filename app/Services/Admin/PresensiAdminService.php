@@ -36,6 +36,11 @@ class PresensiAdminService extends BaseService
         return $this->presensiModel->dataTabel($tanggal);
     }
 
+    public function dataRekapBulanan(?string $bulan = null)
+    {
+        return $this->presensiModel->dataRekapBulanan($bulan ?: date('Y-m'));
+    }
+
     public function detail(int $id): array
     {
         return $this->eksekusi(function () use ($id) {
