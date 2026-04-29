@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Admin;
 
 use App\Models\SettingsModel;
+use App\Services\BaseService;
 
 class SettingsService extends BaseService
 {

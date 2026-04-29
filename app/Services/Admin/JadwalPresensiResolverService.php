@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Admin;
 
 use App\Models\JadwalKerjaModel;
 use App\Models\PegawaiModel;
 use App\Models\ShiftModel;
+use App\Services\BaseService;
 
 class JadwalPresensiResolverService extends BaseService
 {

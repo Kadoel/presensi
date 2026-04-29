@@ -3,9 +3,8 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
-use App\Services\JadwalKerjaService;
+use App\Services\Admin\JadwalKerjaService;
 use Hermawan\DataTables\DataTable;
-use CodeIgniter\Database\RawSql;
 
 class JadwalKerja extends BaseController
 {
@@ -137,7 +136,7 @@ class JadwalKerja extends BaseController
                 }
 
                 $builder->groupEnd();
-            }, false)
+            })
             ->postQuery(function ($builder) {
                 $builder->orderBy('YEAR(jadwal_kerja.tanggal)', 'ASC', false);
                 $builder->orderBy('MONTH(jadwal_kerja.tanggal)', 'ASC', false);

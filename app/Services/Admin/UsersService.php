@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Admin;
 
 use App\Models\PegawaiModel;
 use App\Models\UsersModel;
+use App\Services\BaseService;
 
 class UsersService extends BaseService
 {

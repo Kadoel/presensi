@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Admin;
 
 use App\Models\JadwalKerjaModel;
 use App\Models\PegawaiModel;
 use App\Models\PengajuanIzinModel;
 use App\Models\HariLiburModel;
 use App\Models\PresensiModel;
+use App\Services\BaseService;
 
 class PengajuanIzinService extends BaseService
 {

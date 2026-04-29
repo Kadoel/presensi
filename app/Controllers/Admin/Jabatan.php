@@ -3,12 +3,12 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
-use App\Services\JabatanService;
+use App\Services\Admin\JabatanService;
 use Hermawan\DataTables\DataTable;
 
 class Jabatan extends BaseController
 {
-    protected $jabatanService;
+    protected JabatanService $jabatanService;
 
     public function __construct()
     {

@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Admin;
 
 use App\Models\JadwalKerjaModel;
 use App\Models\PegawaiModel;
 use App\Models\PresensiModel;
 use App\Models\ShiftModel;
 use App\Models\TukarJadwalModel;
+use App\Services\BaseService;
 
 class TukarJadwalService extends BaseService
 {

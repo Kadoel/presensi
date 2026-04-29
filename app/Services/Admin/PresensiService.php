@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Admin;
 
 use App\Models\PresensiModel;
+use App\Services\BaseService;
 use DateTime;
 
 class PresensiService extends BaseService

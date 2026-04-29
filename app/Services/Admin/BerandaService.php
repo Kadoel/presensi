@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Admin;
 
 use App\Models\AuditLogModel;
 use App\Models\JadwalKerjaModel;
@@ -8,6 +8,7 @@ use App\Models\PegawaiModel;
 use App\Models\PengajuanIzinModel;
 use App\Models\PresensiModel;
 use App\Models\TukarJadwalModel;
+use App\Services\BaseService;
 
 class BerandaService extends BaseService
 {

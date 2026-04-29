@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Admin;
 
 use App\Models\HariLiburModel;
 use App\Models\JadwalKerjaModel;
 use App\Models\PresensiModel;
+use App\Services\BaseService;
 
 class HariLiburService extends BaseService
 {

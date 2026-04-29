@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Admin;
 
 use App\Models\ShiftModel;
+use App\Services\BaseService;
 
 class ShiftService extends BaseService
 {

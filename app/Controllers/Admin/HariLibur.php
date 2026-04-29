@@ -3,7 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
-use App\Services\HariLiburService;
+use App\Services\Admin\HariLiburService;
 use Hermawan\DataTables\DataTable;
 
 class HariLibur extends BaseController

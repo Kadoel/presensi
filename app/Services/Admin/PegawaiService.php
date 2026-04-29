@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Admin;
 
 use App\Models\JabatanModel;
 use App\Models\JadwalKerjaModel;
 use App\Models\PegawaiModel;
 use App\Models\PresensiModel;
+use App\Services\BaseService;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;

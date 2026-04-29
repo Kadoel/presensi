@@ -3,7 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
-use App\Services\AuditLogService;
+use App\Services\Admin\AuditLogService;
 use Hermawan\DataTables\DataTable;
 
 class AuditLog extends BaseController

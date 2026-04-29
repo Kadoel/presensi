@@ -3,7 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
-use App\Services\PengajuanIzinService;
+use App\Services\Admin\PengajuanIzinService;
 use Hermawan\DataTables\DataTable;
 
 class PengajuanIzin extends BaseController

@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
-use App\Services\PresensiService;
+use App\Services\Admin\PresensiService;
 
 class KiosPresensiController extends BaseController
 {

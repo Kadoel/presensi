@@ -3,7 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
-use App\Services\UsersService;
+use App\Services\Admin\UsersService;
 use Hermawan\DataTables\DataTable;
 
 class Users extends BaseController

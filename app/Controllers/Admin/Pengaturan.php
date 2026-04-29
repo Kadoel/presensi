@@ -3,12 +3,11 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
-use App\Services\SettingsService;
+use App\Services\Admin\SettingsService;
 
 class Pengaturan extends BaseController
 {
-    protected $pengaturanModel;
-    protected $settingsService;
+    protected SettingsService $settingsService;
 
     public function __construct()
     {

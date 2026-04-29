@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Admin;
 
 use App\Models\HariLiburModel;
 use App\Models\JadwalKerjaModel;
 use App\Models\PegawaiModel;
 use App\Models\PresensiModel;
 use App\Models\ShiftModel;
+use App\Services\BaseService;
 
 class JadwalKerjaService extends BaseService
 {

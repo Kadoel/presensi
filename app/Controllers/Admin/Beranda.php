@@ -3,7 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
-use App\Services\BerandaService;
+use App\Services\Admin\BerandaService;
 
 class Beranda extends BaseController
 {

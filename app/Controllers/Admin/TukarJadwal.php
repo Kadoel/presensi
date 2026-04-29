@@ -3,7 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
-use App\Services\TukarJadwalService;
+use App\Services\Admin\TukarJadwalService;
 use Hermawan\DataTables\DataTable;
 
 class TukarJadwal extends BaseController

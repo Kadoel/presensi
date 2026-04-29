@@ -3,13 +3,13 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
-use App\Services\PegawaiService;
+use App\Services\Admin\PegawaiService;
 use CodeIgniter\Exceptions\PageNotFoundException;
 use Hermawan\DataTables\DataTable;
 
 class Pegawai extends BaseController
 {
-    protected $pegawaiService;
+    protected PegawaiService $pegawaiService;
 
     public function __construct()
     {

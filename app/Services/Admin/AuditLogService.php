@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Admin;
 
 use App\Models\AuditLogModel;
+use App\Services\BaseService;
 use CodeIgniter\I18n\Time;
 
 class AuditLogService extends BaseService

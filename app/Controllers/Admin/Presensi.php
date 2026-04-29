@@ -3,7 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
-use App\Services\PresensiAdminService;
+use App\Services\Admin\PresensiAdminService;
 use Hermawan\DataTables\DataTable;
 
 class Presensi extends BaseController
