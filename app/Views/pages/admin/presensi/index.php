@@ -14,15 +14,15 @@
         ?>
 
         <?php foreach ($ringkasanUtamaCards as $card): ?>
-            <div class="col-6 col-xl-4">
+            <div class="col-12 col-xl-4">
                 <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                    <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                        <div class="d-none d-sm-block">
+                    <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                        <div>
                             <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
                         </div>
-                        <div>
-                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="ringkasan-<?= esc($card['id']); ?>">
-                                <?= esc($ringkasan[$card['key']] ?? 0); ?>
+                        <div class="text-end">
+                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="<?= esc($card['id']); ?>">
+                                0
                             </div>
                             <div class="fs-sm fw-semibold text-uppercase text-muted"><?= esc($card['label']); ?></div>
                         </div>
@@ -44,15 +44,15 @@
         ?>
 
         <?php foreach ($hasilPresensiCards as $card): ?>
-            <div class="col-6 col-xl">
+            <div class="col-12 col-xl">
                 <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                    <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                        <div class="d-none d-sm-block">
+                    <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                        <div>
                             <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
                         </div>
-                        <div>
-                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="ringkasan-<?= esc($card['id']); ?>">
-                                <?= esc($ringkasan[$card['key']] ?? 0); ?>
+                        <div class="text-end">
+                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="<?= esc($card['id']); ?>">
+                                0
                             </div>
                             <div class="fs-sm fw-semibold text-uppercase text-muted"><?= esc($card['label']); ?></div>
                         </div>
@@ -73,15 +73,15 @@
         ?>
 
         <?php foreach ($detailScanCards as $card): ?>
-            <div class="col-6 col-xl-3">
+            <div class="col-12 col-xl-3">
                 <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                    <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                        <div class="d-none d-sm-block">
+                    <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                        <div>
                             <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
                         </div>
-                        <div>
-                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="ringkasan-<?= esc($card['id']); ?>">
-                                <?= esc($ringkasan[$card['key']] ?? 0); ?>
+                        <div class="text-end">
+                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="<?= esc($card['id']); ?>">
+                                0
                             </div>
                             <div class="fs-sm fw-semibold text-uppercase text-muted"><?= esc($card['label']); ?></div>
                         </div>
@@ -157,7 +157,12 @@
     <div class="block-content">
         <div class="row mb-4 justify-content-center">
             <div class="col-auto" style="min-width: 250px;">
-                <input type="month" id="filter-bulan" class="form-control" value="<?= date('Y-m'); ?>">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fa fa-calendar"></i>
+                    </span>
+                    <input type="month" id="filter-bulan" class="form-control" value="<?= date('Y-m'); ?>">
+                </div>
             </div>
         </div>
     </div>

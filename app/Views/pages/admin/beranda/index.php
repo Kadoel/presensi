@@ -19,15 +19,14 @@
             ['id' => 'tukar-jadwal-pending', 'label' => 'Tukar Jadwal Pending', 'icon' => 'fa-right-left', 'class' => 'text-warning'],
         ];
         ?>
-
         <?php foreach ($kpi as $card): ?>
-            <div class="col-6 col-xl-4">
+            <div class="col-12 col-xl-4">
                 <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                    <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                        <div class="d-none d-sm-block">
+                    <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                        <div>
                             <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
                         </div>
-                        <div>
+                        <div class="text-end">
                             <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="<?= esc($card['id']); ?>">
                                 0
                             </div>
@@ -59,13 +58,13 @@
             ?>
 
             <?php foreach ($jadwalHariIni as $card): ?>
-                <div class="col-6 col-xl">
+                <div class="col-12 col-xl">
                     <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                            <div class="d-none d-sm-block">
+                        <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                            <div>
                                 <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
                             </div>
-                            <div>
+                            <div class="text-end">
                                 <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="<?= esc($card['id']); ?>">
                                     0
                                 </div>
@@ -96,13 +95,13 @@
             ?>
 
             <?php foreach ($presensiHariIni as $card): ?>
-                <div class="col-6 col-xl">
+                <div class="col-12 col-xl">
                     <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                            <div class="d-none d-sm-block">
+                        <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                            <div>
                                 <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
                             </div>
-                            <div>
+                            <div class="text-end">
                                 <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="<?= esc($card['id']); ?>">
                                     0
                                 </div>
@@ -134,13 +133,13 @@
             ?>
 
             <?php foreach ($sinkron as $card): ?>
-                <div class="col-6 col-xl-4">
+                <div class="col-12 col-xl-4">
                     <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
-                        <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                            <div class="d-none d-sm-block">
+                        <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                            <div>
                                 <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
                             </div>
-                            <div>
+                            <div class="text-end">
                                 <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="<?= esc($card['id']); ?>">
                                     0
                                 </div>
