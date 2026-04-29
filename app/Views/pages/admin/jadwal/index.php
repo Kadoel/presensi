@@ -112,25 +112,27 @@
 
     <div class="col-12">
         <div id="block-tabel" class="block block-themed block-rounded">
-            <div class="block-header">
-                <h3 class="block-title text-white">
-                    <i class="fa fa-file-lines"></i> <b>DATA JADWAL KERJA</b>
+            <div class="block-header d-flex flex-column flex-lg-row align-items-start align-items-lg-center gap-2">
+                <h3 class="fs-sm fw-bold text-white mb-0 text-uppercase text-nowrap">
+                    <i class="fa fa-file-lines"></i> DATA JADWAL KERJA
                 </h3>
 
-                <div class="block-options d-flex gap-2">
-                    <input type="month"
-                        class="form-control form-control-sm"
-                        id="filter-bulan-jadwal"
-                        value="<?= date('Y-m'); ?>"
-                        style="width: 160px;">
+                <div class="ms-lg-auto">
+                    <div class="d-flex flex-wrap justify-content-start justify-content-lg-end align-items-center gap-2">
+                        <input type="month"
+                            class="form-control form-control-sm flex-shrink-0"
+                            id="filter-bulan-jadwal"
+                            value="<?= date('Y-m'); ?>"
+                            style="width: 160px; min-width: 160px;">
 
-                    <button type="button" id="btn-individu-jadwal" class="btn btn-sm btn-alt-success">
-                        <i class="fa fa-user-plus me-1"></i> Individu
-                    </button>
+                        <button type="button" id="btn-individu-jadwal" class="btn btn-sm btn-alt-success text-nowrap flex-shrink-0">
+                            <i class="fa fa-user-plus me-1"></i> Individu
+                        </button>
 
-                    <button type="button" id="btn-copy-jadwal" class="btn btn-sm btn-alt-primary">
-                        <i class="fa fa-copy me-1"></i> Copy Jadwal
-                    </button>
+                        <button type="button" id="btn-copy-jadwal" class="btn btn-sm btn-alt-primary text-nowrap flex-shrink-0">
+                            <i class="fa fa-copy me-1"></i> Copy Jadwal
+                        </button>
+                    </div>
                 </div>
             </div>
 

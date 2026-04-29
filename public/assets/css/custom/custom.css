@@ -267,4 +267,8 @@
     .border-md-start {
         border-left: 1px solid rgba(0, 0, 0, .08);
     }
+
+    .w-lg-auto {
+        width: auto !important;
+    }
 }
