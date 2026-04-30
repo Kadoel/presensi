@@ -270,4 +270,29 @@ class JadwalKerjaModel extends Model
             ->get()
             ->getResult();
     }
+
+    public function getJadwalKalenderPegawai(int $pegawaiId, string $start, string $end): array
+    {
+        return $this->db->table($this->table)
+            ->select('
+            jadwal_kerja.id,
+            jadwal_kerja.pegawai_id,
+            jadwal_kerja.shift_id,
+            jadwal_kerja.tanggal,
+            jadwal_kerja.status_hari,
+            jadwal_kerja.sumber_data,
+            jadwal_kerja.catatan,
+            shift.kode_shift,
+            shift.nama_shift,
+            shift.jam_masuk,
+            shift.jam_pulang
+        ')
+            ->join('shift', 'shift.id = jadwal_kerja.shift_id', 'left')
+            ->where('jadwal_kerja.pegawai_id', $pegawaiId)
+            ->where('jadwal_kerja.tanggal >=', $start)
+            ->where('jadwal_kerja.tanggal <=', $end)
+            ->orderBy('jadwal_kerja.tanggal', 'ASC')
+            ->get()
+            ->getResult();
+    }
 }

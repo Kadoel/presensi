@@ -105,7 +105,7 @@
         <!-- Main Container -->
         <main id="main-container">
             <!-- Hero -->
-            <div class="bg-image" style="background-image: url('assets/media/photos/photo27@2x.jpg');">
+            <div class="bg-image" style="background-image: url('/assets/media/photos/photo27@2x.jpg');">
                 <div class="bg-white-90">
                     <div class="content text-center">
                         <div class="pt-5 pb-3">
@@ -156,7 +156,7 @@
     <script src="/assets/plugins/flatpickr/flatpickr.min.js"></script>
     <script src="/assets/js/helper/kadoel-helper.js"></script>
     <script src="/assets/js/helper/kadoel-ajax.js"></script>
-    <script src="assets/js/codebase.app.min.js"></script>
+    <script src="/assets/js/codebase.app.min.js"></script>
 
     <!-- Page JS Code -->
     <?php

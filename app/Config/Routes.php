@@ -148,4 +148,9 @@ $routes->group('pegawai', ['filter' => 'role:pegawai'], function ($routes) {
     $routes->get('summary', 'Pegawai\Beranda::summary');
     $routes->get('riwayat-presensi', 'Pegawai\Beranda::riwayatPresensi');
     $routes->GET("logout", "Pegawai\Beranda::logout");
+
+    $routes->group('jadwal', static function ($routes) {
+        $routes->GET('/', 'Pegawai\Jadwal::index');
+        $routes->GET('kalender', 'Pegawai\Jadwal::kalender');
+    });
 });

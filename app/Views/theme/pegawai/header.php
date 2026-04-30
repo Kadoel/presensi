@@ -41,7 +41,7 @@ $segment_header['3'] = $totalSegment_header > 2 ? current_url(true)->getSegment(
                             </a>
                         </li>
                         <li class="nav-main-item">
-                            <a class="nav-main-link <?= $segment_header['2'] == 'riwayat' ? 'active' : ''; ?>" <?= base_url('pegawai/riwayat'); ?>">
+                            <a class="nav-main-link <?= $segment_header['2'] == 'riwayat' ? 'active' : ''; ?>" href="<?= base_url('pegawai/riwayat'); ?>">
                                 <span class="nav-main-link-name">Riwayat Presensi</span>
                             </a>
                         </li>
