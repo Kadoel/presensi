@@ -47,49 +47,49 @@ $segment_sidebar['3'] = $totalSegment_sidebar > 2 ? current_url(true)->getSegmen
                             -->
                 <ul class="nav-main">
                     <li class="nav-main-item">
-                        <a class="nav-main-link" href="<?= base_url('pegawai') ?>">
+                        <a class="nav-main-link <?= $totalSegment_sidebar == 1 ? 'active' : ''; ?>" href="<?= base_url('pegawai') ?>">
                             <i class="nav-main-link-icon fa fa-house-user"></i>
                             <span class="nav-main-link-name">Beranda</span>
                         </a>
                     </li>
-                    <li class="nav-main-item open">
+                    <li class="nav-main-item <?= $segment_sidebar['2'] == 'jadwal' || $segment_sidebar['2'] == 'riwayat' ? 'open' : ''; ?>">
                         <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="true" href="#">
                             <i class="nav-main-link-icon fa fa-puzzle-piece"></i>
                             <span class="nav-main-link-name">Data Saya</span>
                         </a>
                         <ul class="nav-main-submenu">
                             <li class="nav-main-item">
-                                <a class="nav-main-link" href="bd_variations_hero_image_1.html">
+                                <a class="nav-main-link <?= $segment_sidebar['2'] == 'jadwal' ? 'active' : ''; ?>" href="<?= base_url('pegawai/jadwal'); ?>">
                                     <span class="nav-main-link-name">Jadwal Kerja</span>
                                 </a>
                             </li>
                             <li class="nav-main-item">
-                                <a class="nav-main-link active" href="bd_variations_hero_image_2.html">
+                                <a class="nav-main-link <?= $segment_sidebar['2'] == 'riwayat' ? 'active' : ''; ?>" href="<?= base_url('pegawai/riwayat'); ?>">
                                     <span class="nav-main-link-name">Riwayat Presensi</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
-                    <li class="nav-main-item">
+                    <li class="nav-main-item <?= $segment_sidebar['2'] == 'izin' || $segment_sidebar['2'] == 'tukar' ? 'open' : ''; ?>">
                         <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="true" href="#">
                             <i class="nav-main-link-icon fa fa-puzzle-piece"></i>
                             <span class="nav-main-link-name">Pengajuan</span>
                         </a>
                         <ul class="nav-main-submenu">
                             <li class="nav-main-item">
-                                <a class="nav-main-link" href="bd_variations_hero_image_1.html">
+                                <a class="nav-main-link <?= $segment_sidebar['2'] == 'izin' ? 'active' : ''; ?>" href="<?= base_url('pegawai/izin'); ?>">
                                     <span class="nav-main-link-name">Izin / Sakit</span>
                                 </a>
                             </li>
                             <li class="nav-main-item">
-                                <a class="nav-main-link" href="bd_variations_hero_image_2.html">
+                                <a class="nav-main-link <?= $segment_sidebar['2'] == 'tukar' ? 'active' : ''; ?>" href="<?= base_url('pegawai/tukar'); ?>">
                                     <span class="nav-main-link-name">Tukar Jadwal</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
                     <li class="nav-main-item">
-                        <a class="nav-main-link" href="<?= base_url('pegawai/profil') ?>">
+                        <a class="nav-main-link <?= $segment_sidebar['2'] == 'profil' ? 'active' : ''; ?>" href="<?= base_url('pegawai/profil') ?>">
                             <i class="nav-main-link-icon fa fa-house-user"></i>
                             <span class="nav-main-link-name">Profil</span>
                         </a>
