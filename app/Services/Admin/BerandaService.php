@@ -46,8 +46,16 @@ class BerandaService extends BaseService
 
         $sudahSinkron = max($totalJadwal - $belumSinkron, 0);
 
+        $rowsBelumSinkron = $this->presensiModel
+            ->getTanggalBelumSinkronSebelumHariIni($tanggal);
+
+        $tanggalBelumSinkron = array_map(function ($row) {
+            return $row->tanggal;
+        }, $rowsBelumSinkron);
+
         return [
             'tanggal'              => $tanggal,
+            'tanggal_belum_sinkron' => $tanggalBelumSinkron,
 
             // KPI
             'total_pegawai'        => $totalPegawai,

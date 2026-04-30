@@ -54,6 +54,9 @@
 
                     updateProgress(res);
                     renderGrafikBeranda(res);
+
+                    const tanggalList = res.tanggal_belum_sinkron ?? [];
+                    showStickyNotif(tanggalList);
                 },
                 error: function(xhr) {
                     const res = xhr.responseJSON;
@@ -72,6 +75,34 @@
                 }
             });
         }
+
+        function showStickyNotif(tanggalList) {
+            const container = $('#sticky-belum-sinkron');
+            const list = $('#list-belum-sinkron');
+
+            if (!tanggalList || tanggalList.length === 0) {
+                container.addClass('d-none');
+                return;
+            }
+
+            let listHtml = tanggalList.map(t =>
+                `<li>${formatTanggalIndonesia(t)}</li>`
+            ).join('');
+
+            list.html(listHtml);
+            container.removeClass('d-none');
+        }
+
+        function formatTanggalIndonesia(tanggal) {
+            const bulan = [
+                'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+                'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
+            ];
+
+            const d = new Date(tanggal);
+            return `${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}<br>`;
+        }
+
 
         function updateProgress(res) {
             const totalJadwal = res.total_jadwal ?? 0;

@@ -107,9 +107,14 @@ class PresensiAdminService extends BaseService
         return $this->transaksi(function () use ($tanggal) {
             $tanggal = $this->stringWajib($tanggal ?: date('Y-m-d'));
 
-            $cek = $this->validasiWaktuSinkron($tanggal);
-            if ($cek !== null) {
-                return $cek;
+            $belumSinkronSebelumHariIni = $this->validasiBelumSinkronSebelumHariIni($tanggal);
+            if ($belumSinkronSebelumHariIni !== null) {
+                return $belumSinkronSebelumHariIni;
+            }
+
+            $cekWaktu = $this->validasiWaktuSinkron($tanggal);
+            if ($cekWaktu !== null) {
+                return $cekWaktu;
             }
 
             $validasiJumlahJadwal = $this->validasiJumlahJadwalSesuaiPegawaiAktif($tanggal);
@@ -657,7 +662,7 @@ class PresensiAdminService extends BaseService
 
         $jumlahJadwal = $this->jadwalKerjaModel->jumlahJadwalPadaTanggal($tanggal);
 
-        if ($jumlahJadwal !== $jumlahPegawaiAktif) {
+        if ($tanggal == date('Y-m-d') && $jumlahJadwal !== $jumlahPegawaiAktif) {
             return $this->hasilGagal(
                 [],
                 'Sinkron ditolak. Jumlah jadwal pada tanggal ' . tanggal_indonesia($tanggal) .
@@ -666,6 +671,18 @@ class PresensiAdminService extends BaseService
             );
         }
 
+        return null;
+    }
+
+    protected function validasiBelumSinkronSebelumHariIni(string $tanggal)
+    {
+        $jumlah = $this->presensiModel->countBelumSinkronSebelumTanggal($tanggal);
+        if ($tanggal == date('Y-m-d') && $jumlah > 0) {
+            return $this->hasilGagal(
+                [],
+                'Sinkron ditolak. Presensi sebelumnya ada yang belum disinkronkan!'
+            );
+        }
         return null;
     }
 }

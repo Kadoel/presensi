@@ -257,6 +257,11 @@
     background-color: rgba(220, 53, 69, 0.12) !important;
 }
 
+#sticky-belum-sinkron {
+    background: linear-gradient(90deg, #fff3cd, #ffe69c);
+    border-left: 5px solid #f3b760;
+}
+
 @media (max-width: 768px) {
 
     .chart-box-lg,

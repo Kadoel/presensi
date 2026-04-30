@@ -119,6 +119,44 @@
             });
         }
 
+        function showStickyNotif(tanggalList) {
+            const container = $('#sticky-belum-sinkron');
+            const list = $('#list-belum-sinkron');
+
+            if (!tanggalList || tanggalList.length === 0) {
+                container.addClass('d-none');
+                return;
+            }
+
+            let listHtml = tanggalList.map(t =>
+                `<li>${formatTanggalIndonesia(t)}</li>`
+            ).join('');
+
+            list.html(listHtml);
+            container.removeClass('d-none');
+        }
+
+        function formatTanggalIndonesia(tanggal) {
+            const bulan = [
+                'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+                'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
+            ];
+
+            const d = new Date(tanggal);
+            return `${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}<br>`;
+        }
+
+        function loadNotifBelumSinkron() {
+            $.ajax({
+                url: '<?= base_url("admin/summary"); ?>',
+                type: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    showStickyNotif(res.tanggal_belum_sinkron ?? []);
+                }
+            });
+        }
+
         let data_presensi = $('#presensi-tabel').DataTable({
             destroy: true,
             processing: true,
@@ -374,7 +412,7 @@
 
             Swal.fire({
                 title: 'PRESENSI',
-                html: 'Sinkron presensi untuk tanggal <b>' + tanggal + '</b>?',
+                html: 'Sinkron presensi untuk tanggal <b>' + KadoelHelper.toTanggalIndonesia(tanggal) + '</b>?',
                 imageUrl: '<?= base_url('assets/media/favicons/apple-touch-icon-180x180.png') ?>',
                 imageWidth: 128,
                 imageHeight: 128,
@@ -405,6 +443,7 @@
                                 data_presensi.ajax.reload();
                                 data_rekap.ajax.reload();
                                 refreshRingkasan();
+                                loadNotifBelumSinkron();
                             } else {
                                 handleGagal(result);
                             }
@@ -629,5 +668,6 @@
         });
 
         refreshRingkasan();
+        loadNotifBelumSinkron();
     });
 </script>

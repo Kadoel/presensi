@@ -322,4 +322,21 @@ class PresensiModel extends Model
             ->where('pegawai.is_active', 1)
             ->groupBy('pegawai.id, pegawai.nama_pegawai');
     }
+
+    public function countBelumSinkronSebelumTanggal(string $tanggal): int
+    {
+        return (int) $this->where('tanggal <', $tanggal)
+            ->where('hasil_presensi', null)
+            ->countAllResults();
+    }
+
+    public function getTanggalBelumSinkronSebelumHariIni(string $tanggal): array
+    {
+        return $this->select('tanggal')
+            ->where('tanggal <', $tanggal)
+            ->where('hasil_presensi', null)
+            ->groupBy('tanggal')
+            ->orderBy('tanggal', 'ASC')
+            ->findAll();
+    }
 }

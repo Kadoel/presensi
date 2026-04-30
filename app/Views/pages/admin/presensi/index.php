@@ -3,6 +3,27 @@
 <?= $this->section('content'); ?>
 <?php $tanggal = date('Y-m-d'); ?>
 
+<div id="sticky-belum-sinkron" class="alert alert-warning d-none shadow-sm"
+    style="position: sticky; top: 0; z-index: 1020; border-radius: 0;">
+
+    <div class="container-fluid d-flex align-items-start justify-content-between">
+
+        <div class="d-flex">
+            <div class="me-2">
+                <i class="fa fa-triangle-exclamation"></i>
+            </div>
+
+            <div>
+                <b>Presensi Belum Sinkron</b>
+                <div class="mt-1">
+                    <ul id="list-belum-sinkron" class="mb-0 ps-3"></ul>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-close ms-2" onclick="$('#sticky-belum-sinkron').addClass('d-none')"></button>
+    </div>
+</div>
 <div id="block-ringkasan" class="mb-4">
     <div class="row">
         <?php
