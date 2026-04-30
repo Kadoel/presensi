@@ -295,4 +295,30 @@ class JadwalKerjaModel extends Model
             ->get()
             ->getResult();
     }
+
+    public function getSlotTukarJadwalPegawai(int $pegawaiId): array
+    {
+        return $this->db->table($this->table)
+            ->select('
+            jadwal_kerja.id,
+            jadwal_kerja.pegawai_id,
+            jadwal_kerja.tanggal,
+            jadwal_kerja.shift_id,
+            jadwal_kerja.status_hari,
+            jadwal_kerja.sumber_data,
+            shift.kode_shift,
+            shift.nama_shift,
+            shift.jam_masuk,
+            shift.jam_pulang
+        ')
+            ->join('shift', 'shift.id = jadwal_kerja.shift_id', 'left')
+            ->where('jadwal_kerja.pegawai_id', $pegawaiId)
+            ->where('jadwal_kerja.tanggal >=', date('Y-m-d'))
+            ->where('jadwal_kerja.status_hari', 'kerja')
+            ->where('jadwal_kerja.sumber_data', 'manual')
+            ->where('jadwal_kerja.shift_id IS NOT NULL', null, false)
+            ->orderBy('jadwal_kerja.tanggal', 'ASC')
+            ->get()
+            ->getResult();
+    }
 }

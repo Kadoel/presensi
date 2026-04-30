@@ -167,4 +167,12 @@ $routes->group('pegawai', ['filter' => 'role:pegawai'], function ($routes) {
         $routes->post('update/(:num)', 'Pegawai\PengajuanIzin::update/$1');
         $routes->post('delete', 'Pegawai\PengajuanIzin::delete');
     });
+
+    $routes->group('tukar', static function ($routes) {
+        $routes->match(['GET', 'POST'], '/', 'Pegawai\TukarJadwal::index');
+        $routes->post('detail', 'Pegawai\TukarJadwal::detail');
+        $routes->post('simpan', 'Pegawai\TukarJadwal::simpan');
+        $routes->post('slot-saya', 'Pegawai\TukarJadwal::getSlotSaya');
+        $routes->post('slot-pegawai', 'Pegawai\TukarJadwal::getSlotPegawai');
+    });
 });

@@ -91,4 +91,13 @@ class TukarJadwalModel extends Model
     {
         return (int) $this->where('status', 'pending')->countAllResults();
     }
+
+    public function selectDataPegawai(int $pegawaiId)
+    {
+        return $this->selectData()
+            ->groupStart()
+            ->where('tukar_jadwal.pegawai_a_id', $pegawaiId)
+            ->orWhere('tukar_jadwal.pegawai_b_id', $pegawaiId)
+            ->groupEnd();
+    }
 }
