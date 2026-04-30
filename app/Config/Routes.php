@@ -153,4 +153,10 @@ $routes->group('pegawai', ['filter' => 'role:pegawai'], function ($routes) {
         $routes->GET('/', 'Pegawai\Jadwal::index');
         $routes->GET('kalender', 'Pegawai\Jadwal::kalender');
     });
+
+    // 🔥 riwayat presensi (FULL PAGE)
+    $routes->group('riwayat', static function ($routes) {
+        $routes->GET('/', 'Pegawai\RiwayatPresensi::index');
+        $routes->GET('kalender', 'Pegawai\RiwayatPresensi::kalender');
+    });
 });

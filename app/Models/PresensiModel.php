@@ -339,4 +339,37 @@ class PresensiModel extends Model
             ->orderBy('tanggal', 'ASC')
             ->findAll();
     }
+
+    public function getRiwayatKalenderPegawai(int $pegawaiId, string $start, string $end): array
+    {
+        return $this->db->table($this->table)
+            ->select('
+            presensi.id,
+            presensi.pegawai_id,
+            presensi.tanggal,
+            presensi.jadwal_kerja_id,
+            presensi.shift_id,
+            presensi.jam_datang,
+            presensi.jam_pulang,
+            presensi.status_datang,
+            presensi.status_pulang,
+            presensi.menit_telat,
+            presensi.menit_pulang_cepat,
+            presensi.hasil_presensi,
+            presensi.sumber_presensi,
+            presensi.catatan_admin,
+            presensi.is_manual,
+            shift.kode_shift,
+            shift.nama_shift,
+            shift.jam_masuk,
+            shift.jam_pulang AS jam_pulang_shift
+        ')
+            ->join('shift', 'shift.id = presensi.shift_id', 'left')
+            ->where('presensi.pegawai_id', $pegawaiId)
+            ->where('presensi.tanggal >=', $start)
+            ->where('presensi.tanggal <=', $end)
+            ->orderBy('presensi.tanggal', 'ASC')
+            ->get()
+            ->getResult();
+    }
 }
