@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Admin;
+namespace App\Services\Kios;
 
 use App\Models\PresensiModel;
 use App\Services\BaseService;

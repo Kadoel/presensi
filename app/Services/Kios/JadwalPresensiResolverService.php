@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Admin;
+namespace App\Services\Kios;
 
 use App\Models\JadwalKerjaModel;
 use App\Models\PegawaiModel;
