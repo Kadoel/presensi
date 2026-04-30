@@ -21,7 +21,7 @@
                             <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
                         </div>
                         <div class="text-end">
-                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="<?= esc($card['id']); ?>">
+                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="ringkasan-<?= esc($card['id']); ?>">
                                 0
                             </div>
                             <div class="fs-sm fw-semibold text-uppercase text-muted"><?= esc($card['label']); ?></div>
@@ -51,7 +51,7 @@
                             <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
                         </div>
                         <div class="text-end">
-                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="<?= esc($card['id']); ?>">
+                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="ringkasan-<?= esc($card['id']); ?>">
                                 0
                             </div>
                             <div class="fs-sm fw-semibold text-uppercase text-muted"><?= esc($card['label']); ?></div>
@@ -80,7 +80,7 @@
                             <i class="fa <?= esc($card['icon']); ?> fa-2x <?= esc($card['class']); ?> opacity-50"></i>
                         </div>
                         <div class="text-end">
-                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="<?= esc($card['id']); ?>">
+                            <div class="fs-3 fw-semibold <?= esc($card['class']); ?>" id="ringkasan-<?= esc($card['id']); ?>">
                                 0
                             </div>
                             <div class="fs-sm fw-semibold text-uppercase text-muted"><?= esc($card['label']); ?></div>

@@ -88,7 +88,7 @@
                 },
                 success: function(result) {
                     $('#block-ringkasan').LoadingOverlay('hide');
-
+                    console.log(result);
                     if (result.sukses) {
                         const r = result.ringkasan || {};
 
@@ -627,5 +627,7 @@
                 }
             });
         });
+
+        refreshRingkasan();
     });
 </script>
