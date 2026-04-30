@@ -474,45 +474,40 @@ class TukarJadwalService extends BaseService
         return false;
     }
 
-    protected function prosesSwapSimple($jadwalA, $jadwalB): bool
+    protected function prosesSwapSimple(object $jadwalA, object $jadwalB): bool
     {
         if (! is_object($jadwalA) || ! is_object($jadwalB)) {
             return false;
         }
 
-        $idA = (int) $jadwalA->id;
-        $idB = (int) $jadwalB->id;
-
-        $pegawaiA = (int) $jadwalA->pegawai_id;
-        $pegawaiB = (int) $jadwalB->pegawai_id;
-
-        $sql = "
-            UPDATE jadwal_kerja
-            SET pegawai_id = CASE
-                WHEN id = ? THEN ?
-                WHEN id = ? THEN ?
-            END
-            WHERE id IN (?, ?)
-        ";
-
-        $result = $this->db->query($sql, [
-            $idA,
-            $pegawaiB,
-            $idB,
-            $pegawaiA,
-            $idA,
-            $idB
+        $updateA = $this->jadwalKerjaModel->update((int) $jadwalA->id, [
+            'shift_id'    => $jadwalB->shift_id,
+            'status_hari' => $jadwalB->status_hari,
+            'sumber_data' => $jadwalB->sumber_data,
+            'catatan'     => $jadwalB->catatan ?? null,
         ]);
 
-        if (! $result) {
-            $this->logDbError('Swap simple gagal');
+        if (! $updateA) {
+            $this->logDbError('Swap simple update A gagal');
+            return false;
+        }
+
+        $updateB = $this->jadwalKerjaModel->update((int) $jadwalB->id, [
+            'shift_id'    => $jadwalA->shift_id,
+            'status_hari' => $jadwalA->status_hari,
+            'sumber_data' => $jadwalA->sumber_data,
+            'catatan'     => $jadwalA->catatan ?? null,
+        ]);
+
+        if (! $updateB) {
+            $this->logDbError('Swap simple update B gagal');
             return false;
         }
 
         return true;
     }
 
-    protected function prosesSwapPaired($jadwalA, $jadwalB, $jadwalSilangA, $jadwalSilangB): bool
+    protected function prosesSwapPaired(object $jadwalA, object $jadwalB, object $jadwalSilangA, object $jadwalSilangB): bool
     {
         if (
             ! is_object($jadwalA) ||
@@ -523,41 +518,35 @@ class TukarJadwalService extends BaseService
             return false;
         }
 
-        $idA  = (int) $jadwalA->id;
-        $idB  = (int) $jadwalB->id;
-        $idSA = (int) $jadwalSilangA->id;
-        $idSB = (int) $jadwalSilangB->id;
-
-        $pegawaiA = (int) $jadwalA->pegawai_id;
-        $pegawaiB = (int) $jadwalB->pegawai_id;
-
-        $sql = "
-            UPDATE jadwal_kerja
-            SET pegawai_id = CASE
-                WHEN id = ? THEN ?
-                WHEN id = ? THEN ?
-                WHEN id = ? THEN ?
-                WHEN id = ? THEN ?
-            END
-            WHERE id IN (?, ?, ?, ?)
-        ";
-
-        $result = $this->db->query($sql, [
-            $idA,
-            $pegawaiB,
-            $idSB,
-            $pegawaiA,
-            $idB,
-            $pegawaiA,
-            $idSA,
-            $pegawaiB,
-            $idA,
-            $idSB,
-            $idB,
-            $idSA
+        $updateA = $this->jadwalKerjaModel->update((int) $jadwalA->id, [
+            'shift_id'    => $jadwalSilangB->shift_id,
+            'status_hari' => $jadwalSilangB->status_hari,
+            'sumber_data' => $jadwalSilangB->sumber_data,
+            'catatan'     => $jadwalSilangB->catatan ?? null,
         ]);
 
-        if (! $result) {
+        $updateSilangB = $this->jadwalKerjaModel->update((int) $jadwalSilangB->id, [
+            'shift_id'    => $jadwalA->shift_id,
+            'status_hari' => $jadwalA->status_hari,
+            'sumber_data' => $jadwalA->sumber_data,
+            'catatan'     => $jadwalA->catatan ?? null,
+        ]);
+
+        $updateB = $this->jadwalKerjaModel->update((int) $jadwalB->id, [
+            'shift_id'    => $jadwalSilangA->shift_id,
+            'status_hari' => $jadwalSilangA->status_hari,
+            'sumber_data' => $jadwalSilangA->sumber_data,
+            'catatan'     => $jadwalSilangA->catatan ?? null,
+        ]);
+
+        $updateSilangA = $this->jadwalKerjaModel->update((int) $jadwalSilangA->id, [
+            'shift_id'    => $jadwalB->shift_id,
+            'status_hari' => $jadwalB->status_hari,
+            'sumber_data' => $jadwalB->sumber_data,
+            'catatan'     => $jadwalB->catatan ?? null,
+        ]);
+
+        if (! $updateA || ! $updateSilangB || ! $updateB || ! $updateSilangA) {
             $this->logDbError('Swap paired gagal');
             return false;
         }
