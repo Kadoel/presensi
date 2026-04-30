@@ -92,4 +92,27 @@ class PengajuanIzinModel extends Model
     {
         return (int) $this->where('status', 'pending')->countAllResults();
     }
+
+    public function selectDataPegawai(int $pegawaiId)
+    {
+        return $this->db->table($this->table)
+            ->select('
+            pengajuan_izin.id,
+            pengajuan_izin.pegawai_id,
+            pengajuan_izin.jenis,
+            pengajuan_izin.tanggal_mulai,
+            pengajuan_izin.tanggal_selesai,
+            pengajuan_izin.alasan,
+            pengajuan_izin.lampiran,
+            pengajuan_izin.status,
+            pengajuan_izin.catatan_approval,
+            pengajuan_izin.approved_by,
+            pengajuan_izin.approved_at,
+            pengajuan_izin.created_at,
+            pengajuan_izin.updated_at,
+            users.username as approved_by_username
+        ')
+            ->join('users', 'users.id = pengajuan_izin.approved_by', 'left')
+            ->where('pengajuan_izin.pegawai_id', $pegawaiId);
+    }
 }

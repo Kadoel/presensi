@@ -159,4 +159,12 @@ $routes->group('pegawai', ['filter' => 'role:pegawai'], function ($routes) {
         $routes->GET('/', 'Pegawai\RiwayatPresensi::index');
         $routes->GET('kalender', 'Pegawai\RiwayatPresensi::kalender');
     });
+
+    $routes->group('izin', static function ($routes) {
+        $routes->match(['GET', 'POST'], '/', 'Pegawai\PengajuanIzin::index');
+        $routes->post('simpan', 'Pegawai\PengajuanIzin::simpan');
+        $routes->post('edit', 'Pegawai\PengajuanIzin::edit');
+        $routes->post('update/(:num)', 'Pegawai\PengajuanIzin::update/$1');
+        $routes->post('delete', 'Pegawai\PengajuanIzin::delete');
+    });
 });
