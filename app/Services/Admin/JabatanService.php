@@ -115,6 +115,11 @@ class JabatanService extends BaseService
                 return $validasi;
             }
 
+            $validasiNonAktifJabatan = $this->validasiNonAktifJabatan($id, $post);
+            if (! $validasiNonAktifJabatan['sukses']) {
+                return $validasiNonAktifJabatan;
+            }
+
             $simpan = $this->jabatanModel->save([
                 'id'           => $post['edit-id'] ?? $id,
                 'nama_jabatan' => $this->stringWajib($post['edit-nama_jabatan'] ?? ''),
@@ -184,5 +189,30 @@ class JabatanService extends BaseService
 
             return $this->hasilSukses('Data Jabatan Berhasil Dihapus');
         });
+    }
+
+    protected function validasiNonAktifJabatan(int $id, array $post): array
+    {
+        $jabatan = $this->jabatanModel->getJabatanById($id);
+
+        if ($jabatan === null) {
+            return $this->hasilTidakDitemukan('Data Jabatan Tidak Ditemukan');
+        }
+
+        $statusLama = (int) ($jabatan->is_active ?? 0);
+        $statusBaru = $this->intVal($post['edit-is_active'] ?? 1, 1);
+
+        // hanya validasi jika dari aktif -> nonaktif
+        if ($statusLama === 1 && $statusBaru === 0) {
+            $jumlahDipakai = $this->jabatanModel->jumlahPegawaiYangMemakai($id);
+
+            if ($jumlahDipakai > 0) {
+                return $this->hasilGagal([
+                    'edit-is_active' => 'Jabatan tidak dapat dinonaktifkan karena masih dipakai oleh ' . $jumlahDipakai . ' pegawai',
+                ]);
+            }
+        }
+
+        return $this->hasilSukses();
     }
 }
