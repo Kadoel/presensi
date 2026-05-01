@@ -16,7 +16,7 @@
                                 class="form-control"
                                 id="logo-src"
                                 name="logo-src"
-                                value="/assets/media/pegawai/<?= esc($pegawai->logo ?? 'default.png'); ?>">
+                                value="/assets/media/pegawai/default.png ?>">
 
                             <div class="mb-4">
                                 <label class="form-label" for="nama_pegawai">Nama Pegawai <span class="text-danger">*</span></label>
