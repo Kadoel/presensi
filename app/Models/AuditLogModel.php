@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use CodeIgniter\Database\BaseBuilder;
 use CodeIgniter\Model;
 
 class AuditLogModel extends Model
@@ -21,9 +22,9 @@ class AuditLogModel extends Model
     ];
     protected $useTimestamps = false;
 
-    public function selectData(array $filter = [])
+    public function selectData(array $filter = []): BaseBuilder
     {
-        $builder = $this->db->table('audit_logs')
+        $builder = $this->db->table($this->table)
             ->select('
                 audit_logs.id,
                 audit_logs.user_id,
@@ -52,19 +53,19 @@ class AuditLogModel extends Model
         }
 
         if (! empty($filter['tanggal_awal'])) {
-            $builder->where('DATE(audit_logs.created_at) >=', $filter['tanggal_awal']);
+            $builder->where('DATE(audit_logs.created_at) >=', (string) $filter['tanggal_awal']);
         }
 
         if (! empty($filter['tanggal_akhir'])) {
-            $builder->where('DATE(audit_logs.created_at) <=', $filter['tanggal_akhir']);
+            $builder->where('DATE(audit_logs.created_at) <=', (string) $filter['tanggal_akhir']);
         }
 
         return $builder;
     }
 
-    public function getAuditLogById(int $id)
+    public function getAuditLogById(int $id): ?object
     {
-        return $this->db->table('audit_logs')
+        return $this->db->table($this->table)
             ->select('
                 audit_logs.id,
                 audit_logs.user_id,
@@ -83,23 +84,23 @@ class AuditLogModel extends Model
             ->getRow();
     }
 
-    public function getUserFilter()
+    public function getUserFilter(): array
     {
-        return $this->db->table('audit_logs')
+        return $this->db->table($this->table)
             ->select('audit_logs.user_id, users.username')
             ->join('users', 'users.id = audit_logs.user_id', 'left')
-            ->where('audit_logs.user_id IS NOT NULL')
+            ->where('audit_logs.user_id IS NOT NULL', null, false)
             ->groupBy('audit_logs.user_id, users.username')
             ->orderBy('users.username', 'ASC')
             ->get()
             ->getResult();
     }
 
-    public function getActionFilter()
+    public function getActionFilter(): array
     {
-        return $this->db->table('audit_logs')
+        return $this->db->table($this->table)
             ->select('action')
-            ->where('action IS NOT NULL')
+            ->where('action IS NOT NULL', null, false)
             ->where('action !=', '')
             ->groupBy('action')
             ->orderBy('action', 'ASC')
@@ -107,11 +108,11 @@ class AuditLogModel extends Model
             ->getResult();
     }
 
-    public function getTableFilter()
+    public function getTableFilter(): array
     {
-        return $this->db->table('audit_logs')
+        return $this->db->table($this->table)
             ->select('table_name')
-            ->where('table_name IS NOT NULL')
+            ->where('table_name IS NOT NULL', null, false)
             ->where('table_name !=', '')
             ->groupBy('table_name')
             ->orderBy('table_name', 'ASC')
@@ -119,40 +120,39 @@ class AuditLogModel extends Model
             ->getResult();
     }
 
-    public function getTimelineTerbaru(int $limit = 10)
+    public function getTimelineTerbaru(int $limit = 10): array
     {
-        $rows = $this->db->table('audit_logs')
+        return $this->db->table($this->table)
             ->select('
-            audit_logs.id,
-            audit_logs.user_id,
-            audit_logs.action,
-            audit_logs.table_name,
-            audit_logs.row_id,
-            audit_logs.description,
-            audit_logs.ip_address,
-            audit_logs.created_at,
-            users.username
-        ')
+                audit_logs.id,
+                audit_logs.user_id,
+                audit_logs.action,
+                audit_logs.table_name,
+                audit_logs.row_id,
+                audit_logs.description,
+                audit_logs.ip_address,
+                audit_logs.created_at,
+                users.username
+            ')
             ->join('users', 'users.id = audit_logs.user_id', 'left')
             ->orderBy('audit_logs.id', 'DESC')
             ->limit($limit)
             ->get()
             ->getResult();
-        return $rows;
     }
 
     public function getAktivitasTerbaru(int $limit = 10): array
     {
         return $this->select('
-            audit_logs.id,
-            audit_logs.user_id,
-            audit_logs.action,
-            audit_logs.table_name,
-            audit_logs.description,
-            audit_logs.ip_address,
-            audit_logs.created_at,
-            users.username
-        ')
+                audit_logs.id,
+                audit_logs.user_id,
+                audit_logs.action,
+                audit_logs.table_name,
+                audit_logs.description,
+                audit_logs.ip_address,
+                audit_logs.created_at,
+                users.username
+            ')
             ->join('users', 'users.id = audit_logs.user_id', 'left')
             ->orderBy('audit_logs.created_at', 'DESC')
             ->limit($limit)

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use CodeIgniter\Database\BaseBuilder;
 use CodeIgniter\Model;
 
 class PengajuanIzinModel extends Model
@@ -9,6 +10,7 @@ class PengajuanIzinModel extends Model
     protected $table         = 'pengajuan_izin';
     protected $primaryKey    = 'id';
     protected $returnType    = 'object';
+
     protected $allowedFields = [
         'pegawai_id',
         'jenis',
@@ -21,11 +23,12 @@ class PengajuanIzinModel extends Model
         'approved_by',
         'approved_at',
     ];
+
     protected $useTimestamps = true;
 
-    public function selectData()
+    public function selectData(): BaseBuilder
     {
-        return $this->db->table('pengajuan_izin')
+        return $this->db->table($this->table)
             ->select('
                 pengajuan_izin.id,
                 pengajuan_izin.pegawai_id,
@@ -42,18 +45,39 @@ class PengajuanIzinModel extends Model
                 pengajuan_izin.updated_at,
                 pegawai.kode_pegawai,
                 pegawai.nama_pegawai,
-                users.username as approved_by_username
+                users.username AS approved_by_username
             ')
             ->join('pegawai', 'pegawai.id = pengajuan_izin.pegawai_id', 'left')
             ->join('users', 'users.id = pengajuan_izin.approved_by', 'left');
     }
 
-    public function getPengajuanById(int $id)
+    public function selectDataPegawai(int $pegawaiId): BaseBuilder
     {
-        return $this->db->table('pengajuan_izin')
+        return $this->db->table($this->table)
             ->select('
-                pengajuan_izin.*
+                pengajuan_izin.id,
+                pengajuan_izin.pegawai_id,
+                pengajuan_izin.jenis,
+                pengajuan_izin.tanggal_mulai,
+                pengajuan_izin.tanggal_selesai,
+                pengajuan_izin.alasan,
+                pengajuan_izin.lampiran,
+                pengajuan_izin.status,
+                pengajuan_izin.catatan_approval,
+                pengajuan_izin.approved_by,
+                pengajuan_izin.approved_at,
+                pengajuan_izin.created_at,
+                pengajuan_izin.updated_at,
+                users.username AS approved_by_username
             ')
+            ->join('users', 'users.id = pengajuan_izin.approved_by', 'left')
+            ->where('pengajuan_izin.pegawai_id', $pegawaiId);
+    }
+
+    public function getPengajuanById(int $id): ?object
+    {
+        return $this->db->table($this->table)
+            ->select('pengajuan_izin.*')
             ->where('pengajuan_izin.id', $id)
             ->get()
             ->getRow();
@@ -65,7 +89,7 @@ class PengajuanIzinModel extends Model
         string $tanggalSelesai,
         ?int $excludeId = null
     ): int {
-        $builder = $this->db->table('pengajuan_izin')
+        $builder = $this->db->table($this->table)
             ->where('pegawai_id', $pegawaiId)
             ->groupStart()
             ->where('tanggal_mulai <=', $tanggalSelesai)
@@ -90,29 +114,7 @@ class PengajuanIzinModel extends Model
 
     public function countPending(): int
     {
-        return (int) $this->where('status', 'pending')->countAllResults();
-    }
-
-    public function selectDataPegawai(int $pegawaiId)
-    {
-        return $this->db->table($this->table)
-            ->select('
-            pengajuan_izin.id,
-            pengajuan_izin.pegawai_id,
-            pengajuan_izin.jenis,
-            pengajuan_izin.tanggal_mulai,
-            pengajuan_izin.tanggal_selesai,
-            pengajuan_izin.alasan,
-            pengajuan_izin.lampiran,
-            pengajuan_izin.status,
-            pengajuan_izin.catatan_approval,
-            pengajuan_izin.approved_by,
-            pengajuan_izin.approved_at,
-            pengajuan_izin.created_at,
-            pengajuan_izin.updated_at,
-            users.username as approved_by_username
-        ')
-            ->join('users', 'users.id = pengajuan_izin.approved_by', 'left')
-            ->where('pengajuan_izin.pegawai_id', $pegawaiId);
+        return (int) $this->where('status', 'pending')
+            ->countAllResults();
     }
 }

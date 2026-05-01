@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use CodeIgniter\Database\BaseBuilder;
 use CodeIgniter\Model;
 
 class JadwalKerjaModel extends Model
@@ -28,28 +29,28 @@ class JadwalKerjaModel extends Model
 
     protected $useTimestamps = true;
 
-    public function selectData(?string $bulan = null)
+    public function selectData(?string $bulan = null): BaseBuilder
     {
-        $builder = $this->db->table('jadwal_kerja')
+        $builder = $this->db->table($this->table)
             ->select('
-            jadwal_kerja.id,
-            jadwal_kerja.pegawai_id,
-            jadwal_kerja.tanggal,
-            jadwal_kerja.shift_id,
-            jadwal_kerja.status_hari,
-            jadwal_kerja.sumber_data,
-            jadwal_kerja.pengajuan_izin_id,
-            jadwal_kerja.catatan,
-            jadwal_kerja.created_by,
-            jadwal_kerja.created_at,
-            jadwal_kerja.updated_at,
-            pegawai.kode_pegawai,
-            pegawai.nama_pegawai,
-            shift.kode_shift,
-            shift.nama_shift,
-            users.username AS dibuat_oleh,
-            DATE_FORMAT(jadwal_kerja.tanggal, "%Y-%m") AS bulan_jadwal
-        ')
+                jadwal_kerja.id,
+                jadwal_kerja.pegawai_id,
+                jadwal_kerja.tanggal,
+                jadwal_kerja.shift_id,
+                jadwal_kerja.status_hari,
+                jadwal_kerja.sumber_data,
+                jadwal_kerja.pengajuan_izin_id,
+                jadwal_kerja.catatan,
+                jadwal_kerja.created_by,
+                jadwal_kerja.created_at,
+                jadwal_kerja.updated_at,
+                pegawai.kode_pegawai,
+                pegawai.nama_pegawai,
+                shift.kode_shift,
+                shift.nama_shift,
+                users.username AS dibuat_oleh,
+                DATE_FORMAT(jadwal_kerja.tanggal, "%Y-%m") AS bulan_jadwal
+            ')
             ->join('pegawai', 'pegawai.id = jadwal_kerja.pegawai_id', 'left')
             ->join('shift', 'shift.id = jadwal_kerja.shift_id', 'left')
             ->join('users', 'users.id = jadwal_kerja.created_by', 'left');
@@ -61,9 +62,9 @@ class JadwalKerjaModel extends Model
         return $builder;
     }
 
-    public function getJadwalById(int $id)
+    public function getJadwalById(int $id): ?object
     {
-        return $this->db->table('jadwal_kerja')
+        return $this->db->table($this->table)
             ->select('
                 jadwal_kerja.*,
                 pegawai.kode_pegawai,
@@ -87,7 +88,7 @@ class JadwalKerjaModel extends Model
 
     public function getJadwalDetailByPegawaiDanTanggal(int $pegawaiId, string $tanggal): ?object
     {
-        return $this->db->table('jadwal_kerja')
+        return $this->db->table($this->table)
             ->select('
                 jadwal_kerja.*,
                 pegawai.kode_pegawai,
@@ -114,7 +115,7 @@ class JadwalKerjaModel extends Model
 
     public function jumlahBentrokJadwal(int $pegawaiId, string $tanggal, ?int $excludeId = null): int
     {
-        $builder = $this->db->table('jadwal_kerja')
+        $builder = $this->db->table($this->table)
             ->where('pegawai_id', $pegawaiId)
             ->where('tanggal', $tanggal);
 
@@ -127,7 +128,7 @@ class JadwalKerjaModel extends Model
 
     public function getJadwalKerjaAktifPadaTanggalUntukLibur(string $tanggal): array
     {
-        return $this->db->table('jadwal_kerja')
+        return $this->db->table($this->table)
             ->select('
                 jadwal_kerja.id,
                 jadwal_kerja.pegawai_id,
@@ -151,17 +152,18 @@ class JadwalKerjaModel extends Model
 
     public function getJadwalByHariLiburId(int $hariLiburId): array
     {
-        return $this->where('hari_libur_id', $hariLiburId)->findAll();
+        return $this->where('hari_libur_id', $hariLiburId)
+            ->findAll();
     }
 
     public function getBatasAkhirPulangTerakhir(string $tanggal): ?string
     {
-        $row = $this->db->table('jadwal_kerja')
-            ->select('MAX(shift.batas_akhir_pulang) as batas_akhir_pulang')
+        $row = $this->db->table($this->table)
+            ->select('MAX(shift.batas_akhir_pulang) AS batas_akhir_pulang')
             ->join('shift', 'shift.id = jadwal_kerja.shift_id', 'left')
             ->where('jadwal_kerja.tanggal', $tanggal)
             ->where('jadwal_kerja.status_hari', 'kerja')
-            ->where('jadwal_kerja.shift_id IS NOT NULL')
+            ->where('jadwal_kerja.shift_id IS NOT NULL', null, false)
             ->get()
             ->getRow();
 
@@ -170,7 +172,8 @@ class JadwalKerjaModel extends Model
 
     public function jumlahJadwalPadaTanggal(string $tanggal): int
     {
-        return (int) $this->where('tanggal', $tanggal)->countAllResults();
+        return (int) $this->where('tanggal', $tanggal)
+            ->countAllResults();
     }
 
     public function getJadwalPegawaiDalamRentang(int $pegawaiId, string $tanggalMulai, string $tanggalSelesai): array
@@ -182,10 +185,9 @@ class JadwalKerjaModel extends Model
             ->findAll();
     }
 
-    public function countStatusKerjaByTanggal($tanggal)
+    public function countStatusKerjaByTanggal(string $tanggal): int
     {
-        return $this
-            ->where('tanggal', $tanggal)
+        return (int) $this->where('tanggal', $tanggal)
             ->where('status_hari', 'kerja')
             ->countAllResults();
     }
@@ -208,13 +210,13 @@ class JadwalKerjaModel extends Model
     {
         return $this->db->table($this->table)
             ->select('
-            tanggal,
-            COUNT(*) AS total_jadwal,
-            SUM(CASE WHEN status_hari = "kerja" THEN 1 ELSE 0 END) AS total_kerja,
-            SUM(CASE WHEN status_hari = "libur" THEN 1 ELSE 0 END) AS total_libur,
-            SUM(CASE WHEN status_hari = "izin" THEN 1 ELSE 0 END) AS total_izin,
-            SUM(CASE WHEN status_hari = "sakit" THEN 1 ELSE 0 END) AS total_sakit
-        ')
+                tanggal,
+                COUNT(*) AS total_jadwal,
+                SUM(CASE WHEN status_hari = "kerja" THEN 1 ELSE 0 END) AS total_kerja,
+                SUM(CASE WHEN status_hari = "libur" THEN 1 ELSE 0 END) AS total_libur,
+                SUM(CASE WHEN status_hari = "izin" THEN 1 ELSE 0 END) AS total_izin,
+                SUM(CASE WHEN status_hari = "sakit" THEN 1 ELSE 0 END) AS total_sakit
+            ')
             ->where('tanggal >=', $start)
             ->where('tanggal <=', $end)
             ->groupBy('tanggal')
@@ -227,15 +229,15 @@ class JadwalKerjaModel extends Model
     {
         return $this->db->table($this->table)
             ->select('
-            jadwal_kerja.id,
-            jadwal_kerja.tanggal,
-            jadwal_kerja.status_hari,
-            jadwal_kerja.sumber_data,
-            jadwal_kerja.catatan,
-            pegawai.kode_pegawai,
-            pegawai.nama_pegawai,
-            shift.nama_shift
-        ')
+                jadwal_kerja.id,
+                jadwal_kerja.tanggal,
+                jadwal_kerja.status_hari,
+                jadwal_kerja.sumber_data,
+                jadwal_kerja.catatan,
+                pegawai.kode_pegawai,
+                pegawai.nama_pegawai,
+                shift.nama_shift
+            ')
             ->join('pegawai', 'pegawai.id = jadwal_kerja.pegawai_id', 'left')
             ->join('shift', 'shift.id = jadwal_kerja.shift_id', 'left')
             ->where('jadwal_kerja.tanggal', $tanggal)
@@ -246,16 +248,14 @@ class JadwalKerjaModel extends Model
 
     public function countStatusHariIni(string $tanggal, string $status): int
     {
-        return (int) $this
-            ->where('tanggal', $tanggal)
+        return (int) $this->where('tanggal', $tanggal)
             ->where('status_hari', $status)
             ->countAllResults();
     }
 
     public function countJadwalHariIni(string $tanggal): int
     {
-        return (int) $this
-            ->where('tanggal', $tanggal)
+        return (int) $this->where('tanggal', $tanggal)
             ->countAllResults();
     }
 
@@ -275,18 +275,18 @@ class JadwalKerjaModel extends Model
     {
         return $this->db->table($this->table)
             ->select('
-            jadwal_kerja.id,
-            jadwal_kerja.pegawai_id,
-            jadwal_kerja.shift_id,
-            jadwal_kerja.tanggal,
-            jadwal_kerja.status_hari,
-            jadwal_kerja.sumber_data,
-            jadwal_kerja.catatan,
-            shift.kode_shift,
-            shift.nama_shift,
-            shift.jam_masuk,
-            shift.jam_pulang
-        ')
+                jadwal_kerja.id,
+                jadwal_kerja.pegawai_id,
+                jadwal_kerja.shift_id,
+                jadwal_kerja.tanggal,
+                jadwal_kerja.status_hari,
+                jadwal_kerja.sumber_data,
+                jadwal_kerja.catatan,
+                shift.kode_shift,
+                shift.nama_shift,
+                shift.jam_masuk,
+                shift.jam_pulang
+            ')
             ->join('shift', 'shift.id = jadwal_kerja.shift_id', 'left')
             ->where('jadwal_kerja.pegawai_id', $pegawaiId)
             ->where('jadwal_kerja.tanggal >=', $start)
@@ -300,17 +300,17 @@ class JadwalKerjaModel extends Model
     {
         return $this->db->table($this->table)
             ->select('
-            jadwal_kerja.id,
-            jadwal_kerja.pegawai_id,
-            jadwal_kerja.tanggal,
-            jadwal_kerja.shift_id,
-            jadwal_kerja.status_hari,
-            jadwal_kerja.sumber_data,
-            shift.kode_shift,
-            shift.nama_shift,
-            shift.jam_masuk,
-            shift.jam_pulang
-        ')
+                jadwal_kerja.id,
+                jadwal_kerja.pegawai_id,
+                jadwal_kerja.tanggal,
+                jadwal_kerja.shift_id,
+                jadwal_kerja.status_hari,
+                jadwal_kerja.sumber_data,
+                shift.kode_shift,
+                shift.nama_shift,
+                shift.jam_masuk,
+                shift.jam_pulang
+            ')
             ->join('shift', 'shift.id = jadwal_kerja.shift_id', 'left')
             ->where('jadwal_kerja.pegawai_id', $pegawaiId)
             ->where('jadwal_kerja.tanggal >=', date('Y-m-d'))

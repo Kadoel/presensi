@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use CodeIgniter\Database\BaseBuilder;
 use CodeIgniter\Model;
 
 class PresensiModel extends Model
@@ -48,7 +49,7 @@ class PresensiModel extends Model
         return $this->getPresensiByPegawaiDanTanggal($pegawaiId, $tanggal) !== null;
     }
 
-    public function dataTabel(?string $tanggal = null)
+    public function dataTabel(?string $tanggal = null): BaseBuilder
     {
         $builder = $this->db->table($this->table)
             ->select('
@@ -123,7 +124,8 @@ class PresensiModel extends Model
 
     public function countByTanggal(string $tanggal): int
     {
-        return (int) $this->where('tanggal', $tanggal)->countAllResults();
+        return (int) $this->where('tanggal', $tanggal)
+            ->countAllResults();
     }
 
     public function getPresensiTerbaru(string $tanggal, int $limit = 10): array
@@ -153,29 +155,30 @@ class PresensiModel extends Model
 
     public function getPresensiHariIni(string $tanggal, int $limit = 10): array
     {
-        return $this->select('
-            presensi.id,
-            presensi.pegawai_id,
-            presensi.tanggal,
-            presensi.jam_datang,
-            presensi.jam_pulang,
-            presensi.status_datang,
-            presensi.status_pulang,
-            presensi.menit_telat,
-            pegawai.kode_pegawai,
-            pegawai.nama_pegawai,
-            presensi.hasil_presensi,
-            shift.nama_shift
-        ')
+        return $this->db->table($this->table)
+            ->select('
+                presensi.id,
+                presensi.pegawai_id,
+                presensi.tanggal,
+                presensi.jam_datang,
+                presensi.jam_pulang,
+                presensi.status_datang,
+                presensi.status_pulang,
+                presensi.menit_telat,
+                pegawai.kode_pegawai,
+                pegawai.nama_pegawai,
+                presensi.hasil_presensi,
+                shift.nama_shift
+            ')
             ->join('pegawai', 'pegawai.id = presensi.pegawai_id', 'left')
             ->join('shift', 'shift.id = presensi.shift_id', 'left')
             ->where('presensi.tanggal', $tanggal)
             ->orderBy('presensi.jam_datang', 'DESC')
             ->limit($limit)
-            ->findAll();
+            ->get()
+            ->getResult();
     }
 
-    //
     public function countByTanggalDanHasilPresensi(string $tanggal, string $hasil): int
     {
         return (int) $this->where([
@@ -244,9 +247,9 @@ class PresensiModel extends Model
     {
         return $this->db->table($this->table)
             ->select('
-            hasil_presensi,
-            COUNT(*) AS total
-        ')
+                hasil_presensi,
+                COUNT(*) AS total
+            ')
             ->where('DATE_FORMAT(tanggal, "%Y-%m") =', $bulan)
             ->where('hasil_presensi IS NOT NULL', null, false)
             ->groupBy('hasil_presensi')
@@ -282,15 +285,15 @@ class PresensiModel extends Model
     {
         return $this->db->table($this->table)
             ->select('
-            presensi.id,
-            presensi.tanggal,
-            presensi.jam_datang,
-            presensi.jam_pulang,
-            presensi.status_datang,
-            presensi.status_pulang,
-            presensi.hasil_presensi,
-            shift.nama_shift
-        ')
+                presensi.id,
+                presensi.tanggal,
+                presensi.jam_datang,
+                presensi.jam_pulang,
+                presensi.status_datang,
+                presensi.status_pulang,
+                presensi.hasil_presensi,
+                shift.nama_shift
+            ')
             ->join('shift', 'shift.id = presensi.shift_id', 'left')
             ->where('presensi.pegawai_id', $pegawaiId)
             ->orderBy('presensi.tanggal', 'DESC')
@@ -299,24 +302,24 @@ class PresensiModel extends Model
             ->getResult();
     }
 
-    public function dataRekapBulanan(?string $bulan = null)
+    public function dataRekapBulanan(?string $bulan = null): BaseBuilder
     {
         $bulan = $bulan ?: date('Y-m');
 
         return $this->db->table('pegawai')
             ->select("
-            pegawai.id,
-            pegawai.nama_pegawai,
-            COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'hadir' THEN 1 ELSE 0 END), 0) AS hadir,
-            COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'izin' THEN 1 ELSE 0 END), 0) AS izin,
-            COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'sakit' THEN 1 ELSE 0 END), 0) AS sakit,
-            COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'libur' THEN 1 ELSE 0 END), 0) AS libur,
-            COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'alpa' THEN 1 ELSE 0 END), 0) AS alpa
-        ")
+                pegawai.id,
+                pegawai.nama_pegawai,
+                COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'hadir' THEN 1 ELSE 0 END), 0) AS hadir,
+                COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'izin' THEN 1 ELSE 0 END), 0) AS izin,
+                COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'sakit' THEN 1 ELSE 0 END), 0) AS sakit,
+                COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'libur' THEN 1 ELSE 0 END), 0) AS libur,
+                COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'alpa' THEN 1 ELSE 0 END), 0) AS alpa
+            ")
             ->join(
                 'presensi',
                 'presensi.pegawai_id = pegawai.id 
-            AND DATE_FORMAT(presensi.tanggal, "%Y-%m") = ' . $this->db->escape($bulan),
+                AND DATE_FORMAT(presensi.tanggal, "%Y-%m") = ' . $this->db->escape($bulan),
                 'left'
             )
             ->where('pegawai.is_active', 1)
@@ -332,38 +335,40 @@ class PresensiModel extends Model
 
     public function getTanggalBelumSinkronSebelumHariIni(string $tanggal): array
     {
-        return $this->select('tanggal')
+        return $this->db->table($this->table)
+            ->select('tanggal')
             ->where('tanggal <', $tanggal)
             ->where('hasil_presensi', null)
             ->groupBy('tanggal')
             ->orderBy('tanggal', 'ASC')
-            ->findAll();
+            ->get()
+            ->getResult();
     }
 
     public function getRiwayatKalenderPegawai(int $pegawaiId, string $start, string $end): array
     {
         return $this->db->table($this->table)
             ->select('
-            presensi.id,
-            presensi.pegawai_id,
-            presensi.tanggal,
-            presensi.jadwal_kerja_id,
-            presensi.shift_id,
-            presensi.jam_datang,
-            presensi.jam_pulang,
-            presensi.status_datang,
-            presensi.status_pulang,
-            presensi.menit_telat,
-            presensi.menit_pulang_cepat,
-            presensi.hasil_presensi,
-            presensi.sumber_presensi,
-            presensi.catatan_admin,
-            presensi.is_manual,
-            shift.kode_shift,
-            shift.nama_shift,
-            shift.jam_masuk,
-            shift.jam_pulang AS jam_pulang_shift
-        ')
+                presensi.id,
+                presensi.pegawai_id,
+                presensi.tanggal,
+                presensi.jadwal_kerja_id,
+                presensi.shift_id,
+                presensi.jam_datang,
+                presensi.jam_pulang,
+                presensi.status_datang,
+                presensi.status_pulang,
+                presensi.menit_telat,
+                presensi.menit_pulang_cepat,
+                presensi.hasil_presensi,
+                presensi.sumber_presensi,
+                presensi.catatan_admin,
+                presensi.is_manual,
+                shift.kode_shift,
+                shift.nama_shift,
+                shift.jam_masuk,
+                shift.jam_pulang AS jam_pulang_shift
+            ')
             ->join('shift', 'shift.id = presensi.shift_id', 'left')
             ->where('presensi.pegawai_id', $pegawaiId)
             ->where('presensi.tanggal >=', $start)

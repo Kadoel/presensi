@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use CodeIgniter\Database\BaseBuilder;
 use CodeIgniter\Model;
 
 class HariLiburModel extends Model
@@ -16,9 +17,9 @@ class HariLiburModel extends Model
     ];
     protected $useTimestamps = true;
 
-    public function selectData()
+    public function selectData(): BaseBuilder
     {
-        return $this->db->table('hari_libur')
+        return $this->db->table($this->table)
             ->select('
                 hari_libur.id,
                 hari_libur.tanggal,
@@ -29,9 +30,9 @@ class HariLiburModel extends Model
             ');
     }
 
-    public function getHariLiburById(int $id)
+    public function getHariLiburById(int $id): ?object
     {
-        return $this->db->table('hari_libur')
+        return $this->db->table($this->table)
             ->select('
                 hari_libur.id,
                 hari_libur.tanggal,
