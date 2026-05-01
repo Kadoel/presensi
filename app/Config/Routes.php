@@ -175,4 +175,10 @@ $routes->group('pegawai', ['filter' => 'role:pegawai'], function ($routes) {
         $routes->post('slot-saya', 'Pegawai\TukarJadwal::getSlotSaya');
         $routes->post('slot-pegawai', 'Pegawai\TukarJadwal::getSlotPegawai');
     });
+
+    $routes->group('profil', function ($routes) {
+        $routes->get('/', 'Pegawai\Profil::index');
+        $routes->get('data', 'Pegawai\Profil::data');
+        $routes->post('update', 'Pegawai\Profil::update');
+    });
 });
