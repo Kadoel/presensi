@@ -13,7 +13,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="mb-4">
-                                <label class="form-label" for="nama_jabatan">Nama Layanan <span class="text-danger">*</span></label>
+                                <label class="form-label" for="nama_jabatan">Nama Jabatan <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nama_jabatan" name="nama_jabatan" autocomplete="off">
                                 <div id="error-nama_jabatan" class="invalid-feedback animated fadeIn"></div>
                             </div>
