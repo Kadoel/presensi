@@ -4,6 +4,7 @@ namespace App\Services\Admin;
 
 use App\Models\SettingsModel;
 use App\Services\BaseService;
+use CodeIgniter\HTTP\Files\UploadedFile;
 
 class SettingsService extends BaseService
 {
@@ -25,7 +26,7 @@ class SettingsService extends BaseService
         return $this->cache;
     }
 
-    public function simpan(array $post, $file): array
+    public function simpan(array $post, ?UploadedFile $file): array
     {
         return $this->eksekusi(function () use ($post, $file) {
             $rules = [

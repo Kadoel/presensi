@@ -8,6 +8,8 @@ use App\Models\PengajuanIzinModel;
 use App\Models\HariLiburModel;
 use App\Models\PresensiModel;
 use App\Services\BaseService;
+use CodeIgniter\Database\BaseBuilder;
+use CodeIgniter\HTTP\Files\UploadedFile;
 
 class PengajuanIzinService extends BaseService
 {
@@ -28,7 +30,7 @@ class PengajuanIzinService extends BaseService
         $this->presensiModel = new PresensiModel();
     }
 
-    public function dataTabel()
+    public function dataTabel(): BaseBuilder
     {
         return $this->pengajuanIzinModel->selectData();
     }
@@ -47,7 +49,7 @@ class PengajuanIzinService extends BaseService
         });
     }
 
-    public function simpan(array $post, $file): array
+    public function simpan(array $post, ?UploadedFile $file): array
     {
         return $this->transaksi(function () use ($post, $file) {
             $rules =  [
@@ -258,7 +260,7 @@ class PengajuanIzinService extends BaseService
         });
     }
 
-    public function ubah(int $id, array $post, $file): array
+    public function ubah(int $id, array $post, ?UploadedFile $file): array
     {
         return $this->eksekusi(function () use ($id, $post, $file) {
             $pengajuan = $this->pengajuanIzinModel->getPengajuanById($id);
@@ -715,7 +717,7 @@ class PengajuanIzinService extends BaseService
         return $this->hasilSukses();
     }
 
-    protected function simpanLampiran($file, int $pegawaiId): ?string
+    protected function simpanLampiran(?UploadedFile $file, int $pegawaiId): ?string
     {
         if (! $file || $file->getError() == 4) {
             return null;

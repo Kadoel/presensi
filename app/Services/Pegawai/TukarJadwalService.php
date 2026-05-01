@@ -6,6 +6,7 @@ use App\Models\JadwalKerjaModel;
 use App\Models\PegawaiModel;
 use App\Models\TukarJadwalModel;
 use App\Services\Admin\TukarJadwalService as AdminTukarJadwalService;
+use CodeIgniter\Database\BaseBuilder;
 
 class TukarJadwalService extends AdminTukarJadwalService
 {
@@ -22,11 +23,12 @@ class TukarJadwalService extends AdminTukarJadwalService
         $this->pegawaiModelPegawai     = new PegawaiModel();
     }
 
-    public function dataTabel()
+    public function dataTabel(): BaseBuilder
     {
         $pegawaiId = $this->intAtauNull(session()->get('pegawai_id'));
 
-        return $this->tukarJadwalModelPegawai->selectDataPegawai((int) $pegawaiId);
+        return $this->tukarJadwalModelPegawai
+            ->selectDataPegawai((int) $pegawaiId);
     }
 
     public function getPegawaiTujuan(): array

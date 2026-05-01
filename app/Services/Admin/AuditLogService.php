@@ -4,6 +4,7 @@ namespace App\Services\Admin;
 
 use App\Models\AuditLogModel;
 use App\Services\BaseService;
+use CodeIgniter\Database\BaseBuilder;
 use CodeIgniter\I18n\Time;
 
 class AuditLogService extends BaseService
@@ -16,7 +17,7 @@ class AuditLogService extends BaseService
         $this->auditLogModel = new AuditLogModel();
     }
 
-    public function dataTabel(array $filter = [])
+    public function dataTabel(array $filter = []): BaseBuilder
     {
         return $this->auditLogModel->selectData($filter);
     }

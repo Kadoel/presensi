@@ -5,6 +5,7 @@ namespace App\Services\Admin;
 use App\Models\PegawaiModel;
 use App\Models\UsersModel;
 use App\Services\BaseService;
+use CodeIgniter\Database\BaseBuilder;
 
 class UsersService extends BaseService
 {
@@ -27,7 +28,7 @@ class UsersService extends BaseService
         });
     }
 
-    public function dataTabel()
+    public function dataTabel(): BaseBuilder
     {
         return $this->usersModel->selectData();
     }

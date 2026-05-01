@@ -6,6 +6,7 @@ use App\Models\JadwalKerjaModel;
 use App\Models\PegawaiModel;
 use App\Models\PresensiModel;
 use App\Services\BaseService;
+use CodeIgniter\Database\BaseBuilder;
 use DateTime;
 
 class PresensiAdminService extends BaseService
@@ -31,12 +32,12 @@ class PresensiAdminService extends BaseService
             ->findAll();
     }
 
-    public function dataTabel(?string $tanggal = null)
+    public function dataTabel(?string $tanggal = null): BaseBuilder
     {
         return $this->presensiModel->dataTabel($tanggal);
     }
 
-    public function dataRekapBulanan(?string $bulan = null)
+    public function dataRekapBulanan(?string $bulan = null): BaseBuilder
     {
         return $this->presensiModel->dataRekapBulanan($bulan ?: date('Y-m'));
     }
@@ -674,7 +675,7 @@ class PresensiAdminService extends BaseService
         return null;
     }
 
-    protected function validasiBelumSinkronSebelumHariIni(string $tanggal)
+    protected function validasiBelumSinkronSebelumHariIni(string $tanggal): ?array
     {
         $jumlah = $this->presensiModel->countBelumSinkronSebelumTanggal($tanggal);
         if ($tanggal == date('Y-m-d') && $jumlah > 0) {

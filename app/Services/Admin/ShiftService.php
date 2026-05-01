@@ -4,6 +4,7 @@ namespace App\Services\Admin;
 
 use App\Models\ShiftModel;
 use App\Services\BaseService;
+use CodeIgniter\Database\BaseBuilder;
 
 class ShiftService extends BaseService
 {
@@ -15,7 +16,7 @@ class ShiftService extends BaseService
         $this->shiftModel = new ShiftModel();
     }
 
-    public function dataTabel()
+    public function dataTabel(): BaseBuilder
     {
         return $this->shiftModel->selectData();
     }

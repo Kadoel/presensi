@@ -6,6 +6,7 @@ use App\Models\HariLiburModel;
 use App\Models\JadwalKerjaModel;
 use App\Models\PresensiModel;
 use App\Services\BaseService;
+use CodeIgniter\Database\BaseBuilder;
 
 class HariLiburService extends BaseService
 {
@@ -21,7 +22,7 @@ class HariLiburService extends BaseService
         $this->presensiModel = new PresensiModel();
     }
 
-    public function dataTabel()
+    public function dataTabel(): BaseBuilder
     {
         return $this->hariLiburModel->selectData();
     }

@@ -4,6 +4,7 @@ namespace App\Services\Pegawai;
 
 use App\Models\PegawaiModel;
 use App\Services\BaseService;
+use CodeIgniter\HTTP\Files\UploadedFile;
 
 class ProfilService extends BaseService
 {
@@ -36,7 +37,7 @@ class ProfilService extends BaseService
         });
     }
 
-    public function update(array $post, $file): array
+    public function update(array $post, ?UploadedFile $file): array
     {
         return $this->eksekusi(function () use ($post, $file) {
             $pegawaiId = $this->intAtauNull(session()->get('pegawai_id'));

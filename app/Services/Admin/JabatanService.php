@@ -4,6 +4,7 @@ namespace App\Services\Admin;
 
 use App\Models\JabatanModel;
 use App\Services\BaseService;
+use CodeIgniter\Database\BaseBuilder;
 
 class JabatanService extends BaseService
 {
@@ -15,7 +16,7 @@ class JabatanService extends BaseService
         $this->jabatanModel = new JabatanModel();
     }
 
-    public function dataTabel()
+    public function dataTabel(): BaseBuilder
     {
         return $this->jabatanModel->selectData();
     }

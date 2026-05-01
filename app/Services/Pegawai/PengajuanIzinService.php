@@ -7,6 +7,8 @@ use App\Models\JadwalKerjaModel;
 use App\Models\PengajuanIzinModel;
 use App\Models\PresensiModel;
 use App\Services\BaseService;
+use CodeIgniter\Database\BaseBuilder;
+use CodeIgniter\HTTP\Files\UploadedFile;
 
 class PengajuanIzinService extends BaseService
 {
@@ -25,14 +27,14 @@ class PengajuanIzinService extends BaseService
         $this->presensiModel      = new PresensiModel();
     }
 
-    public function dataTabel()
+    public function dataTabel(): BaseBuilder
     {
         $pegawaiId = $this->intAtauNull(session()->get('pegawai_id'));
 
         return $this->pengajuanIzinModel->selectDataPegawai((int) $pegawaiId);
     }
 
-    public function simpan(array $post, $file): array
+    public function simpan(array $post, ?UploadedFile $file): array
     {
         return $this->transaksi(function () use ($post, $file) {
             $pegawaiId = $this->intAtauNull(session()->get('pegawai_id'));
@@ -120,7 +122,7 @@ class PengajuanIzinService extends BaseService
         });
     }
 
-    public function ubah(int $id, array $post, $file): array
+    public function ubah(int $id, array $post, ?UploadedFile $file): array
     {
         return $this->transaksi(function () use ($id, $post, $file) {
             $pegawaiId = $this->intAtauNull(session()->get('pegawai_id'));
@@ -242,7 +244,7 @@ class PengajuanIzinService extends BaseService
         });
     }
 
-    protected function rulesSimpan($file): array
+    protected function rulesSimpan(?UploadedFile $file): array
     {
         $rules = [
             'jenis' => [
@@ -295,7 +297,7 @@ class PengajuanIzinService extends BaseService
         return $rules;
     }
 
-    protected function rulesUbah($file): array
+    protected function rulesUbah(?UploadedFile $file): array
     {
         $rules = [
             'edit-jenis' => [
@@ -470,7 +472,7 @@ class PengajuanIzinService extends BaseService
         return ((int) floor((strtotime($tanggalSelesai) - strtotime($tanggalMulai)) / 86400)) + 1;
     }
 
-    protected function simpanLampiran($file, int $pegawaiId): ?string
+    protected function simpanLampiran(?UploadedFile $file, int $pegawaiId): ?string
     {
         if (! $file || $file->getError() == 4) {
             return null;

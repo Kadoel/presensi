@@ -3,13 +3,14 @@
 namespace App\Services;
 
 use CodeIgniter\Database\BaseConnection;
+use CodeIgniter\Validation\Validation;
 use Config\Database;
 use Config\Services;
 use Throwable;
 
 class BaseService
 {
-    protected $validation;
+    protected Validation $validation;
     protected BaseConnection $db;
 
     public function __construct()
@@ -148,23 +149,23 @@ class BaseService
         ]);
     }
 
-    protected function stringWajib($value): string
+    protected function stringWajib(mixed $value): string
     {
         return trim((string) $value);
     }
 
-    protected function stringAtauNull($value): ?string
+    protected function stringAtauNull(mixed $value): ?string
     {
         $value = trim((string) $value);
         return $value !== '' ? $value : null;
     }
 
-    protected function intVal($value, int $default = 0): int
+    protected function intVal(mixed $value, int $default = 0): int
     {
         return is_numeric($value) ? (int) $value : $default;
     }
 
-    protected function intAtauNull($value): ?int
+    protected function intAtauNull(mixed $value): ?int
     {
         if ($value === null || $value === '') {
             return null;
@@ -173,7 +174,7 @@ class BaseService
         return (int) $value;
     }
 
-    protected function boolInt($value, int $default = 0): int
+    protected function boolInt(mixed $value, int $default = 0): int
     {
         if ($value === null || $value === '') {
             return $default;

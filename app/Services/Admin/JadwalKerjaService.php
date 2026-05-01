@@ -8,6 +8,7 @@ use App\Models\PegawaiModel;
 use App\Models\PresensiModel;
 use App\Models\ShiftModel;
 use App\Services\BaseService;
+use CodeIgniter\Database\BaseBuilder;
 
 class JadwalKerjaService extends BaseService
 {
@@ -28,7 +29,7 @@ class JadwalKerjaService extends BaseService
         $this->presensiModel    = new PresensiModel();
     }
 
-    public function dataTabel(?string $bulan = null)
+    public function dataTabel(?string $bulan = null): BaseBuilder
     {
         return $this->jadwalKerjaModel->selectData($bulan);
     }
@@ -674,7 +675,7 @@ class JadwalKerjaService extends BaseService
         });
     }
 
-    protected function parseTanggalList($value): array
+    protected function parseTanggalList(mixed $value): array
     {
         return array_values(array_unique(array_filter(array_map('trim', explode(',', (string) $value)))));
     }
@@ -970,7 +971,7 @@ class JadwalKerjaService extends BaseService
         return $this->hasilSukses();
     }
 
-    protected function validasiSudahSinkronTanggal(array $jadwalSumber)
+    protected function validasiSudahSinkronTanggal(array $jadwalSumber): array
     {
         $tanggalSudahSinkron = [];
 

@@ -7,6 +7,8 @@ use App\Models\JadwalKerjaModel;
 use App\Models\PegawaiModel;
 use App\Models\PresensiModel;
 use App\Services\BaseService;
+use CodeIgniter\Database\BaseBuilder;
+use CodeIgniter\HTTP\Files\UploadedFile;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
@@ -30,17 +32,17 @@ class PegawaiService extends BaseService
         $this->jadwalKerjaModel = new JadwalKerjaModel();
     }
 
-    public function dataJabatanSelect()
+    public function dataJabatanSelect(): array
     {
         return $this->jabatanModel->getJabatanSelect();
     }
 
-    public function dataTabel()
+    public function dataTabel(): BaseBuilder
     {
         return $this->pegawaiModel->selectData();
     }
 
-    public function simpan(array $post, $file): array
+    public function simpan(array $post, ?UploadedFile $file): array
     {
         return $this->eksekusi(function () use ($post, $file) {
             $maxTanggal = date('Y-m-d');
@@ -188,7 +190,7 @@ class PegawaiService extends BaseService
         });
     }
 
-    public function ubah(int $id, array $post, $file): array
+    public function ubah(int $id, array $post, ?UploadedFile $file): array
     {
         return $this->eksekusi(function () use ($id, $post, $file) {
             $maxTanggal = date('Y-m-d');

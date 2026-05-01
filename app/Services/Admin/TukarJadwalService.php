@@ -8,6 +8,7 @@ use App\Models\PresensiModel;
 use App\Models\ShiftModel;
 use App\Models\TukarJadwalModel;
 use App\Services\BaseService;
+use CodeIgniter\Database\BaseBuilder;
 
 class TukarJadwalService extends BaseService
 {
@@ -39,7 +40,7 @@ class TukarJadwalService extends BaseService
         $this->presensiModel    = new PresensiModel();
     }
 
-    public function dataTabel()
+    public function dataTabel(): BaseBuilder
     {
         return $this->tukarJadwalModel->selectData();
     }
@@ -321,7 +322,7 @@ class TukarJadwalService extends BaseService
      *     jadwal_silang_b?: mixed
      * }
      */
-    protected function validasiTukarSlot($jadwalA, $jadwalB): array
+    protected function validasiTukarSlot(object $jadwalA, object $jadwalB): array
     {
         $basic = $this->validasiDasar($jadwalA, $jadwalB);
         if (! $basic['sukses']) {
@@ -385,7 +386,7 @@ class TukarJadwalService extends BaseService
         return $this->hasilGagal([], 'Tukar jadwal beda tanggal tidak valid karena hanya salah satu pegawai memiliki jadwal pada tanggal silang');
     }
 
-    protected function validasiDasar($jadwalA, $jadwalB): array
+    protected function validasiDasar(object $jadwalA, object $jadwalB): array
     {
         if (! is_object($jadwalA) || ! is_object($jadwalB)) {
             return $this->hasilGagal([], 'Data jadwal tidak valid');
@@ -417,7 +418,7 @@ class TukarJadwalService extends BaseService
         return $this->hasilSukses();
     }
 
-    protected function validasiSnapshotUtama($data, $jadwalA, $jadwalB): array
+    protected function validasiSnapshotUtama(object $data, object $jadwalA, object $jadwalB): array
     {
         if (! is_object($data) || ! is_object($jadwalA) || ! is_object($jadwalB)) {
             return $this->hasilGagal([], 'Data snapshot jadwal tidak valid');
@@ -446,8 +447,12 @@ class TukarJadwalService extends BaseService
         return $this->hasilSukses();
     }
 
-    protected function tidakAdaPerubahanEfektif($jadwalA, $jadwalB, $jadwalSilangA = null, $jadwalSilangB = null): bool
-    {
+    protected function tidakAdaPerubahanEfektif(
+        object $jadwalA,
+        object $jadwalB,
+        ?object $jadwalSilangA = null,
+        ?object $jadwalSilangB = null
+    ): bool {
         if (! is_object($jadwalA) || ! is_object($jadwalB)) {
             return false;
         }
@@ -554,7 +559,7 @@ class TukarJadwalService extends BaseService
         return true;
     }
 
-    protected function jalankanSwapDariHasilValidasi(array $validasi, $jadwalA, $jadwalB): array
+    protected function jalankanSwapDariHasilValidasi(array $validasi, object $jadwalA, object $jadwalB): array
     {
         $tipeSwap = $validasi['tipe_swap'] ?? null;
 

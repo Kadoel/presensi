@@ -144,10 +144,10 @@ class PresensiService extends BaseService
         object $pegawai,
         object $jadwal,
         object $shift,
-        $presensi,
+        ?object $presensi,
         string $tanggalKerja
     ): array {
-        if (is_object($presensi) && $presensi->jam_datang !== null) {
+        if ($presensi !== null && $presensi->jam_datang !== null) {
             return $this->hasilGagal([], 'Pegawai sudah melakukan presensi datang');
         }
 
@@ -195,10 +195,10 @@ class PresensiService extends BaseService
         object $pegawai,
         object $jadwal,
         object $shift,
-        $presensi,
+        ?object $presensi,
         string $tanggalKerja
     ): array {
-        if (! is_object($presensi) || $presensi->jam_datang === null) {
+        if ($presensi === null || $presensi->jam_datang === null) {
             return $this->hasilGagal([], 'Pegawai belum melakukan presensi datang');
         }
 
