@@ -269,6 +269,11 @@ class ShiftService extends BaseService
                 return $validasi;
             }
 
+            $validasiNonAktifShift = $this->validasiNonAktifShift($id, $post);
+            if (! $validasiNonAktifShift['sukses']) {
+                return $validasiNonAktifShift;
+            }
+
             $idData         = (int) ($post['edit-id'] ?? $id);
             $namaShift      = $this->stringWajib($post['edit-nama_shift'] ?? '');
             $kodeShift      = url_title($namaShift, '-', true);
@@ -486,5 +491,30 @@ class ShiftService extends BaseService
         }
 
         return null;
+    }
+
+    protected function validasiNonAktifShift(int $id, array $post): array
+    {
+        $shift = $this->shiftModel->getShiftById($id);
+
+        if ($shift === null) {
+            return $this->hasilTidakDitemukan('Data Shift Tidak Ada Di Database');
+        }
+
+        $statusLama = (int) ($shift->is_active ?? 0);
+        $statusBaru = $this->intVal($post['edit-is_active'] ?? 1, 1);
+
+        // hanya validasi jika dari aktif -> nonaktif
+        if ($statusLama === 1 && $statusBaru === 0) {
+            $jumlahDipakai = $this->shiftModel->jumlahJadwalYangMemakai($id);
+
+            if ($jumlahDipakai > 0) {
+                return $this->hasilGagal([
+                    'edit-is_active' => 'Data Shift tidak dapat dinonaktifkan karena masih dipakai oleh ' . $jumlahDipakai . ' jadwal kerja'
+                ]);
+            }
+        }
+
+        return $this->hasilSukses();
     }
 }
