@@ -58,7 +58,7 @@ $segment['3'] = $totalSegment > 2 ? current_url(true)->getSegment(3) : '';
 <li class="nav-main-item">
     <a class="nav-main-link <?= $segment['2'] == 'izin' ? 'active' : ''; ?>" href="<?= base_url('admin/izin'); ?>">
         <i class="nav-main-link-icon fa fa-file-medical"></i>
-        <span class="nav-main-link-name">Izin & Sakit</span>
+        <span class="nav-main-link-name">Izin & Sakit & Cuti</span>
     </a>
 </li>
 
