@@ -4,6 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 use App\Services\Admin\HariLiburService;
+use CodeIgniter\HTTP\ResponseInterface;
 use Hermawan\DataTables\DataTable;
 
 class HariLibur extends BaseController
@@ -15,7 +16,7 @@ class HariLibur extends BaseController
         $this->hariLiburService = new HariLiburService();
     }
 
-    public function index()
+    public function index(): ResponseInterface | string
     {
         if ($this->request->getMethod() === 'GET') {
             return view('pages/admin/libur/index', [
@@ -44,7 +45,7 @@ class HariLibur extends BaseController
             ->toJson(true);
     }
 
-    public function simpan()
+    public function simpan(): ResponseInterface
     {
         return $this->response->setJSON(
             $this->hariLiburService->simpan($this->request->getPost())
@@ -60,14 +61,15 @@ class HariLibur extends BaseController
         );
     }
 
-    public function update($id)
+
+    public function update(int $id): ResponseInterface
     {
         return $this->response->setJSON(
             $this->hariLiburService->ubah((int) $id, $this->request->getPost())
         );
     }
 
-    public function hapus()
+    public function hapus(): ResponseInterface
     {
         $id = (int) $this->request->getPost('id');
 
@@ -76,7 +78,7 @@ class HariLibur extends BaseController
         );
     }
 
-    public function konfirmasiOverride()
+    public function konfirmasiOverride(): ResponseInterface
     {
         return $this->response->setJSON(
             $this->hariLiburService->konfirmasiOverride($this->request->getPost())

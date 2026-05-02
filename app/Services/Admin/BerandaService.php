@@ -46,7 +46,8 @@ class BerandaService extends BaseService
 
         $sudahSinkron = max($totalJadwal - $belumSinkron, 0);
 
-        $rowsBelumSinkron = $this->presensiModel
+        // 🔥 FIX DI SINI (pakai jadwal, bukan presensi)
+        $rowsBelumSinkron = $this->jadwalKerjaModel
             ->getTanggalBelumSinkronSebelumHariIni($tanggal);
 
         $tanggalBelumSinkron = array_map(function ($row) {

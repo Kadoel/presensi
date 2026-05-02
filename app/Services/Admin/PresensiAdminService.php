@@ -4,6 +4,7 @@ namespace App\Services\Admin;
 
 use App\Models\JadwalKerjaModel;
 use App\Models\PegawaiModel;
+use App\Models\PengajuanIzinModel;
 use App\Models\PresensiModel;
 use App\Services\BaseService;
 use CodeIgniter\Database\BaseBuilder;
@@ -14,6 +15,7 @@ class PresensiAdminService extends BaseService
     protected PresensiModel $presensiModel;
     protected JadwalKerjaModel $jadwalKerjaModel;
     protected PegawaiModel $pegawaiModel;
+    protected PengajuanIzinModel $pengajuanIzinModel;
 
     public function __construct()
     {
@@ -21,6 +23,7 @@ class PresensiAdminService extends BaseService
         $this->presensiModel = new PresensiModel();
         $this->jadwalKerjaModel = new JadwalKerjaModel();
         $this->pegawaiModel = new PegawaiModel();
+        $this->pengajuanIzinModel = new PengajuanIzinModel();
     }
 
     public function dataPegawaiSelect(): array
@@ -121,6 +124,13 @@ class PresensiAdminService extends BaseService
             $validasiJumlahJadwal = $this->validasiJumlahJadwalSesuaiPegawaiAktif($tanggal);
             if ($validasiJumlahJadwal !== null) {
                 return $validasiJumlahJadwal;
+            }
+
+            $tanggal = $this->stringWajib($tanggal ?: date('Y-m-d'));
+            // 🔥 VALIDASI BARU
+            $validasiPengajuan = $this->validasiPengajuanIzinPendingPadaTanggal($tanggal);
+            if ($validasiPengajuan !== null) {
+                return $validasiPengajuan;
             }
 
             $jadwalList = $this->jadwalKerjaModel
@@ -677,13 +687,27 @@ class PresensiAdminService extends BaseService
 
     protected function validasiBelumSinkronSebelumHariIni(string $tanggal): ?array
     {
-        $jumlah = $this->presensiModel->countBelumSinkronSebelumTanggal($tanggal);
-        if ($tanggal == date('Y-m-d') && $jumlah > 0) {
+        $rowsBelumSinkron = $this->jadwalKerjaModel->getTanggalBelumSinkronSebelumHariIni($tanggal);
+        if ($tanggal == date('Y-m-d') && $rowsBelumSinkron !== null) {
             return $this->hasilGagal(
                 [],
                 'Sinkron ditolak. Presensi sebelumnya ada yang belum disinkronkan!'
             );
         }
+        return null;
+    }
+
+    protected function validasiPengajuanIzinPendingPadaTanggal(string $tanggal): ?array
+    {
+        $jumlahPending = $this->pengajuanIzinModel->countPendingByTanggal($tanggal);
+
+        if ($jumlahPending > 0) {
+            return $this->hasilGagal(
+                [],
+                'Sinkron ditolak. Masih ada ' . $jumlahPending . ' pengajuan izin/sakit yang belum diproses pada tanggal ' . tanggal_indonesia($tanggal) . '. Silakan setujui atau tolak terlebih dahulu.'
+            );
+        }
+
         return null;
     }
 }

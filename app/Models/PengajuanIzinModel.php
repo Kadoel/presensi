@@ -117,4 +117,12 @@ class PengajuanIzinModel extends Model
         return (int) $this->where('status', 'pending')
             ->countAllResults();
     }
+
+    public function countPendingByTanggal(string $tanggal): int
+    {
+        return (int) $this->where('status', 'pending')
+            ->where('tanggal_mulai <=', $tanggal)
+            ->where('tanggal_selesai >=', $tanggal)
+            ->countAllResults();
+    }
 }

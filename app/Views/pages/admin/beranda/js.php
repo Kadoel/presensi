@@ -57,6 +57,7 @@
 
                     const tanggalList = res.tanggal_belum_sinkron ?? [];
                     showStickyNotif(tanggalList);
+                    console.log(tanggalList);
                 },
                 error: function(xhr) {
                     const res = xhr.responseJSON;
