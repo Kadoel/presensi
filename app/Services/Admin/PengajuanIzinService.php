@@ -525,7 +525,7 @@ class PengajuanIzinService extends BaseService
                     . ' pada tanggal ' . (string) $pengajuan->tanggal_mulai . ' s.d. ' . (string) $pengajuan->tanggal_selesai
             );
 
-            return $this->hasilSukses('Data Pengajuan Izin Berhasil Dihapus');
+            return $this->hasilSukses('Data Pengajuan Berhasil Dihapus');
         });
     }
 

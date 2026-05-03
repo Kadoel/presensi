@@ -3,16 +3,16 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
-use App\Services\Admin\PengajuanIzinService;
+use App\Services\Admin\IzinSakitService;
 use Hermawan\DataTables\DataTable;
 
-class PengajuanIzin extends BaseController
+class IzinSakit extends BaseController
 {
-    protected PengajuanIzinService $pengajuanIzinService;
+    protected IzinSakitService $pengajuanIzinService;
 
     public function __construct()
     {
-        $this->pengajuanIzinService = new PengajuanIzinService();
+        $this->pengajuanIzinService = new IzinSakitService();
     }
 
     public function index()
@@ -20,8 +20,8 @@ class PengajuanIzin extends BaseController
         if ($this->request->getMethod() === 'GET') {
             $pegawaiDropdown = $this->pengajuanIzinService->getPegawaiDropdown();
 
-            return view('pages/admin/izin/index', [
-                'judul'    => 'Izin & Sakit & Cuti',
+            return view('pages/admin/izin_sakit/index', [
+                'judul'    => 'Izin & Sakit',
                 'validasi' => $this->validasi,
                 'pegawai' => $pegawaiDropdown['pegawai'] ?? [],
             ]);

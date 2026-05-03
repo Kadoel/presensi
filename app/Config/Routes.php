@@ -87,17 +87,30 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
         $routes->post('update/(:num)', 'Admin\HariLibur::update/$1');
     });
 
-    //Pengajuan Izin & Sakit
-    $routes->group("izin", static function ($routes) {
-        $routes->match(['GET', 'POST'], '/', 'Admin\PengajuanIzin::index');
-        $routes->post('simpan', 'Admin\PengajuanIzin::simpan');
-        $routes->post('edit', 'Admin\PengajuanIzin::edit');
-        $routes->post('delete', 'Admin\PengajuanIzin::hapus');
-        $routes->post('approve', 'Admin\PengajuanIzin::approve');
-        $routes->post('reject', 'Admin\PengajuanIzin::reject');
-        $routes->post('cancel-approve', 'Admin\PengajuanIzin::cancelApprove');
-        $routes->post('update/(:num)', 'Admin\PengajuanIzin::ubah/$1');
+    // Izin & Sakit
+    $routes->group("izin-sakit", static function ($routes) {
+        $routes->match(['GET', 'POST'], '/', 'Admin\IzinSakit::index');
+        $routes->post('simpan', 'Admin\IzinSakit::simpan');
+        $routes->post('edit', 'Admin\IzinSakit::edit');
+        $routes->post('delete', 'Admin\IzinSakit::hapus');
+        $routes->post('approve', 'Admin\IzinSakit::approve');
+        $routes->post('reject', 'Admin\IzinSakit::reject');
+        $routes->post('cancel-approve', 'Admin\IzinSakit::cancelApprove');
+        $routes->post('update/(:num)', 'Admin\IzinSakit::ubah/$1');
     });
+
+    // Cuti
+    $routes->group("cuti", static function ($routes) {
+        $routes->match(['GET', 'POST'], '/', 'Admin\Cuti::index');
+        $routes->post('simpan', 'Admin\Cuti::simpan');
+        $routes->post('edit', 'Admin\Cuti::edit');
+        $routes->post('delete', 'Admin\Cuti::hapus');
+        $routes->post('approve', 'Admin\Cuti::approve');
+        $routes->post('reject', 'Admin\Cuti::reject');
+        $routes->post('cancel-approve', 'Admin\Cuti::cancelApprove');
+        $routes->post('update/(:num)', 'Admin\Cuti::ubah/$1');
+    });
+
 
     //Jadwal Kerja
     $routes->group('jadwal', static function ($routes) {

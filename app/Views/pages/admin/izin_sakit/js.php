@@ -34,7 +34,7 @@
                 url: '<?= base_url("assets/plugins/DataTablesbs5/plugins/id.json"); ?>'
             },
             ajax: {
-                url: '<?= base_url("admin/izin"); ?>',
+                url: '<?= base_url("admin/izin-sakit"); ?>',
                 method: 'POST',
                 data: {
                     [csrfToken]: csrfHash
@@ -127,7 +127,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: '<?= base_url('admin/izin/simpan') ?>',
+                url: '<?= base_url('admin/izin-sakit/simpan') ?>',
                 dataType: 'JSON',
                 cache: false,
                 contentType: false,
@@ -213,7 +213,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: '<?= base_url('admin/izin/edit') ?>',
+                url: '<?= base_url('admin/izin-sakit/edit') ?>',
                 dataType: 'JSON',
                 data: {
                     [csrfToken]: csrfHash,
@@ -290,7 +290,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: '<?= base_url('admin/izin/update') ?>/' + id,
+                url: '<?= base_url('admin/izin-sakit/update') ?>/' + id,
                 dataType: 'JSON',
                 cache: false,
                 contentType: false,
@@ -352,7 +352,7 @@
 
                     $.ajax({
                         type: 'POST',
-                        url: '<?= base_url('admin/izin/delete') ?>',
+                        url: '<?= base_url('admin/izin-sakit/delete') ?>',
                         dataType: 'JSON',
                         data: {
                             [csrfToken]: csrfHash,
@@ -397,7 +397,7 @@
 
                     $.ajax({
                         type: 'POST',
-                        url: '<?= base_url('admin/izin/approve') ?>',
+                        url: '<?= base_url('admin/izin-sakit/approve') ?>',
                         dataType: 'JSON',
                         data: {
                             [csrfToken]: csrfHash,
@@ -439,7 +439,7 @@
 
                     $.ajax({
                         type: 'POST',
-                        url: '<?= base_url('admin/izin/reject') ?>',
+                        url: '<?= base_url('admin/izin-sakit/reject') ?>',
                         dataType: 'JSON',
                         data: {
                             [csrfToken]: csrfHash,
@@ -480,7 +480,7 @@
 
                     $.ajax({
                         type: 'POST',
-                        url: '<?= base_url('admin/izin/cancel-approve') ?>',
+                        url: '<?= base_url('admin/izin-sakit/cancel-approve') ?>',
                         dataType: 'JSON',
                         data: {
                             [csrfToken]: csrfHash,

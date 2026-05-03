@@ -56,11 +56,19 @@ $segment['3'] = $totalSegment > 2 ? current_url(true)->getSegment(3) : '';
 </li>
 
 <li class="nav-main-item">
-    <a class="nav-main-link <?= $segment['2'] == 'izin' ? 'active' : ''; ?>" href="<?= base_url('admin/izin'); ?>">
+    <a class="nav-main-link <?= $segment['2'] == 'izin-sakit' ? 'active' : ''; ?>" href="<?= base_url('admin/izin-sakit'); ?>">
         <i class="nav-main-link-icon fa fa-file-medical"></i>
-        <span class="nav-main-link-name">Izin & Sakit & Cuti</span>
+        <span class="nav-main-link-name">Izin & Sakit</span>
     </a>
 </li>
+
+<li class="nav-main-item">
+    <a class="nav-main-link <?= $segment['2'] == 'cuti' ? 'active' : ''; ?>" href="<?= base_url('admin/cuti'); ?>">
+        <i class="nav-main-link-icon fa fa-calendar-days"></i>
+        <span class="nav-main-link-name">Cuti</span>
+    </a>
+</li>
+
 
 
 <li class="nav-main-item">

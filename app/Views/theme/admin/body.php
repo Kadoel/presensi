@@ -165,6 +165,7 @@
   <?php
   $segment1 = trim((string) current_url(true)->getSegment(1)); // admin / pegawai
   $segment2 = trim((string) current_url(true)->getSegment(2)); // pengguna / dst
+  $segment2 = str_replace('-', '_', $segment2);
 
   $jsView = null;
 
