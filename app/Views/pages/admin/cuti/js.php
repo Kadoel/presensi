@@ -8,9 +8,7 @@
         <?= notifikasi(); ?>
 
         <?= select2('pegawai_id'); ?>
-        <?= select2('jenis'); ?>
         <?= select2_modal('edit-pegawai_id', 'modal-ubah'); ?>
-        <?= select2_modal('edit-jenis', 'modal-ubah'); ?>
 
         function initTooltips() {
             $('[data-bs-toggle="tooltip"]').tooltip();
