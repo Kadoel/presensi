@@ -166,8 +166,9 @@ class JadwalKerja extends BaseController
                 return match ($row->status_hari) {
                     'kerja' => '<span class="badge bg-success">Kerja</span>',
                     'libur' => '<span class="badge bg-danger">Libur</span>',
-                    'izin'  => '<span class="badge bg-warning text-dark">Izin</span>',
-                    'sakit' => '<span class="badge bg-info text-dark">Sakit</span>',
+                    'izin'  => '<span class="badge bg-warning">Izin</span>',
+                    'sakit' => '<span class="badge bg-info">Sakit</span>',
+                    'cuti' => '<span class="badge bg-danger">Cuti</span>',
                     default => '<span class="badge bg-secondary">-</span>',
                 };
             })

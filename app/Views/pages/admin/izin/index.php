@@ -29,6 +29,7 @@
                             <option></option>
                             <option value="izin">Izin</option>
                             <option value="sakit">Sakit</option>
+                            <option value="cuti">Cuti</option>
                         </select>
                         <div id="error-jenis" class="invalid-feedback animated fadeIn"></div>
                     </div>
@@ -127,6 +128,7 @@
                                 <option></option>
                                 <option value="izin">Izin</option>
                                 <option value="sakit">Sakit</option>
+                                <option value="cuti">Cuti</option>
                             </select>
                             <div id="error-edit-jenis" class="invalid-feedback animated fadeIn"></div>
                         </div>

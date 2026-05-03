@@ -65,7 +65,7 @@ class CreatePresensiTable extends Migration
             ],
             'hasil_presensi' => [
                 'type'       => 'ENUM',
-                'constraint' => ['hadir', 'alpa', 'izin', 'sakit', 'libur'],
+                'constraint' => ['hadir', 'alpa', 'izin', 'sakit', 'libur', 'cuti'],
                 'null'       => true,
             ],
             'selfie_datang' => [
@@ -106,6 +106,11 @@ class CreatePresensiTable extends Migration
                 'type'       => 'TINYINT',
                 'constraint' => 1,
                 'default'    => 0,
+            ],
+            'sumber_presensi' => [
+                'type'    => "ENUM('scan','sinkron','lupa_presensi')",
+                'default' => 'scan',
+                'null'    => false,
             ],
             'created_at' => [
                 'type' => 'DATETIME',

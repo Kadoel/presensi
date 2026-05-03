@@ -22,7 +22,7 @@ class CreatePengajuanIzinTable extends Migration
             ],
             'jenis' => [
                 'type'       => 'ENUM',
-                'constraint' => ['izin', 'sakit'],
+                'constraint' => ['izin', 'sakit', 'cuti'],
             ],
             'tanggal_mulai' => [
                 'type' => 'DATE',

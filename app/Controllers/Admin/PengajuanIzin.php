@@ -21,7 +21,7 @@ class PengajuanIzin extends BaseController
             $pegawaiDropdown = $this->pengajuanIzinService->getPegawaiDropdown();
 
             return view('pages/admin/izin/index', [
-                'judul'    => 'Izin & Sakit',
+                'judul'    => 'Izin & Sakit & Cuti',
                 'validasi' => $this->validasi,
                 'pegawai' => $pegawaiDropdown['pegawai'] ?? [],
             ]);
@@ -45,10 +45,10 @@ class PengajuanIzin extends BaseController
             })
             ->edit('status', function ($row) {
                 if ($row->status === 'approved') {
-                    return '<span class="badge bg-success">✔ Disetujui</span>';
+                    return '<span class="badge bg-success text-white">✔ Disetujui</span>';
                 }
                 if ($row->status === 'rejected') {
-                    return '<span class="badge bg-danger">✖ Ditolak</span>';
+                    return '<span class="badge bg-danger text-white">✖ Ditolak</span>';
                 }
                 return '<span class="badge bg-warning text-white">⏳ Pending</span>';
             })

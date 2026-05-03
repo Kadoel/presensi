@@ -63,7 +63,7 @@ class PengajuanIzinService extends BaseService
                 ],
                 'jenis' => [
                     'label'  => 'Jenis',
-                    'rules'  => 'required|in_list[izin,sakit]',
+                    'rules'  => 'required|in_list[izin,sakit,cuti]',
                     'errors' => [
                         'required' => '{field} harus dipilih',
                         'in_list'  => '{field} tidak valid',
@@ -117,6 +117,15 @@ class PengajuanIzinService extends BaseService
             $pegawaiId      = $this->intAtauNull($post['pegawai_id'] ?? null);
             $tanggalMulai   = $this->stringWajib($post['tanggal_mulai'] ?? '');
             $tanggalSelesai = $this->stringWajib($post['tanggal_selesai'] ?? '');
+            $jenis          = $this->stringWajib($post['jenis'] ?? '');
+
+            if ($jenis === 'cuti') {
+                $validasiCuti = $this->validasiPengajuanCutiMinimalDuaHari($tanggalMulai, 'tanggal_mulai');
+
+                if (! $validasiCuti['sukses']) {
+                    return $validasiCuti;
+                }
+            }
 
             $validasiPegawai = $this->validasiPegawaiAktif($pegawaiId, 'pegawai_id');
             if (! $validasiPegawai['sukses']) {
@@ -207,7 +216,7 @@ class PengajuanIzinService extends BaseService
                 }
 
                 return $this->hasilGagal([
-                    'general' => 'Data pengajuan izin gagal disimpan'
+                    'general' => 'Data pengajuan ' . $jenis . ' gagal disimpan'
                 ]);
             }
 
@@ -219,13 +228,12 @@ class PengajuanIzinService extends BaseService
                 }
 
                 return $this->hasilGagal([
-                    'general' => 'ID data pengajuan izin gagal didapatkan'
+                    'general' => 'ID data pengajuan ' . $jenis . ' gagal didapatkan'
                 ]);
             }
 
             if ($isAdmin) {
                 $pengajuan = $this->pengajuanIzinModel->getPengajuanById($idPengajuan);
-
                 if ($pengajuan === null) {
                     if ($namaFile !== null) {
                         $this->hapusFileLampiran($namaFile);
@@ -290,7 +298,7 @@ class PengajuanIzinService extends BaseService
                 ],
                 'edit-jenis' => [
                     'label'  => 'Jenis',
-                    'rules'  => 'required|in_list[izin,sakit]',
+                    'rules'  => 'required|in_list[izin,sakit,cuti]',
                     'errors' => [
                         'required' => '{field} harus dipilih',
                         'in_list'  => '{field} tidak valid',
@@ -344,6 +352,15 @@ class PengajuanIzinService extends BaseService
             $pegawaiId      = $this->intAtauNull($post['edit-pegawai_id'] ?? null);
             $tanggalMulai   = $this->stringWajib($post['edit-tanggal_mulai'] ?? '');
             $tanggalSelesai = $this->stringWajib($post['edit-tanggal_selesai'] ?? '');
+            $jenis = $this->stringWajib($post['edit-jenis'] ?? '');
+
+            if ($jenis === 'cuti') {
+                $validasiCuti = $this->validasiPengajuanCutiMinimalDuaHari($tanggalMulai, 'edit-tanggal_mulai');
+
+                if (! $validasiCuti['sukses']) {
+                    return $validasiCuti;
+                }
+            }
 
             $validasiPegawai = $this->validasiPegawaiAktif($pegawaiId, 'edit-pegawai_id');
             if (! $validasiPegawai['sukses']) {
@@ -472,7 +489,7 @@ class PengajuanIzinService extends BaseService
             $pengajuan = $this->pengajuanIzinModel->getPengajuanById($id);
 
             if ($pengajuan === null) {
-                return $this->hasilTidakDitemukan('Data Pengajuan Izin Tidak Ada Di Database');
+                return $this->hasilTidakDitemukan('Data Pengajuan Tidak Ada Di Database');
             }
 
             if (($pengajuan->status ?? 'pending') === 'approved') {
@@ -493,7 +510,7 @@ class PengajuanIzinService extends BaseService
             $hapus = $this->pengajuanIzinModel->delete($id);
 
             if (! $hapus) {
-                return $this->hasilGagal([], 'Data Pengajuan Izin Gagal Dihapus');
+                return $this->hasilGagal([], 'Data Pengajuan Gagal Dihapus');
             }
 
             if (! empty($pengajuan->lampiran)) {
@@ -518,7 +535,7 @@ class PengajuanIzinService extends BaseService
             $pengajuan = $this->pengajuanIzinModel->getPengajuanById($id);
 
             if ($pengajuan === null) {
-                return $this->hasilTidakDitemukan('Data Pengajuan Izin Tidak Ditemukan');
+                return $this->hasilTidakDitemukan('Data Pengajuan Tidak Ditemukan');
             }
 
             if (($pengajuan->status ?? 'pending') === 'approved') {
@@ -582,7 +599,7 @@ class PengajuanIzinService extends BaseService
             $pengajuan = $this->pengajuanIzinModel->getPengajuanById($id);
 
             if ($pengajuan === null) {
-                return $this->hasilTidakDitemukan('Data Pengajuan Izin Tidak Ditemukan');
+                return $this->hasilTidakDitemukan('Data Pengajuan Tidak Ditemukan');
             }
 
             if (($pengajuan->status ?? 'pending') === 'rejected') {
@@ -618,7 +635,7 @@ class PengajuanIzinService extends BaseService
             $pengajuan = $this->pengajuanIzinModel->getPengajuanById($id);
 
             if ($pengajuan === null) {
-                return $this->hasilTidakDitemukan('Data Pengajuan Izin Tidak Ditemukan');
+                return $this->hasilTidakDitemukan('Data Pengajuan Tidak Ditemukan');
             }
 
             if (($pengajuan->status ?? 'pending') !== 'approved') {
@@ -753,7 +770,7 @@ class PengajuanIzinService extends BaseService
         $pegawaiId      = (int) $pengajuan->pegawai_id;
         $tanggalMulai   = (string) $pengajuan->tanggal_mulai;
         $tanggalSelesai = (string) $pengajuan->tanggal_selesai;
-        $statusHariBaru = (string) $pengajuan->jenis; // izin / sakit
+        $statusHariBaru = (string) $pengajuan->jenis; // izin / sakit / cuti
         $catatanBaru    = $this->stringAtauNull($pengajuan->alasan ?? '');
         $approvedBy     = $this->intAtauNull($approvedBy);
 
@@ -997,7 +1014,7 @@ class PengajuanIzinService extends BaseService
 
         if (! empty($tanggalAdaPresensi)) {
             $pesan = 'Tidak bisa ' . $methodLabel .
-                ' pengajuan izin/sakit karena sudah ada presensi pada tanggal: ' .
+                ' pengajuan karena sudah ada presensi pada tanggal: ' .
                 implode(', ', $tanggalAdaPresensi);
 
             if ($fields[0] === 'general') {
@@ -1007,6 +1024,19 @@ class PengajuanIzinService extends BaseService
             return $this->hasilGagal([
                 $fields[0] => $pesan,
                 $fields[1] => $pesan,
+            ]);
+        }
+
+        return $this->hasilSukses();
+    }
+
+    protected function validasiPengajuanCutiMinimalDuaHari(string $tanggalMulai, string $field): array
+    {
+        $batasMinimal = date('Y-m-d', strtotime('+2 days'));
+
+        if ($tanggalMulai < $batasMinimal) {
+            return $this->hasilGagal([
+                $field => 'Pengajuan cuti paling lambat diajukan 2 hari sebelum tanggal mulai. Minimal tanggal mulai: ' . tanggal_indonesia($batasMinimal),
             ]);
         }
 

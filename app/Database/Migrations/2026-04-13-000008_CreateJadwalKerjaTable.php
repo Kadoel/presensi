@@ -31,7 +31,7 @@ class CreateJadwalKerjaTable extends Migration
             ],
             'status_hari' => [
                 'type'       => 'ENUM',
-                'constraint' => ['kerja', 'libur', 'izin', 'sakit'],
+                'constraint' => ['kerja', 'libur', 'izin', 'sakit', 'cuti'],
                 'default'    => 'kerja',
             ],
             'sumber_data' => [
@@ -61,7 +61,7 @@ class CreateJadwalKerjaTable extends Migration
             ],
             'status_hari_sebelumnya' => [
                 'type'       => 'ENUM',
-                'constraint' => ['kerja', 'libur', 'izin', 'sakit'],
+                'constraint' => ['kerja', 'libur', 'izin', 'sakit', 'cuti'],
                 'null'       => true,
             ],
             'catatan_sebelumnya' => [

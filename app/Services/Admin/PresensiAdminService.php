@@ -260,6 +260,7 @@ class PresensiAdminService extends BaseService
         return match ($statusHari) {
             'izin'  => 'izin',
             'sakit' => 'sakit',
+            'cuti' => 'cuti',
             'libur' => 'libur',
             'kerja' => (
                 is_object($presensi)
@@ -662,6 +663,7 @@ class PresensiAdminService extends BaseService
             'alpa'  => '<span class="badge bg-danger">Alpa</span>',
             'izin'  => '<span class="badge bg-info">Izin</span>',
             'sakit' => '<span class="badge bg-primary">Sakit</span>',
+            'cuti' => '<span class="badge bg-secondary">Cuti</span>',
             'libur' => '<span class="badge bg-secondary">Libur</span>',
             default => '<span class="badge bg-light text-dark">Belum Sinkron</span>',
         };
