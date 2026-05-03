@@ -82,6 +82,11 @@ $segment_sidebar['3'] = $totalSegment_sidebar > 2 ? current_url(true)->getSegmen
                                 </a>
                             </li>
                             <li class="nav-main-item">
+                                <a class="nav-main-link <?= $segment_sidebar['2'] == 'cuti' ? 'active' : ''; ?>" href="<?= base_url('pegawai/cuti'); ?>">
+                                    <span class="nav-main-link-name">Cuti</span>
+                                </a>
+                            </li>
+                            <li class="nav-main-item">
                                 <a class="nav-main-link <?= $segment_sidebar['2'] == 'tukar' ? 'active' : ''; ?>" href="<?= base_url('pegawai/tukar'); ?>">
                                     <span class="nav-main-link-name">Tukar Jadwal</span>
                                 </a>

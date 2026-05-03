@@ -194,7 +194,7 @@
         </div>
 
         <div class="col-12 col-xl">
-            <a class="block block-rounded block-link-shadow text-center" href="<?= base_url('pegawai/riwayat-presensi'); ?>">
+            <a class="block block-rounded block-link-shadow text-center" href="<?= base_url('pegawai/riwayat'); ?>">
                 <div class="block-content block-content-full">
                     <i class="fa fa-clock-rotate-left fa-2x text-success mb-2"></i>
                     <div class="fw-semibold">Riwayat Presensi</div>
@@ -214,7 +214,7 @@
         </div>
 
         <div class="col-12 col-xl">
-            <a class="block block-rounded block-link-shadow text-center" href="<?= base_url('pegawai/tukar-jadwal'); ?>">
+            <a class="block block-rounded block-link-shadow text-center" href="<?= base_url('pegawai/tukar'); ?>">
                 <div class="block-content block-content-full">
                     <i class="fa fa-right-left fa-2x text-warning mb-2"></i>
                     <div class="fw-semibold">Tukar Jadwal</div>

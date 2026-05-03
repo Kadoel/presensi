@@ -203,4 +203,12 @@ $routes->group('pegawai', ['filter' => 'role:pegawai'], function ($routes) {
         $routes->get('data', 'Pegawai\Profil::data');
         $routes->post('update', 'Pegawai\Profil::update');
     });
+
+    $routes->group('cuti', static function ($routes) {
+        $routes->match(['GET', 'POST'], '/', 'Pegawai\Cuti::index');
+        $routes->post('simpan', 'Pegawai\Cuti::simpan');
+        $routes->post('edit', 'Pegawai\Cuti::edit');
+        $routes->post('update/(:num)', 'Pegawai\Cuti::update/$1');
+        $routes->post('delete', 'Pegawai\Cuti::delete');
+    });
 });
