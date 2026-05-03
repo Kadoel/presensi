@@ -68,6 +68,7 @@ class BerandaService extends BaseService
             'jadwal_izin'          => $this->jadwalKerjaModel->countStatusHariIni($tanggal, 'izin'),
             'jadwal_sakit'         => $this->jadwalKerjaModel->countStatusHariIni($tanggal, 'sakit'),
             'jadwal_libur'         => $this->jadwalKerjaModel->countStatusHariIni($tanggal, 'libur'),
+            'jadwal_cuti'          => $this->jadwalKerjaModel->countStatusHariIni($tanggal, 'cuti'),
             'total_jadwal'         => $totalJadwal,
 
             // Presensi Hari Ini
@@ -84,6 +85,7 @@ class BerandaService extends BaseService
             'izin'                 => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'izin'),
             'sakit'                => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'sakit'),
             'libur'                => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'libur'),
+            'cuti'                 => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'cuti'),
             'alpa'                 => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'alpa'),
 
             // Progress

@@ -35,6 +35,7 @@
                     $('#jadwal-izin').text(res.jadwal_izin ?? 0);
                     $('#jadwal-sakit').text(res.jadwal_sakit ?? 0);
                     $('#jadwal-libur').text(res.jadwal_libur ?? 0);
+                    $('#jadwal-cuti').text(res.jadwal_cuti ?? 0);
                     $('#total-jadwal').text(res.total_jadwal ?? 0);
 
                     // Presensi Hari Ini
@@ -50,6 +51,7 @@
                     $('#izin').text(res.izin ?? 0);
                     $('#sakit').text(res.sakit ?? 0);
                     $('#libur').text(res.libur ?? 0);
+                    $('#cuti').text(res.cuti ?? 0);
                     $('#alpa').text(res.alpa ?? 0);
 
                     updateProgress(res);

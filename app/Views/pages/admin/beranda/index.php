@@ -75,12 +75,13 @@
                 ['id' => 'jadwal-izin', 'label' => 'Izin', 'icon' => 'fa-file-signature', 'class' => 'text-info'],
                 ['id' => 'jadwal-sakit', 'label' => 'Sakit', 'icon' => 'fa-notes-medical', 'class' => 'text-primary'],
                 ['id' => 'jadwal-libur', 'label' => 'Libur', 'icon' => 'fa-umbrella-beach', 'class' => 'text-secondary'],
+                ['id' => 'jadwal-cuti', 'label' => 'Cuti', 'icon' => 'fa-umbrella-beach', 'class' => 'text-secondary'],
                 ['id' => 'total-jadwal', 'label' => 'Total Jadwal', 'icon' => 'fa-calendar-days', 'class' => 'text-dark'],
             ];
             ?>
 
             <?php foreach ($jadwalHariIni as $card): ?>
-                <div class="col-12 col-xl">
+                <div class="col-12 col-xl-4">
                     <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
                         <div class="block-content block-content-full d-flex justify-content-between align-items-center">
                             <div>
@@ -143,13 +144,29 @@
             <small class="text-muted">Sinkron presensi pegawai tanggal <?= tanggal_indonesia(date('Y-m-d')); ?></small>
         </div>
         <div class="row">
+            <div class="col-12 col-xl-12">
+                <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                    <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fa fa-clock-rotate-left fa-2x text-danger opacity-50"></i>
+                        </div>
+                        <div class="text-end">
+                            <div class="fs-3 fw-semibold text-danger" id="belum-sinkron">
+                                0
+                            </div>
+                            <div class="fs-sm fw-semibold text-uppercase text-muted">Belum Sinkron</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
             <?php
             $sinkron = [
-                ['id' => 'belum-sinkron', 'label' => 'Belum Sinkron', 'icon' => 'fa-clock-rotate-left', 'class' => 'text-danger'],
                 ['id' => 'hadir', 'label' => 'Hadir', 'icon' => 'fa-user-check', 'class' => 'text-success'],
                 ['id' => 'izin', 'label' => 'Izin', 'icon' => 'fa-file-signature', 'class' => 'text-info'],
                 ['id' => 'sakit', 'label' => 'Sakit', 'icon' => 'fa-notes-medical', 'class' => 'text-primary'],
                 ['id' => 'libur', 'label' => 'Libur', 'icon' => 'fa-umbrella-beach', 'class' => 'text-secondary'],
+                ['id' => 'cuti', 'label' => 'Cuti', 'icon' => 'fa-umbrella-beach', 'class' => 'text-secondary'],
                 ['id' => 'alpa', 'label' => 'Alpa', 'icon' => 'fa-user-xmark', 'class' => 'text-danger'],
             ];
             ?>

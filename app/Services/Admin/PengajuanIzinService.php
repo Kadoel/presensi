@@ -129,13 +129,13 @@ class PengajuanIzinService extends BaseService
             $tanggalSelesai = $this->stringWajib($post['tanggal_selesai'] ?? '');
             $jenis          = $this->stringWajib($post['jenis'] ?? '');
 
-            if ($jenis === 'cuti') {
-                $validasiCuti = $this->validasiPengajuanCutiMinimalDuaHari($tanggalMulai, 'tanggal_mulai');
+            // if ($jenis === 'cuti') {
+            //     $validasiCuti = $this->validasiPengajuanCutiMinimalDuaHari($tanggalMulai, 'tanggal_mulai');
 
-                if (! $validasiCuti['sukses']) {
-                    return $validasiCuti;
-                }
-            }
+            //     if (! $validasiCuti['sukses']) {
+            //         return $validasiCuti;
+            //     }
+            // }
 
             $validasiPegawai = $this->validasiPegawaiAktif($pegawaiId, 'pegawai_id');
             if (! $validasiPegawai['sukses']) {
