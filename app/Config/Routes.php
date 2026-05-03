@@ -152,6 +152,13 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
         $routes->post('rekap-bulanan', 'Admin\Presensi::rekapBulanan');
         $routes->post('lupa/update/(:num)', 'Admin\Presensi::updateLupa/$1');
     });
+
+    // Saldo Cuti
+    $routes->group('saldo-cuti', static function ($routes) {
+        $routes->match(['GET', 'POST'], '/', 'Admin\SaldoCuti::index');
+        $routes->post('generate', 'Admin\SaldoCuti::generate');
+        $routes->post('ringkasan', 'Admin\SaldoCuti::ringkasan');
+    });
 });
 
 

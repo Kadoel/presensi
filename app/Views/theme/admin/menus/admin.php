@@ -35,6 +35,14 @@ $segment['3'] = $totalSegment > 2 ? current_url(true)->getSegment(3) : '';
 </li>
 
 <li class="nav-main-item">
+    <a class="nav-main-link <?= $segment['2'] == 'saldo-cuti' ? 'active' : ''; ?>" href="<?= base_url('admin/saldo-cuti'); ?>">
+        <i class="nav-main-link-icon fa fa-wallet"></i>
+        <span class="nav-main-link-name">Saldo Cuti</span>
+    </a>
+</li>
+
+
+<li class="nav-main-item">
     <a class="nav-main-link <?= $segment['2'] == 'pengguna' ? 'active' : ''; ?>" href="<?= base_url('admin/pengguna'); ?>">
         <i class="nav-main-link-icon fa fa-user-shield"></i>
         <span class="nav-main-link-name">Pengguna</span>
