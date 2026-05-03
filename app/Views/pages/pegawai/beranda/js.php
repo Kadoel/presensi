@@ -56,6 +56,7 @@
         $('#izin').text(data.izin ?? 0);
         $('#sakit').text(data.sakit ?? 0);
         $('#libur').text(data.libur ?? 0);
+        $('#cuti').text(data.cuti ?? 0);
         $('#alpa').text(data.alpa ?? 0);
     }
 

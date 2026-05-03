@@ -103,7 +103,7 @@
     </div>
 
     <div class="row">
-        <div class="col-12 col-xl">
+        <div class="col-12 col-xl-4">
             <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
                 <div class="block-content block-content-full d-flex justify-content-between align-items-center">
                     <div>
@@ -117,7 +117,7 @@
             </a>
         </div>
 
-        <div class="col-12 col-xl">
+        <div class="col-12 col-xl-4">
             <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
                 <div class="block-content block-content-full d-flex justify-content-between align-items-center">
                     <div>
@@ -131,7 +131,7 @@
             </a>
         </div>
 
-        <div class="col-12 col-xl">
+        <div class="col-12 col-xl-4">
             <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
                 <div class="block-content block-content-full d-flex justify-content-between align-items-center">
                     <div>
@@ -145,7 +145,7 @@
             </a>
         </div>
 
-        <div class="col-12 col-xl">
+        <div class="col-12 col-xl-4">
             <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
                 <div class="block-content block-content-full d-flex justify-content-between align-items-center">
                     <div>
@@ -159,7 +159,21 @@
             </a>
         </div>
 
-        <div class="col-12 col-xl">
+        <div class="col-12 col-xl-4">
+            <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fa fa-umbrella-beach fa-2x text-secondary opacity-50"></i>
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-3 fw-semibold text-secondary" id="cuti">0</div>
+                        <div class="fs-sm fw-semibold text-uppercase text-muted">Cuti</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-12 col-xl-4">
             <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
                 <div class="block-content block-content-full d-flex justify-content-between align-items-center">
                     <div>
@@ -207,8 +221,8 @@
             <a class="block block-rounded block-link-shadow text-center" href="<?= base_url('pegawai/izin'); ?>">
                 <div class="block-content block-content-full">
                     <i class="fa fa-file-signature fa-2x text-info mb-2"></i>
-                    <div class="fw-semibold">Ajukan Izin</div>
-                    <div class="fs-sm text-muted">Izin atau sakit</div>
+                    <div class="fw-semibold">Izin & Sakit</div>
+                    <div class="fs-sm text-muted">Ajukan Izin atau sakit</div>
                 </div>
             </a>
         </div>
@@ -219,6 +233,16 @@
                     <i class="fa fa-right-left fa-2x text-warning mb-2"></i>
                     <div class="fw-semibold">Tukar Jadwal</div>
                     <div class="fs-sm text-muted">Ajukan perubahan</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-12 col-xl">
+            <a class="block block-rounded block-link-shadow text-center" href="<?= base_url('pegawai/cuti'); ?>">
+                <div class="block-content block-content-full">
+                    <i class="fa fa-calendar-days fa-2x text-primary mb-2"></i>
+                    <div class="fw-semibold">Cuti</div>
+                    <div class="fs-sm text-muted">Ajukan Cuti</div>
                 </div>
             </a>
         </div>

@@ -42,6 +42,7 @@ class BerandaService extends BaseService
                 'izin'         => $this->presensiModel->countByPegawaiBulanDanHasil($pegawaiId, $bulan, 'izin'),
                 'sakit'        => $this->presensiModel->countByPegawaiBulanDanHasil($pegawaiId, $bulan, 'sakit'),
                 'libur'        => $this->presensiModel->countByPegawaiBulanDanHasil($pegawaiId, $bulan, 'libur'),
+                'cuti'        => $this->presensiModel->countByPegawaiBulanDanHasil($pegawaiId, $bulan, 'cuti'),
                 'alpa'         => $this->presensiModel->countByPegawaiBulanDanHasil($pegawaiId, $bulan, 'alpa'),
                 'telat'        => $this->presensiModel->countByPegawaiBulanDanStatusDatang($pegawaiId, $bulan, 'telat'),
                 'pulang_cepat' => $this->presensiModel->countByPegawaiBulanDanStatusPulang($pegawaiId, $bulan, 'pulang_cepat'),
