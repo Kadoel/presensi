@@ -152,4 +152,52 @@ class SaldoCutiService extends BaseService
             return $this->hasilSukses($pesan);
         });
     }
+
+    public function ambil(int $id): array
+    {
+        return $this->eksekusi(function () use ($id) {
+            $saldo = $this->saldoCutiModel->find($id);
+
+            if ($saldo === null) {
+                return $this->hasilTidakDitemukan('Data saldo cuti tidak ditemukan');
+            }
+
+            return $this->hasilData([
+                'saldo_cuti' => $saldo
+            ]);
+        });
+    }
+
+    public function ubah(int $id, array $post): array
+    {
+        return $this->eksekusi(function () use ($id, $post) {
+            $rules = [
+                'edit-jatah' => [
+                    'label' => 'Jatah Cuti',
+                    'rules' => 'required|integer|greater_than_equal_to[0]',
+                ],
+            ];
+
+            $validasi = $this->validasi($rules, $post);
+
+            if (! $validasi['sukses']) {
+                return $validasi;
+            }
+
+            $jatah = (int) ($post['edit-jatah'] ?? 0);
+
+            $update = $this->saldoCutiModel->updateJatah($id, $jatah);
+            if ($update !== true) {
+                return $this->hasilGagal([
+                    'edit-jatah' => $update
+                ]);
+            }
+
+            if (! $update) {
+                return $this->hasilGagal([], 'Saldo cuti gagal diubah');
+            }
+
+            return $this->hasilSukses('Saldo cuti berhasil diubah');
+        });
+    }
 }

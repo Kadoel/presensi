@@ -30,6 +30,16 @@ class PengajuanIzinService extends BaseService
         $this->presensiModel = new PresensiModel();
     }
 
+    protected function prosesSetelahApproveBerhasil(object $pengajuan, ?int $approvedBy = null): array
+    {
+        return $this->hasilSukses();
+    }
+
+    protected function prosesSetelahCancelApproveBerhasil(object $pengajuan): array
+    {
+        return $this->hasilSukses();
+    }
+
     public function dataTabel(): BaseBuilder
     {
         return $this->pengajuanIzinModel->selectData();
@@ -252,6 +262,15 @@ class PengajuanIzinService extends BaseService
                     }
 
                     return $sinkron;
+                }
+
+                $hookApprove = $this->prosesSetelahApproveBerhasil($pengajuan, $approvedBy);
+                if (! $hookApprove['sukses']) {
+                    if ($namaFile !== null) {
+                        $this->hapusFileLampiran($namaFile);
+                    }
+
+                    return $hookApprove;
                 }
             }
 
@@ -581,6 +600,11 @@ class PengajuanIzinService extends BaseService
                 return $sinkron;
             }
 
+            $hookApprove = $this->prosesSetelahApproveBerhasil($pengajuan, $approvedBy);
+            if (! $hookApprove['sukses']) {
+                return $hookApprove;
+            }
+
             $this->catatAudit(
                 'approve',
                 'pengajuan_izin',
@@ -668,6 +692,11 @@ class PengajuanIzinService extends BaseService
 
             if (! $update) {
                 return $this->hasilGagal([], 'Gagal membatalkan persetujuan');
+            }
+
+            $hookCancel = $this->prosesSetelahCancelApproveBerhasil($pengajuan);
+            if (! $hookCancel['sukses']) {
+                return $hookCancel;
             }
 
             $update = $this->pengajuanIzinModel->update($id, [

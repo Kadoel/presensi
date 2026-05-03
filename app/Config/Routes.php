@@ -157,7 +157,9 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->group('saldo-cuti', static function ($routes) {
         $routes->match(['GET', 'POST'], '/', 'Admin\SaldoCuti::index');
         $routes->post('generate', 'Admin\SaldoCuti::generate');
+        $routes->post('edit', 'Admin\SaldoCuti::edit');
         $routes->post('ringkasan', 'Admin\SaldoCuti::ringkasan');
+        $routes->post('update/(:num)', 'Admin\SaldoCuti::ubah/$1');
     });
 });
 

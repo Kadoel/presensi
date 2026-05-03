@@ -47,6 +47,34 @@ class SaldoCutiModel extends Model
             ->first();
     }
 
+    public function kurangiSaldo(int $pegawaiId, int $tahun, int $jumlahHari): bool
+    {
+        $saldo = $this->getByPegawaiTahun($pegawaiId, $tahun);
+
+        if ($saldo === null || (int) $saldo->sisa < $jumlahHari) {
+            return false;
+        }
+
+        return $this->update($saldo->id, [
+            'terpakai' => (int) $saldo->terpakai + $jumlahHari,
+            'sisa'     => (int) $saldo->sisa - $jumlahHari,
+        ]);
+    }
+
+    public function tambahSaldo(int $pegawaiId, int $tahun, int $jumlahHari): bool
+    {
+        $saldo = $this->getByPegawaiTahun($pegawaiId, $tahun);
+
+        if ($saldo === null) {
+            return false;
+        }
+
+        return $this->update($saldo->id, [
+            'terpakai' => max(0, (int) $saldo->terpakai - $jumlahHari),
+            'sisa'     => min((int) $saldo->jatah, (int) $saldo->sisa + $jumlahHari),
+        ]);
+    }
+
     public function getRingkasanByTahun(int $tahun): object
     {
         $row = $this->db->table($this->table)
@@ -66,5 +94,27 @@ class SaldoCutiModel extends Model
             'total_terpakai' => (int) ($row->total_terpakai ?? 0),
             'total_sisa'     => (int) ($row->total_sisa ?? 0),
         ];
+    }
+
+    public function updateJatah(int $id, int $jatah): bool|string
+    {
+        $saldo = $this->find($id);
+
+        if ($saldo === null) {
+            return false;
+        }
+
+        $terpakai = (int) $saldo->terpakai;
+
+        if ($jatah < $terpakai) {
+            return 'Jatah tidak boleh lebih kecil dari cuti yang sudah terpakai (' . $terpakai . ' hari)';
+        }
+
+        $sisa = $jatah - $terpakai;
+
+        return $this->update($id, [
+            'jatah' => $jatah,
+            'sisa'  => $sisa,
+        ]);
     }
 }

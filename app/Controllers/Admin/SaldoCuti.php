@@ -31,7 +31,7 @@ class SaldoCuti extends BaseController
         return DataTable::of($builder)
             ->addNumbering('#')
             ->edit('pegawai_id', function ($row) {
-                return esc(($row->kode_pegawai ?? '-') . ' - ' . ($row->nama_pegawai ?? '-'));
+                return esc($row->nama_pegawai ?? '-');
             })
             ->edit('tahun', function ($row) {
                 return (string) ($row->tahun ?? '-');
@@ -40,17 +40,48 @@ class SaldoCuti extends BaseController
                 return (int) ($row->jatah ?? 0) . ' hari';
             })
             ->edit('terpakai', function ($row) {
-                return (int) ($row->terpakai ?? 0) . ' hari';
+                $jatah = (int) ($row->jatah ?? 0);
+                $setengah_saldo = floor(((int) ($row->jatah ?? 0)) / 2); //5 -> 2
+                $terpakai = (int) ($row->terpakai ?? 0);
+                $badge = '<span class="badge bg-secondary">Unknown</span>';
+
+                if ($terpakai == $jatah) {
+                    $badge = '<span class="badge bg-danger text-white">' . (int) ($row->terpakai ?? 0) . ' hari</span>';
+                }
+                if ($terpakai != $jatah && $terpakai > $setengah_saldo) {
+                    $badge = '<span class="badge bg-danger text-white">' . (int) ($row->terpakai ?? 0) . ' hari</span>';
+                }
+                if ($terpakai != $jatah && $terpakai <= $setengah_saldo) {
+                    $badge = '<span class="badge bg-info text-white">' . (int) ($row->terpakai ?? 0) . ' hari</span>';
+                }
+                if ($terpakai != $jatah && $terpakai === 0) {
+                    $badge = '<span class="badge bg-success text-white">' . (int) ($row->terpakai ?? 0) . ' hari</span>';
+                }
+                return $badge;
             })
             ->edit('sisa', function ($row) {
-                return '<span class="badge bg-success text-white">' . (int) ($row->sisa ?? 0) . ' hari</span>';
-            })
-            ->edit('is_active', function ($row) {
-                if ((int) ($row->is_active ?? 0) === 1) {
-                    return '<span class="badge bg-success text-white">Aktif</span>';
-                }
+                $jatah = (int) ($row->jatah ?? 0);
+                $setengah_saldo = ceil(((int) ($row->jatah ?? 0)) / 2);
+                $sisa = (int) ($row->sisa ?? 0);
+                $badge = '<span class="badge bg-secondary">Unknown</span>';
 
-                return '<span class="badge bg-secondary text-white">Tidak Aktif</span>';
+                if ($jatah == $sisa) {
+                    $badge = '<span class="badge bg-success text-white">' . (int) ($row->sisa ?? 0) . ' hari</span>';
+                }
+                if ($sisa != $jatah && $sisa >= $setengah_saldo) {
+                    $badge = '<span class="badge bg-info text-white">' . (int) ($row->sisa ?? 0) . ' hari</span>';
+                }
+                if ($sisa != $jatah && $sisa < $setengah_saldo) {
+                    $badge = '<span class="badge bg-danger text-white">' . (int) ($row->sisa ?? 0) . ' hari</span>';
+                }
+                return $badge;
+            })
+            ->add('action', function ($row) {
+                return '
+                    <button type="button" class="btn btn-sm btn-warning" id="act-edit" data-id="' . $row->id . '">
+                        <i class="fa fa-edit text-white"></i>
+                    </button>
+                ';
             })
             ->toJson(true);
     }
@@ -59,6 +90,22 @@ class SaldoCuti extends BaseController
     {
         return $this->response->setJSON(
             $this->saldoCutiService->generate($this->request->getPost())
+        );
+    }
+
+    public function edit()
+    {
+        $id = (int) $this->request->getPost('id');
+
+        return $this->response->setJSON(
+            $this->saldoCutiService->ambil($id)
+        );
+    }
+
+    public function ubah(int $id)
+    {
+        return $this->response->setJSON(
+            $this->saldoCutiService->ubah((int) $id, $this->request->getPost())
         );
     }
 

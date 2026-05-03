@@ -94,12 +94,47 @@
                                 <th class="text-center"><b>JATAH</b></th>
                                 <th class="text-center"><b>TERPAKAI</b></th>
                                 <th class="text-center"><b>SISA</b></th>
-                                <th class="text-center"><b>STATUS PEGAWAI</b></th>
+                                <th class="text-center" style="width: 8%;"><b>AKSI</b></th>
                             </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="modal-ubah" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="block-content-ubah" class="block block-themed block-rounded shadow-none mb-0">
+                <div class="block-header">
+                    <h3 class="block-title text-white">
+                        <i class="fa fa-pen-to-square"></i> <b>UBAH SALDO CUTI</b>
+                    </h3>
+                </div>
+
+                <form id="form_edit_saldo_cuti" autocomplete="off">
+                    <div class="block-content">
+                        <input type="hidden" id="edit-id" name="edit-id">
+
+                        <div class="mb-4">
+                            <label class="form-label">Jatah Cuti <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="edit-jatah" name="edit-jatah" min="0">
+                            <div id="error-edit-jatah" class="invalid-feedback animated fadeIn"></div>
+                        </div>
+                    </div>
+
+                    <div class="block-content block-content-full block-content-sm bg-body-light fs-sm text-end">
+                        <button type="button" class="btn btn-sm btn-secondary" id="tutup-modal">
+                            Batal
+                        </button>
+                        <button type="submit" class="btn btn-sm btn-primary text-white" id="update-data">
+                            <i class="fa fa-save"></i> Simpan
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

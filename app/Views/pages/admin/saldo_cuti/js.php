@@ -93,7 +93,7 @@
                     data: 'sisa'
                 },
                 {
-                    data: 'is_active'
+                    data: 'action'
                 }
             ],
             order: [
@@ -183,6 +183,83 @@
                     });
                 }
             });
+        });
+
+        function clear_errors_edit() {
+            $('#edit-jatah').removeClass('is-invalid');
+            $('#error-edit-jatah').html('').hide();
+        }
+
+        $('#saldo-cuti-tabel').on('click', '#act-edit', function() {
+            let id = $(this).data('id');
+
+            clear_errors_edit();
+            $("#block-content-ubah").LoadingOverlay("show");
+            $('#modal-ubah').modal('show');
+
+            $.ajax({
+                type: 'POST',
+                url: '<?= base_url('admin/saldo-cuti/edit') ?>',
+                dataType: 'JSON',
+                data: {
+                    [csrfToken]: csrfHash,
+                    id: id
+                },
+                success: function(result) {
+                    $("#block-content-ubah").LoadingOverlay("hide");
+
+                    if (result['sukses']) {
+                        const item = result['saldo_cuti'] || {};
+
+                        $('#edit-id').val(item.id);
+                        $('#edit-jatah').val(item.jatah);
+                    } else {
+                        KadoelAjax.handleError(result);
+                    }
+                },
+                error: function(xhr) {
+                    $("#block-content-ubah").LoadingOverlay("hide");
+                    console.log(xhr.status + ': ' + xhr.statusText);
+                }
+            });
+        });
+
+        $('#form_edit_saldo_cuti').on('submit', function(e) {
+            e.preventDefault();
+
+            $('#update-data').prop('disabled', true);
+            clear_errors_edit();
+            $("#block-content-ubah").LoadingOverlay("show");
+
+            const id = $('#edit-id').val();
+
+            $.ajax({
+                type: 'POST',
+                url: '<?= base_url('admin/saldo-cuti/update') ?>/' + id,
+                dataType: 'JSON',
+                data: $(this).serialize() + '&' + csrfToken + '=' + csrfHash,
+                success: function(result) {
+                    $("#block-content-ubah").LoadingOverlay("hide");
+                    $('#update-data').prop('disabled', false);
+
+                    if (result['sukses']) {
+                        $('#modal-ubah').modal('hide');
+                        notifikasi('success', 'right', result['pesan']);
+                        data_saldo_cuti.ajax.reload();
+                    } else {
+                        KadoelAjax.handleError(result);
+                    }
+                },
+                error: function(xhr) {
+                    $("#block-content-ubah").LoadingOverlay("hide");
+                    $('#update-data').prop('disabled', false);
+                    console.log(xhr.status + ': ' + xhr.statusText);
+                }
+            });
+        });
+
+        $('#modal-ubah').on('click', '#tutup-modal', function() {
+            $('#modal-ubah').modal('hide');
         });
     });
 </script>
