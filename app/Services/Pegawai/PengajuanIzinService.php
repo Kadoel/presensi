@@ -55,6 +55,14 @@ class PengajuanIzinService extends BaseService
             $tanggalSelesai = $this->stringWajib($post['tanggal_selesai'] ?? '');
             $alasan        = $this->stringWajib($post['alasan'] ?? '');
 
+            if ($jenis === 'cuti') {
+                $validasiCuti = $this->validasiPengajuanCutiMinimalDuaHari($tanggalMulai, 'tanggal_mulai');
+
+                if (! $validasiCuti['sukses']) {
+                    return $validasiCuti;
+                }
+            }
+
             $validasiProses = $this->validasiProsesPengajuan(
                 $pegawaiId,
                 $tanggalMulai,
@@ -149,6 +157,14 @@ class PengajuanIzinService extends BaseService
             $tanggalMulai  = $this->stringWajib($post['edit-tanggal_mulai'] ?? '');
             $tanggalSelesai = $this->stringWajib($post['edit-tanggal_selesai'] ?? '');
             $alasan        = $this->stringWajib($post['edit-alasan'] ?? '');
+
+            if ($jenis === 'cuti') {
+                $validasiCuti = $this->validasiPengajuanCutiMinimalDuaHari($tanggalMulai, 'edit-tanggal_mulai');
+
+                if (! $validasiCuti['sukses']) {
+                    return $validasiCuti;
+                }
+            }
 
             $validasiProses = $this->validasiProsesPengajuan(
                 (int) $pegawaiId,
@@ -501,5 +517,18 @@ class PengajuanIzinService extends BaseService
         if (is_file($path)) {
             @unlink($path);
         }
+    }
+
+    protected function validasiPengajuanCutiMinimalDuaHari(string $tanggalMulai, string $field): array
+    {
+        $batasMinimal = date('Y-m-d', strtotime('+2 days'));
+
+        if ($tanggalMulai < $batasMinimal) {
+            return $this->hasilGagal([
+                $field => 'Pengajuan cuti paling lambat diajukan 2 hari sebelum tanggal mulai. Minimal tanggal mulai: ' . tanggal_indonesia($batasMinimal),
+            ]);
+        }
+
+        return $this->hasilSukses();
     }
 }
