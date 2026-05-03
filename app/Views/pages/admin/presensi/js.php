@@ -101,6 +101,7 @@
                         $('#ringkasan-izin').text(r.izin || 0);
                         $('#ringkasan-sakit').text(r.sakit || 0);
                         $('#ringkasan-libur').text(r.libur || 0);
+                        $('#ringkasan-cuti').text(r.cuti || 0);
 
                         $('#ringkasan-tepat-waktu-datang').text(r.tepat_waktu_datang || 0);
                         $('#ringkasan-telat').text(r.telat || 0);
@@ -304,6 +305,9 @@
                 },
                 {
                     data: 'libur'
+                },
+                {
+                    data: 'cuti'
                 },
                 {
                     data: 'alpa'

@@ -314,6 +314,7 @@ class PresensiModel extends Model
                 COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'izin' THEN 1 ELSE 0 END), 0) AS izin,
                 COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'sakit' THEN 1 ELSE 0 END), 0) AS sakit,
                 COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'libur' THEN 1 ELSE 0 END), 0) AS libur,
+                COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'cuti' THEN 1 ELSE 0 END), 0) AS cuti,
                 COALESCE(SUM(CASE WHEN presensi.hasil_presensi = 'alpa' THEN 1 ELSE 0 END), 0) AS alpa
             ")
             ->join(

@@ -61,11 +61,12 @@
             ['id' => 'izin', 'key' => 'izin', 'label' => 'Izin', 'icon' => 'fa-file-signature', 'class' => 'text-info'],
             ['id' => 'sakit', 'key' => 'sakit', 'label' => 'Sakit', 'icon' => 'fa-notes-medical', 'class' => 'text-primary'],
             ['id' => 'libur', 'key' => 'libur', 'label' => 'Libur', 'icon' => 'fa-umbrella-beach', 'class' => 'text-warning'],
+            ['id' => 'cuti', 'key' => 'cuti', 'label' => 'Cuti', 'icon' => 'fa-umbrella-beach', 'class' => 'text-secondary'],
         ];
         ?>
 
         <?php foreach ($hasilPresensiCards as $card): ?>
-            <div class="col-12 col-xl">
+            <div class="col-12 col-xl-4">
                 <a class="block block-rounded block-link-shadow text-end" href="javascript:void(0)">
                     <div class="block-content block-content-full d-flex justify-content-between align-items-center">
                         <div>
@@ -198,6 +199,7 @@
                     <th class="text-center"><b>IZIN</b></th>
                     <th class="text-center"><b>SAKIT</b></th>
                     <th class="text-center"><b>LIBUR</b></th>
+                    <th class="text-center"><b>CUTI</b></th>
                     <th class="text-center"><b>ALPA</b></th>
                 </tr>
             </thead>

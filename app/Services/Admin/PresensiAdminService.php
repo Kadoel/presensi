@@ -85,6 +85,7 @@ class PresensiAdminService extends BaseService
                     'izin'                 => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'izin'),
                     'sakit'                => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'sakit'),
                     'libur'                => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'libur'),
+                    'cuti'                => $this->presensiModel->countByTanggalDanHasilPresensi($tanggal, 'cuti'),
 
                     'tepat_waktu_datang'   => $this->presensiModel->countByTanggalDanStatusDatang($tanggal, 'tepat_waktu'),
                     'telat'                => $this->presensiModel->countByTanggalDanStatusDatang($tanggal, 'telat'),
