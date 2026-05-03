@@ -75,7 +75,7 @@
                 ['id' => 'jadwal-izin', 'label' => 'Izin', 'icon' => 'fa-file-signature', 'class' => 'text-info'],
                 ['id' => 'jadwal-sakit', 'label' => 'Sakit', 'icon' => 'fa-notes-medical', 'class' => 'text-primary'],
                 ['id' => 'jadwal-libur', 'label' => 'Libur', 'icon' => 'fa-umbrella-beach', 'class' => 'text-secondary'],
-                ['id' => 'jadwal-cuti', 'label' => 'Cuti', 'icon' => 'fa-umbrella-beach', 'class' => 'text-secondary'],
+                ['id' => 'jadwal-cuti', 'label' => 'Cuti', 'icon' => 'fa-umbrella-beach', 'class' => 'text-warning'],
                 ['id' => 'total-jadwal', 'label' => 'Total Jadwal', 'icon' => 'fa-calendar-days', 'class' => 'text-dark'],
             ];
             ?>
@@ -166,7 +166,7 @@
                 ['id' => 'izin', 'label' => 'Izin', 'icon' => 'fa-file-signature', 'class' => 'text-info'],
                 ['id' => 'sakit', 'label' => 'Sakit', 'icon' => 'fa-notes-medical', 'class' => 'text-primary'],
                 ['id' => 'libur', 'label' => 'Libur', 'icon' => 'fa-umbrella-beach', 'class' => 'text-secondary'],
-                ['id' => 'cuti', 'label' => 'Cuti', 'icon' => 'fa-umbrella-beach', 'class' => 'text-secondary'],
+                ['id' => 'cuti', 'label' => 'Cuti', 'icon' => 'fa-umbrella-beach', 'class' => 'text-warning'],
                 ['id' => 'alpa', 'label' => 'Alpa', 'icon' => 'fa-user-xmark', 'class' => 'text-danger'],
             ];
             ?>

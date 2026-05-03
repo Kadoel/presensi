@@ -316,12 +316,12 @@ class PresensiAdminService extends BaseService
         $batasTimestamp = strtotime($tanggal . ' ' . $batasAkhir);
         $sekarang = time();
 
-        if ($sekarang <= $batasTimestamp) {
-            return $this->hasilGagal(
-                [],
-                'Sinkron presensi hari ini hanya bisa setelah batas akhir pulang: ' . substr($batasAkhir, 0, 5)
-            );
-        }
+        // if ($sekarang <= $batasTimestamp) {
+        //     return $this->hasilGagal(
+        //         [],
+        //         'Sinkron presensi hari ini hanya bisa setelah batas akhir pulang: ' . substr($batasAkhir, 0, 5)
+        //     );
+        // }
 
         return null;
     }
@@ -690,12 +690,19 @@ class PresensiAdminService extends BaseService
     protected function validasiBelumSinkronSebelumHariIni(string $tanggal): ?array
     {
         $rowsBelumSinkron = $this->jadwalKerjaModel->getTanggalBelumSinkronSebelumHariIni($tanggal);
-        if ($tanggal == date('Y-m-d') && $rowsBelumSinkron !== null) {
+
+        if ($tanggal === date('Y-m-d') && ! empty($rowsBelumSinkron)) {
+            $tanggalBelumSinkron = array_map(
+                fn($row) => tanggal_indonesia($row->tanggal),
+                $rowsBelumSinkron
+            );
+
             return $this->hasilGagal(
                 [],
-                'Sinkron ditolak. Presensi sebelumnya ada yang belum disinkronkan!'
+                'Sinkron ditolak. Presensi sebelumnya belum disinkronkan pada tanggal: ' . implode(', ', $tanggalBelumSinkron)
             );
         }
+
         return null;
     }
 
