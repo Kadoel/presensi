@@ -96,7 +96,7 @@ class Pegawai extends BaseController
         return $this->response->setJSON($result);
     }
 
-    public function kartu($id)
+    public function kartu(int $id)
     {
         $ukuran = $this->request->getGet('ukuran') ?? 'B1';
 
@@ -112,7 +112,7 @@ class Pegawai extends BaseController
         ]);
     }
 
-    public function downloadQRCode($id)
+    public function downloadQRCode(int $id)
     {
         $result = $this->pegawaiService->downloadQRCode((int) $id);
 
