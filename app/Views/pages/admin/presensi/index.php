@@ -183,7 +183,7 @@
                     <span class="input-group-text">
                         <i class="fa fa-calendar"></i>
                     </span>
-                    <input type="month" id="filter-bulan" class="form-control" value="<?= date('Y-m'); ?>">
+                    <input type="month" id="filter-bulan" class="form-control" value="<?= date('Y-m'); ?>" max="<?= date('Y-m'); ?>">
                 </div>
             </div>
         </div>
