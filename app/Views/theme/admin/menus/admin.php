@@ -3,6 +3,12 @@ $totalSegment = current_url(true)->getTotalSegments();
 $segment['2'] = current_url(true)->getSegment(2);
 $segment['3'] = $totalSegment > 2 ? current_url(true)->getSegment(3) : '';
 ?>
+<li class="nav-main-item">
+    <a class="nav-main-link <?= $totalSegment == 1 ? 'active' : ''; ?>" href="<?= base_url('admin'); ?>">
+        <i class="nav-main-link-icon fa fa-house-user"></i>
+        <span class="nav-main-link-name">Beranda</span>
+    </a>
+</li>
 
 <li class="nav-main-heading">DATA MASTER</li>
 
