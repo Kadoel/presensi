@@ -163,7 +163,8 @@
             alpa: 'Alpa',
             izin: 'Izin',
             sakit: 'Sakit',
-            libur: 'Libur'
+            libur: 'Libur',
+            cuti: 'Cuti',
         };
 
         return labels[value] || 'Belum Sinkron';
@@ -173,6 +174,7 @@
         const map = {
             hadir: '<span class="badge bg-success">Hadir</span>',
             alpa: '<span class="badge bg-danger">Alpa</span>',
+            cuti: '<span class="badge bg-danger">Cuti</span>',
             izin: '<span class="badge bg-info">Izin</span>',
             sakit: '<span class="badge bg-primary">Sakit</span>',
             libur: '<span class="badge bg-secondary">Libur</span>'

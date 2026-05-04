@@ -73,6 +73,7 @@ class RiwayatPresensiService extends BaseService
             'izin'  => 'Izin',
             'sakit' => 'Sakit',
             'libur' => 'Libur',
+            'cuti' => 'Cuti',
             default => 'Belum Sinkron',
         };
     }
@@ -82,6 +83,7 @@ class RiwayatPresensiService extends BaseService
         return match ($hasil) {
             'hadir' => '#198754',
             'alpa'  => '#dc3545',
+            'cuti'  => '#ff00b7',
             'izin'  => '#0dcaf0',
             'sakit' => '#0d6efd',
             'libur' => '#6c757d',
