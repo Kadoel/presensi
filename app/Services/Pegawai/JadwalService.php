@@ -74,6 +74,7 @@ class JadwalService extends BaseService
             'libur' => 'Libur',
             'izin'  => 'Izin',
             'sakit' => 'Sakit',
+            'cuti' => 'Cuti',
             default => '-',
         };
     }
@@ -83,6 +84,7 @@ class JadwalService extends BaseService
         if (($item->status_hari ?? '') !== 'kerja') {
             return match ($item->status_hari) {
                 'libur' => '#dc3545',
+                'cuti' => '#fd21d1',
                 'izin'  => '#ffc107',
                 'sakit' => '#0dcaf0',
                 default => '#6c757d',

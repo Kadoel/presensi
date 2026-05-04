@@ -159,7 +159,8 @@
             kerja: 'Kerja',
             libur: 'Libur',
             izin: 'Izin',
-            sakit: 'Sakit'
+            sakit: 'Sakit',
+            cuti: 'Cuti'
         };
 
         return labels[status] || '-';
@@ -169,6 +170,7 @@
         const map = {
             kerja: '<span class="badge bg-success">Kerja</span>',
             libur: '<span class="badge bg-danger">Libur</span>',
+            cuti: '<span class="badge bg-danger">Cuti</span>',
             izin: '<span class="badge bg-warning text-dark">Izin</span>',
             sakit: '<span class="badge bg-info text-dark">Sakit</span>'
         };
