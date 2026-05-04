@@ -94,7 +94,7 @@
         'main-content-boxed'                        Full width Main Content with a specific maximum width (screen width > 1200px)
         'main-content-narrow'                       Full width Main Content with a percentage width (screen width > 1200px)
     -->
-    <div id="page-container" class="sidebar-dark side-scroll page-header-fixed page-header-dark main-content-boxed">
+    <div id="page-container" class="sidebar-dark side-scroll page-header-fixed page-header-dark main-content-narrow">
         <!-- Sidebar -->
         <?= $this->include('theme/pegawai/sidebar'); ?>
         <!-- END Sidebar -->
@@ -162,6 +162,7 @@
     <?php
     $segment1 = trim((string) current_url(true)->getSegment(1)); // admin / pegawai
     $segment2 = trim((string) current_url(true)->getSegment(2)); // pengguna / dst
+    $segment2 = str_replace('-', '_', $segment2);
 
     $jsView = null;
 
