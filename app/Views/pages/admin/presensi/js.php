@@ -671,6 +671,12 @@
             });
         });
 
+        $('#btn-export-bulanan').on('click', function() {
+            const bulan = $('#filter-bulan').val() || '<?= date('Y-m'); ?>';
+
+            window.open('<?= base_url('admin/presensi/export-bulanan') ?>?bulan=' + encodeURIComponent(bulan), '_blank');
+        });
+
         refreshRingkasan();
         loadNotifBelumSinkron();
     });

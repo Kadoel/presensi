@@ -378,4 +378,32 @@ class PresensiModel extends Model
             ->get()
             ->getResult();
     }
+
+    public function getExportBulanan(string $bulan): array
+    {
+        return $this->db->table($this->table)
+            ->select('
+            presensi.tanggal,
+            pegawai.kode_pegawai,
+            pegawai.nama_pegawai,
+            shift.nama_shift,
+            presensi.jam_datang,
+            presensi.jam_pulang,
+            presensi.status_datang,
+            presensi.status_pulang,
+            presensi.menit_telat,
+            presensi.menit_pulang_cepat,
+            presensi.hasil_presensi,
+            presensi.sumber_presensi,
+            presensi.catatan_admin
+        ')
+            ->join('pegawai', 'pegawai.id = presensi.pegawai_id', 'left')
+            ->join('shift', 'shift.id = presensi.shift_id', 'left')
+            ->where('DATE_FORMAT(presensi.tanggal, "%Y-%m") =', $bulan)
+            ->where('presensi.hasil_presensi IS NOT NULL', null, false)
+            ->orderBy('presensi.tanggal', 'ASC')
+            ->orderBy('pegawai.nama_pegawai', 'ASC')
+            ->get()
+            ->getResult();
+    }
 }

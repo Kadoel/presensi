@@ -124,4 +124,11 @@ class Presensi extends BaseController
             $this->presensiAdminService->hapusLupaPresensi((int) $this->request->getVar('id'))
         );
     }
+
+    public function exportBulanan()
+    {
+        return $this->presensiAdminService->exportBulanan(
+            $this->request->getGet('bulan') ?: date('Y-m')
+        );
+    }
 }

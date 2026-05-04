@@ -186,6 +186,12 @@
                     <input type="month" id="filter-bulan" class="form-control" value="<?= date('Y-m'); ?>" max="<?= date('Y-m'); ?>">
                 </div>
             </div>
+
+            <div class="col-auto">
+                <button type="button" class="btn btn-success text-white" id="btn-export-bulanan">
+                    <i class="fa fa-file-excel"></i> Export
+                </button>
+            </div>
         </div>
     </div>
 

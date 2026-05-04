@@ -9,6 +9,11 @@ use App\Models\PresensiModel;
 use App\Services\BaseService;
 use CodeIgniter\Database\BaseBuilder;
 use DateTime;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class PresensiAdminService extends BaseService
 {
@@ -575,6 +580,293 @@ class PresensiAdminService extends BaseService
 
             return $this->hasilSukses('Lupa presensi berhasil dihapus');
         });
+    }
+
+    public function exportBulanan(string $bulan)
+    {
+        $bulan = preg_match('/^\d{4}-\d{2}$/', $bulan) ? $bulan : date('Y-m');
+
+        $rows = $this->presensiModel->getExportBulanan($bulan);
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Presensi ' . $bulan);
+
+        $headers = [
+            'No',
+            'Tanggal',
+            'Kode Pegawai',
+            'Nama Pegawai',
+            'Shift',
+            'Jam Datang',
+            'Status Datang',
+            'Jam Pulang',
+            'Status Pulang',
+            'Menit Telat',
+            'Menit Pulang Cepat',
+            'Hasil Presensi',
+            'Sumber',
+            'Catatan Admin',
+        ];
+
+        $sheet->fromArray($headers, null, 'A1');
+
+        $styleHeader = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                ],
+            ],
+        ];
+
+        $styleBorder = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                ],
+            ],
+        ];
+
+        $styleIndent = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_LEFT,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+                'indent'     => 1,
+            ],
+        ];
+
+        $sheet->getStyle('A1:N1')->applyFromArray($styleHeader);
+
+        $rowExcel = 2;
+        $no = 1;
+        $tanggalGroups = [];
+        $summaryPegawai = [];
+
+        foreach ($rows as $row) {
+            $tanggalRaw = (string) $row->tanggal;
+            $tanggal    = tanggal_indonesia($tanggalRaw);
+
+            if (! isset($tanggalGroups[$tanggalRaw])) {
+                $tanggalGroups[$tanggalRaw] = [
+                    'start' => $rowExcel,
+                    'end'   => $rowExcel,
+                ];
+            } else {
+                $tanggalGroups[$tanggalRaw]['end'] = $rowExcel;
+            }
+
+            $hasil = (string) ($row->hasil_presensi ?? '');
+            $kodePegawai = (string) ($row->kode_pegawai ?? '');
+
+            if (! isset($summaryPegawai[$kodePegawai])) {
+                $summaryPegawai[$kodePegawai] = [
+                    'kode_pegawai' => $row->kode_pegawai ?? '-',
+                    'nama_pegawai' => $row->nama_pegawai ?? '-',
+                    'hadir'        => 0,
+                    'izin'         => 0,
+                    'sakit'        => 0,
+                    'cuti'         => 0,
+                    'libur'        => 0,
+                    'alpa'         => 0,
+                    'telat'        => 0,
+                    'pulang_cepat' => 0,
+                ];
+            }
+
+            if (isset($summaryPegawai[$kodePegawai][$hasil])) {
+                $summaryPegawai[$kodePegawai][$hasil]++;
+            }
+
+            if (($row->status_datang ?? '') === 'telat') {
+                $summaryPegawai[$kodePegawai]['telat']++;
+            }
+
+            if (($row->status_pulang ?? '') === 'pulang_cepat') {
+                $summaryPegawai[$kodePegawai]['pulang_cepat']++;
+            }
+
+            $sheet->fromArray([
+                $no++,
+                $tanggal,
+                $row->kode_pegawai ?? '-',
+                $row->nama_pegawai ?? '-',
+                $row->nama_shift ?: '-',
+                $this->formatJamExcel($row->jam_datang ?? null),
+                $row->status_datang ?: '-',
+                $this->formatJamExcel($row->jam_pulang ?? null),
+                $row->status_pulang ?: '-',
+                (int) ($row->menit_telat ?? 0),
+                (int) ($row->menit_pulang_cepat ?? 0),
+                $hasil ?: '-',
+                $row->sumber_presensi ?: '-',
+                $row->catatan_admin ?: '-',
+            ], null, 'A' . $rowExcel);
+
+            $sheet->getStyle('A' . $rowExcel . ':N' . $rowExcel)->applyFromArray($styleBorder);
+            // kolom text → indent
+            $sheet->getStyle('C' . $rowExcel . ':E' . $rowExcel)->applyFromArray($styleIndent);
+            $sheet->getStyle('N' . $rowExcel)->applyFromArray($styleIndent);
+
+            $sheet->getStyle('A' . $rowExcel)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('B' . $rowExcel)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('F' . $rowExcel . ':M' . $rowExcel)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+            $sheet->getStyle('L' . $rowExcel)
+                ->getFill()
+                ->setFillType(Fill::FILL_SOLID)
+                ->getStartColor()
+                ->setRGB($this->warnaHasilPresensi($hasil));
+
+            $sheet->getStyle('L' . $rowExcel)->getFont()->setBold(true);
+            $sheet->getStyle('L' . $rowExcel)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+            $rowExcel++;
+        }
+
+        foreach ($tanggalGroups as $range) {
+            if ($range['start'] === $range['end']) {
+                continue;
+            }
+
+            $cellRange = 'B' . $range['start'] . ':B' . $range['end'];
+
+            $sheet->mergeCells($cellRange);
+            $sheet->getStyle($cellRange)->applyFromArray([
+                'font' => [
+                    'bold' => true,
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical'   => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                    ],
+                ],
+            ]);
+        }
+
+        $rowExcel += 2;
+
+        $sheet->setCellValue('A' . $rowExcel, 'SUMMARY PRESENSI PEGAWAI');
+        $sheet->mergeCells('A' . $rowExcel . ':K' . $rowExcel);
+
+        $sheet->getStyle('A' . $rowExcel . ':K' . $rowExcel)->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'size' => 12,
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                ],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => [
+                    'rgb' => 'D9EAF7',
+                ],
+            ],
+        ]);
+
+        $rowExcel++;
+
+        $summaryHeaders = [
+            'No',
+            'Kode Pegawai',
+            'Nama Pegawai',
+            'Hadir',
+            'Izin',
+            'Sakit',
+            'Cuti',
+            'Libur',
+            'Alpa',
+            'Telat',
+            'Pulang Cepat',
+        ];
+
+        $sheet->fromArray($summaryHeaders, null, 'A' . $rowExcel);
+        $sheet->getStyle('A' . $rowExcel . ':K' . $rowExcel)->applyFromArray($styleHeader);
+
+        $rowExcel++;
+        $noSummary = 1;
+
+        foreach ($summaryPegawai as $summary) {
+            $sheet->fromArray([
+                $noSummary++,
+                $summary['kode_pegawai'],
+                $summary['nama_pegawai'],
+                $summary['hadir'],
+                $summary['izin'],
+                $summary['sakit'],
+                $summary['cuti'],
+                $summary['libur'],
+                $summary['alpa'],
+                $summary['telat'],
+                $summary['pulang_cepat'],
+            ], null, 'A' . $rowExcel);
+
+            $sheet->getStyle('A' . $rowExcel . ':K' . $rowExcel)->applyFromArray($styleBorder);
+            // kode pegawai & nama pegawai → indent (tidak center)
+            $sheet->getStyle('B' . $rowExcel . ':C' . $rowExcel)->applyFromArray($styleIndent);
+            $sheet->getStyle('D' . $rowExcel . ':K' . $rowExcel)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+            $rowExcel++;
+        }
+
+        foreach (range('A', 'N') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $sheet->freezePane('A2');
+
+        $filename = 'export-presensi-' . $bulan . '.xlsx';
+
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    protected function formatJamExcel(?string $value): string
+    {
+        if (empty($value)) {
+            return '-';
+        }
+
+        return date('H:i', strtotime($value));
+    }
+
+    protected function warnaHasilPresensi(string $hasil): string
+    {
+        return match ($hasil) {
+            'hadir' => 'C6EFCE',
+            'izin'  => 'D9EAF7',
+            'sakit' => 'D9E1F2',
+            'cuti'  => 'E4DFEC',
+            'libur' => 'FFF2CC',
+            'alpa'  => 'F4CCCC',
+            default => 'FFFFFF',
+        };
     }
 
     protected function pastikanLupaPresensi(object $presensi): ?array

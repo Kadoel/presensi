@@ -143,6 +143,7 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     //Presensi
     $routes->group('presensi', static function ($routes) {
         $routes->match(['GET', 'POST'], '/', 'Admin\Presensi::index');
+        $routes->get('export-bulanan', 'Admin\Presensi::exportBulanan');
         $routes->post('detail', 'Admin\Presensi::detail');
         $routes->post('sinkron', 'Admin\Presensi::sinkron');
         $routes->post('generate-alpa', 'Admin\Presensi::generateAlpa'); // alias lama
