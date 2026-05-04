@@ -1,7 +1,6 @@
 <?php
 $totalSegment = current_url(true)->getTotalSegments();
 $segment['2'] = current_url(true)->getSegment(2);
-$segment['2'] = str_replace('-', '_', $segment['2']);
 $segment['3'] = $totalSegment > 2 ? current_url(true)->getSegment(3) : '';
 ?>
 
