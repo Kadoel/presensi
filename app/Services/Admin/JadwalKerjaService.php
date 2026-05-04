@@ -626,6 +626,7 @@ class JadwalKerjaService extends BaseService
                 $totalLibur  = (int) $row->total_libur;
                 $totalIzin   = (int) $row->total_izin;
                 $totalSakit  = (int) $row->total_sakit;
+                $totalCuti  = (int) $row->total_cuti;
 
                 $bermasalah = $totalJadwal !== $totalPegawaiAktif;
 
@@ -654,6 +655,7 @@ class JadwalKerjaService extends BaseService
                         'total_libur'         => $totalLibur,
                         'total_izin'          => $totalIzin,
                         'total_sakit'         => $totalSakit,
+                        'total_cuti'          => $totalCuti,
                         'bermasalah'          => $bermasalah,
                         'kurang_jadwal'       => max($totalPegawaiAktif - $totalJadwal, 0),
                         'lebih_jadwal'        => max($totalJadwal - $totalPegawaiAktif, 0),

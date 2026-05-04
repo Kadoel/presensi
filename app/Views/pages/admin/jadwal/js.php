@@ -44,7 +44,8 @@
                 kerja: '<span class="badge bg-success">Kerja</span>',
                 libur: '<span class="badge bg-danger">Libur</span>',
                 izin: '<span class="badge bg-warning text-dark">Izin</span>',
-                sakit: '<span class="badge bg-info text-dark">Sakit</span>'
+                sakit: '<span class="badge bg-info text-dark">Sakit</span>',
+                cuti: '<span class="badge bg-danger">Cuti</span>',
             };
 
             return map[status] || '<span class="badge bg-secondary">-</span>';
@@ -459,7 +460,7 @@
                         html: `
                             <div class="fc-jadwal-detail">
                                 <div><b>${p.total_jadwal || 0}</b> / ${p.total_pegawai_aktif || 0}</div>
-                                <div>K:${p.total_kerja || 0} L:${p.total_libur || 0}</div>
+                                <div>K:${p.total_kerja || 0} L:${p.total_libur || 0} S:${p.total_sakit || 0} I:${p.total_izin || 0} L:${p.total_cuti || 0}</div>
                                 ${warning}
                             </div>
                         `

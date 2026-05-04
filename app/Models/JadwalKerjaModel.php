@@ -215,7 +215,8 @@ class JadwalKerjaModel extends Model
                 SUM(CASE WHEN status_hari = "kerja" THEN 1 ELSE 0 END) AS total_kerja,
                 SUM(CASE WHEN status_hari = "libur" THEN 1 ELSE 0 END) AS total_libur,
                 SUM(CASE WHEN status_hari = "izin" THEN 1 ELSE 0 END) AS total_izin,
-                SUM(CASE WHEN status_hari = "sakit" THEN 1 ELSE 0 END) AS total_sakit
+                SUM(CASE WHEN status_hari = "sakit" THEN 1 ELSE 0 END) AS total_sakit,
+                SUM(CASE WHEN status_hari = "cuti" THEN 1 ELSE 0 END) AS total_cuti
             ')
             ->where('tanggal >=', $start)
             ->where('tanggal <=', $end)
