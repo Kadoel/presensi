@@ -1006,7 +1006,7 @@ class PresensiAdminService extends BaseService
         if ($jumlahPending > 0) {
             return $this->hasilGagal(
                 [],
-                'Sinkron ditolak. Masih ada ' . $jumlahPending . ' pengajuan izin/sakit yang belum diproses pada tanggal ' . tanggal_indonesia($tanggal) . '. Silakan setujui atau tolak terlebih dahulu.'
+                'Sinkron ditolak. Masih ada ' . $jumlahPending . ' pengajuan izin/sakit/cuti yang belum diproses pada tanggal ' . tanggal_indonesia($tanggal) . '. Silakan setujui atau tolak terlebih dahulu.'
             );
         }
 
