@@ -257,4 +257,18 @@ class PegawaiModel extends Model
             ->get()
             ->getResult();
     }
+
+    /**
+     * Tambahkan method ini ke app/Models/PegawaiModel.php
+     */
+    public function getPegawaiAktifUntukPenggajian(): array
+    {
+        return $this->db->table($this->table)
+            ->select('pegawai.id, pegawai.kode_pegawai, pegawai.nama_pegawai, pegawai.jabatan_id, jabatan.nama_jabatan')
+            ->join('jabatan', 'jabatan.id = pegawai.jabatan_id', 'left')
+            ->where('pegawai.is_active', 1)
+            ->orderBy('pegawai.nama_pegawai', 'ASC')
+            ->get()
+            ->getResult();
+    }
 }

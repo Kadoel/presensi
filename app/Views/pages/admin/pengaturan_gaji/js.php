@@ -22,15 +22,24 @@
 
         const fieldsEdit = fieldsTambah.map(field => 'edit-' + field);
 
-        function onlyNumber(value) {
-            return String(value || '').replace(/\D/g, '');
+        function normalizeNominal(value) {
+            value = String(value || '').trim();
+
+            // dari database: 3200000.00 / 3200000.50
+            if (/^\d+\.\d{1,2}$/.test(value)) {
+                value = value.split('.')[0];
+            }
+
+            // dari input user: 3.000 / 3.200.000
+            value = value.replace(/\D/g, '');
+
+            value = value.replace(/^0+/, '');
+
+            return value;
         }
 
         function formatRupiah(value) {
-            let angka = onlyNumber(value);
-
-            // hapus nol di depan
-            angka = angka.replace(/^0+/, '');
+            const angka = normalizeNominal(value);
 
             if (angka === '') {
                 return '';

@@ -171,6 +171,18 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
         $routes->post('delete', 'Admin\PengaturanGaji::delete');
         $routes->post('update/(:num)', 'Admin\PengaturanGaji::update/$1');
     });
+
+    $routes->group('penggajian', static function ($routes) {
+        $routes->match(['GET', 'POST'], '/', 'Admin\Penggajian::index');
+        $routes->get('export', 'Admin\Penggajian::export');
+        $routes->post('ringkasan', 'Admin\Penggajian::ringkasan');
+        $routes->post('generate', 'Admin\Penggajian::generate');
+        $routes->post('finalkan', 'Admin\Penggajian::finalkan');
+        $routes->post('detail', 'Admin\Penggajian::detail');
+        $routes->get('slip/bulk', 'Admin\Penggajian::exportSlipBulk');
+        $routes->get('slip/preview/(:num)', 'Admin\Penggajian::previewSlip/$1');
+        $routes->get('slip/pdf/(:num)', 'Admin\Penggajian::exportSlipPdf/$1');
+    });
 });
 
 

@@ -345,4 +345,20 @@ class JadwalKerjaModel extends Model
             ->get()
             ->getResult();
     }
+
+    /**
+     * Tambahkan method ini ke app/Models/JadwalKerjaModel.php
+     */
+    public function getTanggalBelumSinkronByBulan(string $bulan): array
+    {
+        return $this->db->table($this->table)
+            ->select('jadwal_kerja.tanggal, COUNT(jadwal_kerja.id) AS total_jadwal, COUNT(presensi.id) AS total_presensi, COALESCE(SUM(CASE WHEN presensi.hasil_presensi IS NOT NULL THEN 1 ELSE 0 END), 0) AS total_sudah_sinkron')
+            ->join('presensi', 'presensi.pegawai_id = jadwal_kerja.pegawai_id AND presensi.tanggal = jadwal_kerja.tanggal', 'left')
+            ->where('DATE_FORMAT(jadwal_kerja.tanggal, "%Y-%m") =', $bulan)
+            ->groupBy('jadwal_kerja.tanggal')
+            ->having('total_sudah_sinkron < total_jadwal')
+            ->orderBy('jadwal_kerja.tanggal', 'ASC')
+            ->get()
+            ->getResult();
+    }
 }

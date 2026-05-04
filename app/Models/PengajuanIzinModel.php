@@ -125,4 +125,16 @@ class PengajuanIzinModel extends Model
             ->where('tanggal_selesai >=', $tanggal)
             ->countAllResults();
     }
+
+    /**
+     * Tambahkan method ini ke app/Models/PengajuanIzinModel.php
+     */
+    public function countPendingByPeriode(string $tanggalMulai, string $tanggalSelesai): int
+    {
+        return (int) $this->where('status', 'pending')
+            ->whereIn('jenis', ['izin', 'sakit', 'cuti'])
+            ->where('tanggal_mulai <=', $tanggalSelesai)
+            ->where('tanggal_selesai >=', $tanggalMulai)
+            ->countAllResults();
+    }
 }

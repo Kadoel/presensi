@@ -108,6 +108,14 @@ $segment['3'] = $totalSegment > 2 ? current_url(true)->getSegment(3) : '';
 </li>
 
 <li class="nav-main-item">
+    <a class="nav-main-link <?= $segment['2'] == 'penggajian' ? 'active' : ''; ?>" href="<?= base_url('admin/penggajian'); ?>">
+        <i class="nav-main-link-icon fa fa-money-check-dollar"></i>
+        <span class="nav-main-link-name">Penggajian</span>
+    </a>
+</li>
+
+
+<li class="nav-main-item">
     <a class="nav-main-link <?= $segment['2'] == 'log' ? 'active' : ''; ?>" href="<?= base_url('admin/log'); ?>">
         <i class="nav-main-link-icon fa fa-clipboard-list"></i>
         <span class="nav-main-link-name">Audit Logs</span>

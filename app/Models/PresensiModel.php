@@ -406,4 +406,27 @@ class PresensiModel extends Model
             ->get()
             ->getResult();
     }
+
+    /**
+     * Tambahkan method ini ke app/Models/PresensiModel.php
+     */
+    public function getRekapPenggajianPegawai(int $pegawaiId, string $bulan): ?object
+    {
+        return $this->db->table($this->table)
+            ->select('
+                COALESCE(SUM(CASE WHEN hasil_presensi = "hadir" THEN 1 ELSE 0 END), 0) AS total_hadir, 
+                COALESCE(SUM(CASE WHEN hasil_presensi = "izin" THEN 1 ELSE 0 END), 0) AS total_izin, 
+                COALESCE(SUM(CASE WHEN hasil_presensi = "sakit" THEN 1 ELSE 0 END), 0) AS total_sakit, 
+                COALESCE(SUM(CASE WHEN hasil_presensi = "libur" THEN 1 ELSE 0 END), 0) AS total_libur, 
+                COALESCE(SUM(CASE WHEN hasil_presensi = "cuti" THEN 1 ELSE 0 END), 0) AS total_cuti, 
+                COALESCE(SUM(CASE WHEN hasil_presensi = "alpa" THEN 1 ELSE 0 END), 0) AS total_alpa, 
+                COALESCE(SUM(menit_telat), 0) AS total_menit_telat, 
+                COALESCE(SUM(menit_pulang_cepat), 0) AS total_menit_pulang_cepat
+            ')
+            ->where('pegawai_id', $pegawaiId)
+            ->where('DATE_FORMAT(tanggal, "%Y-%m") =', $bulan)
+            ->where('hasil_presensi IS NOT NULL', null, false)
+            ->get()
+            ->getRow();
+    }
 }
