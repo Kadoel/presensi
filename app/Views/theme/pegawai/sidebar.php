@@ -1,7 +1,6 @@
 <?php
 $totalSegment_sidebar = current_url(true)->getTotalSegments();
 $segment_sidebar['2'] = current_url(true)->getSegment(2);
-$segment_sidebar['2'] = str_replace('-', '_', $segment_sidebar['2']);
 $segment_sidebar['3'] = $totalSegment_sidebar > 2 ? current_url(true)->getSegment(3) : '';
 ?>
 
