@@ -162,6 +162,15 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
         $routes->post('ringkasan', 'Admin\SaldoCuti::ringkasan');
         $routes->post('update/(:num)', 'Admin\SaldoCuti::ubah/$1');
     });
+
+    // Pengaturan Gaji
+    $routes->group('pengaturan-gaji', static function ($routes) {
+        $routes->match(['GET', 'POST'], '/', 'Admin\PengaturanGaji::index');
+        $routes->post('simpan', 'Admin\PengaturanGaji::simpan');
+        $routes->post('edit', 'Admin\PengaturanGaji::edit');
+        $routes->post('delete', 'Admin\PengaturanGaji::delete');
+        $routes->post('update/(:num)', 'Admin\PengaturanGaji::update/$1');
+    });
 });
 
 

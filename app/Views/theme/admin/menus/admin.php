@@ -20,6 +20,14 @@ $segment['3'] = $totalSegment > 2 ? current_url(true)->getSegment(3) : '';
 </li>
 
 <li class="nav-main-item">
+    <a class="nav-main-link <?= $segment['2'] == 'pengaturan-gaji' ? 'active' : ''; ?>" href="<?= base_url('admin/pengaturan-gaji'); ?>">
+        <i class="nav-main-link-icon fa fa-money-bill-wave"></i>
+        <span class="nav-main-link-name">Pengaturan Gaji</span>
+    </a>
+</li>
+
+
+<li class="nav-main-item">
     <a class="nav-main-link <?= $segment['2'] == 'jabatan' ? 'active' : ''; ?>" href="<?= base_url('admin/jabatan'); ?>">
         <i class="nav-main-link-icon fa fa-sitemap"></i>
         <span class="nav-main-link-name">Jabatan</span>
