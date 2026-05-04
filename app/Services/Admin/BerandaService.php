@@ -152,6 +152,7 @@ class BerandaService extends BaseService
             'izin'  => 0,
             'sakit' => 0,
             'libur' => 0,
+            'cuti'  => 0,
             'alpa'  => 0,
         ];
 
@@ -163,12 +164,13 @@ class BerandaService extends BaseService
 
         return [
             'bulan'  => $bulan,
-            'labels' => ['Hadir', 'Izin', 'Sakit', 'Libur', 'Alpa'],
+            'labels' => ['Hadir', 'Izin', 'Sakit', 'Libur', 'Cuti', 'Alpa'],
             'data'   => [
                 $data['hadir'],
                 $data['izin'],
                 $data['sakit'],
                 $data['libur'],
+                $data['cuti'],
                 $data['alpa'],
             ],
         ];

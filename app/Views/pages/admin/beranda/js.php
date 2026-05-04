@@ -142,13 +142,14 @@
             chartHasilPresensi = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Hadir', 'Izin', 'Sakit', 'Libur', 'Alpa', 'Belum Sinkron'],
+                    labels: ['Hadir', 'Izin', 'Sakit', 'Libur', 'Cuti', 'Alpa', 'Belum Sinkron'],
                     datasets: [{
                         data: [
                             res.hadir ?? 0,
                             res.izin ?? 0,
                             res.sakit ?? 0,
                             res.libur ?? 0,
+                            res.cuti ?? 0,
                             res.alpa ?? 0,
                             res.belum_sinkron ?? 0
                         ],
@@ -157,8 +158,9 @@
                             '#3c90df',
                             '#0665d0',
                             '#6c757d',
-                            '#e04f1a',
-                            '#f3b760'
+                            '#e0e0e0',
+                            '#f3b760',
+                            '#e04f1a'
                         ],
                         borderWidth: 0
                     }]
@@ -382,6 +384,7 @@
                             '#3c90df',
                             '#0665d0',
                             '#6c757d',
+                            '#faff6f',
                             '#e04f1a'
                         ],
                         hoverOffset: 8,
