@@ -96,12 +96,12 @@ class Penggajian extends BaseController
         );
     }
 
-    public function previewSlip($id)
+    public function previewSlip(int $id)
     {
         return $this->penggajianService->previewSlip((int) $id);
     }
 
-    public function exportSlipPdf($id)
+    public function exportSlipPdf(int $id)
     {
         return $this->penggajianService->exportSlipPdf((int) $id);
     }
@@ -113,7 +113,7 @@ class Penggajian extends BaseController
         );
     }
 
-    private function rupiah($value): string
+    private function rupiah(int $value): string
     {
         return 'Rp ' . number_format((float) $value, 0, ',', '.');
     }

@@ -8,6 +8,7 @@ use App\Models\PengajuanIzinModel;
 use App\Models\PengaturanGajiModel;
 use App\Models\PenggajianModel;
 use App\Models\PresensiModel;
+use App\Models\SettingsModel;
 use App\Services\BaseService;
 use CodeIgniter\Database\BaseBuilder;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -27,6 +28,7 @@ class PenggajianService extends BaseService
     protected PresensiModel $presensiModel;
     protected JadwalKerjaModel $jadwalKerjaModel;
     protected PengajuanIzinModel $pengajuanIzinModel;
+    protected SettingsModel $settingsModel;
 
     public function __construct()
     {
@@ -37,6 +39,7 @@ class PenggajianService extends BaseService
         $this->presensiModel       = new PresensiModel();
         $this->jadwalKerjaModel    = new JadwalKerjaModel();
         $this->pengajuanIzinModel  = new PengajuanIzinModel();
+        $this->settingsModel       = new SettingsModel();
     }
 
     public function dataTabel(?string $bulan = null): BaseBuilder
@@ -353,6 +356,7 @@ class PenggajianService extends BaseService
     public function previewSlip(int $id)
     {
         $slip = $this->penggajianModel->getSlipById($id);
+        $setting = $this->settingsModel->getSettings();
 
         if ($slip === null || ($slip->status ?? '') !== 'final') {
             return redirect()->back()->with('error', 'Slip gaji hanya tersedia untuk penggajian final');
@@ -360,12 +364,16 @@ class PenggajianService extends BaseService
 
         return view('pages/admin/penggajian/slip', [
             'slip' => $slip,
+            'logo'  => $setting->logo ?? 'default.png',
+            'nama_usaha' => $setting->nama_usaha,
+            'alamat_usaha' => $setting->alamat,
         ]);
     }
 
     public function exportSlipPdf(int $id)
     {
         $slip = $this->penggajianModel->getSlipById($id);
+        $setting = $this->settingsModel->getSettings();
 
         if ($slip === null || ($slip->status ?? '') !== 'final') {
             return redirect()->back()->with('error', 'Slip gaji hanya tersedia untuk penggajian final');
@@ -373,6 +381,9 @@ class PenggajianService extends BaseService
 
         $html = view('pages/admin/penggajian/slip', [
             'slip' => $slip,
+            'logo'  => $setting->logo ?? 'default.png',
+            'nama_usaha' => $setting->nama_usaha,
+            'alamat_usaha' => $setting->alamat,
             'isPdf' => true,
         ]);
 
@@ -386,6 +397,7 @@ class PenggajianService extends BaseService
         $bulan = preg_match('/^\d{4}-\d{2}$/', $bulan) ? $bulan : date('Y-m');
 
         $rows = $this->penggajianModel->getSlipFinalByBulan($bulan);
+        $setting = $this->settingsModel->getSettings();
 
         if (empty($rows)) {
             return redirect()->back()->with('error', 'Data slip final belum tersedia');
@@ -400,6 +412,9 @@ class PenggajianService extends BaseService
         foreach ($rows as $slip) {
             $html = view('pages/admin/penggajian/slip', [
                 'slip' => $slip,
+                'logo'  => $setting->logo ?? 'default.png',
+                'nama_usaha' => $setting->nama_usaha,
+                'alamat_usaha' => $setting->alamat,
                 'isPdf' => true,
             ]);
 

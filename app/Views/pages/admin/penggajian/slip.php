@@ -1,6 +1,25 @@
 <?php
 $isPdf = (bool) ($isPdf ?? false);
 $status = (string) ($slip->status ?? 'draft');
+
+$logoName = $logo ?? 'default.png';
+$logoPath = FCPATH . 'assets/media/photos/' . $logoName;
+
+if (! is_file($logoPath)) {
+    $logoPath = FCPATH . 'assets/media/photos/default.png';
+}
+
+$logoSrc = base_url('assets/media/photos/default.png');
+
+if (is_file($logoPath)) {
+    if ($isPdf) {
+        $mime = mime_content_type($logoPath);
+        $data = base64_encode(file_get_contents($logoPath));
+        $logoSrc = 'data:' . $mime . ';base64,' . $data;
+    } else {
+        $logoSrc = base_url('assets/media/photos/' . basename($logoPath));
+    }
+}
 ?>
 
 <!doctype html>
@@ -11,26 +30,30 @@ $status = (string) ($slip->status ?? 'draft');
     <title>Slip Gaji <?= esc($slip->nama_pegawai ?? '-'); ?> - <?= esc($slip->bulan ?? '-'); ?></title>
 
     <style>
+        @page {
+            margin: 14mm;
+        }
+
         * {
             box-sizing: border-box;
         }
 
         body {
             font-family: DejaVu Sans, Arial, sans-serif;
-            font-size: 12px;
+            font-size: <?= $isPdf ? '10px' : '12px'; ?>;
             color: #111827;
             margin: 0;
-            padding: <?= $isPdf ? '0' : '24px'; ?>;
+            padding: 0;
             background: <?= $isPdf ? '#ffffff' : '#f3f4f6'; ?>;
         }
 
         .page {
             width: 100%;
-            max-width: 820px;
-            margin: 0 auto;
+            max-width: none;
+            margin: 0;
             background: #ffffff;
-            padding: 28px;
-            border: 1px solid #d1d5db;
+            padding: 0;
+            border: none;
         }
 
         .header {
@@ -106,7 +129,17 @@ $status = (string) ($slip->status ?? 'draft');
         .summary-table th,
         .summary-table td {
             border: 1px solid #d1d5db;
-            padding: 8px 10px;
+            padding: <?= $isPdf ? '5px 7px' : '8px 10px'; ?>;
+        }
+
+        .section-title {
+            margin-top: <?= $isPdf ? '12px' : '18px'; ?>;
+            margin-bottom: 8px;
+            font-size: <?= $isPdf ? '11px' : '13px'; ?>;
+            font-weight: bold;
+            background: #e5e7eb;
+            padding: <?= $isPdf ? '6px 8px' : '8px 10px'; ?>;
+            border: 1px solid #d1d5db;
         }
 
         .salary-table th,
@@ -215,12 +248,35 @@ $status = (string) ($slip->status ?? 'draft');
 
     <div class="page">
         <div class="header">
-            <h1 class="title">SLIP GAJI PEGAWAI</h1>
-            <div class="subtitle">
-                Periode <?= esc(slipBulanIndonesia($slip->bulan ?? null)); ?>
-                &nbsp;|&nbsp;
-                <span class="status"><?= strtoupper(esc($status)); ?></span>
-            </div>
+            <table style="width:100%; border-bottom:3px solid #111827; padding-bottom:10px;">
+                <tr>
+                    <td style="width:80px; vertical-align:middle;">
+                        <img src="<?= esc($logoSrc); ?>" style="width:70px;">
+                    </td>
+
+                    <td style="vertical-align:middle;">
+                        <div style="font-size:18px; font-weight:bold;">
+                            <?= esc($nama_usaha ?? 'Nama Usaha'); ?>
+                        </div>
+                        <div style="font-size:12px; color:#4b5563;">
+                            <?= esc($alamat_usaha ?? 'Alamat Usaha'); ?>
+                        </div>
+                    </td>
+
+                    <!-- JUDUL SLIP -->
+                    <td style="text-align:right; vertical-align:top;">
+                        <div style="font-size:16px; font-weight:bold;">
+                            SLIP GAJI
+                        </div>
+                        <div style="font-size:12px; margin-top:4px;">
+                            <?= esc(slipBulanIndonesia($slip->bulan ?? null)); ?>
+                        </div>
+                        <div style="margin-top:6px;">
+                            <span class="status"><?= strtoupper(esc($status)); ?></span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
         </div>
 
         <table class="info-table">
