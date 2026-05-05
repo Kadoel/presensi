@@ -1,123 +1,157 @@
 <?php
 $totalSegment = current_url(true)->getTotalSegments();
-$segment['2'] = current_url(true)->getSegment(2);
-$segment['3'] = $totalSegment > 2 ? current_url(true)->getSegment(3) : '';
+$segment2 = $totalSegment >= 2 ? current_url(true)->getSegment(2) : '';
+
+$menus = [
+    [
+        'type' => 'item',
+        'label' => 'Beranda',
+        'url' => 'admin',
+        'icon' => 'fa fa-house-user',
+        'active' => $totalSegment == 1,
+    ],
+    [
+        'type' => 'heading',
+        'label' => 'MASTER DATA',
+    ],
+    [
+        'type' => 'item',
+        'label' => 'Pengaturan',
+        'url' => 'admin/pengaturan',
+        'icon' => 'fa fa-cogs',
+        'segment' => 'pengaturan',
+    ],
+    [
+        'type' => 'item',
+        'label' => 'Jabatan',
+        'url' => 'admin/jabatan',
+        'icon' => 'fa fa-sitemap',
+        'segment' => 'jabatan',
+    ],
+    [
+        'type' => 'item',
+        'label' => 'Pegawai',
+        'url' => 'admin/pegawai',
+        'icon' => 'fa fa-users',
+        'segment' => 'pegawai',
+    ],
+    [
+        'type' => 'item',
+        'label' => 'Pengguna',
+        'url' => 'admin/pengguna',
+        'icon' => 'fa fa-user-shield',
+        'segment' => 'pengguna',
+    ],
+    [
+        'type' => 'heading',
+        'label' => 'KALENDER & SHIFT',
+    ],
+    [
+        'type' => 'item',
+        'label' => 'Shift',
+        'url' => 'admin/shift',
+        'icon' => 'fa fa-clock',
+        'segment' => 'shift',
+    ],
+    [
+        'type' => 'item',
+        'label' => 'Jadwal Kerja',
+        'url' => 'admin/jadwal',
+        'icon' => 'fa fa-calendar-alt',
+        'segment' => 'jadwal',
+    ],
+    [
+        'type' => 'item',
+        'label' => 'Hari Libur',
+        'url' => 'admin/libur',
+        'icon' => 'fa fa-calendar-xmark',
+        'segment' => 'libur',
+    ],
+    [
+        'type' => 'heading',
+        'label' => 'TRANSAKSI',
+    ],
+    [
+        'type' => 'item',
+        'label' => 'Presensi',
+        'url' => 'admin/presensi',
+        'icon' => 'fa fa-calendar-check',
+        'segment' => 'presensi',
+    ],
+    [
+        'type' => 'item',
+        'label' => 'Izin & Sakit',
+        'url' => 'admin/izin-sakit',
+        'icon' => 'fa fa-file-medical',
+        'segment' => 'izin-sakit',
+    ],
+    [
+        'type' => 'item',
+        'label' => 'Cuti',
+        'url' => 'admin/cuti',
+        'icon' => 'fa fa-calendar-days',
+        'segment' => 'cuti',
+    ],
+    [
+        'type' => 'item',
+        'label' => 'Saldo Cuti',
+        'url' => 'admin/saldo-cuti',
+        'icon' => 'fa fa-wallet',
+        'segment' => 'saldo-cuti',
+    ],
+    [
+        'type' => 'item',
+        'label' => 'Tukar Jadwal',
+        'url' => 'admin/tukar',
+        'icon' => 'fa fa-right-left',
+        'segment' => 'tukar',
+    ],
+    [
+        'type' => 'heading',
+        'label' => 'PAYROLL',
+    ],
+    [
+        'type' => 'item',
+        'label' => 'Pengaturan Gaji',
+        'url' => 'admin/pengaturan-gaji',
+        'icon' => 'fa fa-money-bill-wave',
+        'segment' => 'pengaturan-gaji',
+    ],
+    [
+        'type' => 'item',
+        'label' => 'Penggajian',
+        'url' => 'admin/penggajian',
+        'icon' => 'fa fa-money-check-dollar',
+        'segment' => 'penggajian',
+    ],
+    [
+        'type' => 'heading',
+        'label' => 'MONITORING',
+    ],
+    [
+        'type' => 'item',
+        'label' => 'Audit Logs',
+        'url' => 'admin/log',
+        'icon' => 'fa fa-clipboard-list',
+        'segment' => 'log',
+    ],
+];
 ?>
-<li class="nav-main-item">
-    <a class="nav-main-link <?= $totalSegment == 1 ? 'active' : ''; ?>" href="<?= base_url('admin'); ?>">
-        <i class="nav-main-link-icon fa fa-house-user"></i>
-        <span class="nav-main-link-name">Beranda</span>
-    </a>
-</li>
 
-<li class="nav-main-heading">DATA MASTER</li>
+<?php foreach ($menus as $menu): ?>
+    <?php if (($menu['type'] ?? '') === 'heading'): ?>
+        <li class="nav-main-heading"><?= esc($menu['label']); ?></li>
+        <?php continue; ?>
+    <?php endif; ?>
 
-<li class="nav-main-item">
-    <a class="nav-main-link <?= $segment['2'] == 'pengaturan' ? 'active' : ''; ?>" href="<?= base_url('admin/pengaturan'); ?>">
-        <i class="nav-main-link-icon fa fa-cogs"></i>
-        <span class="nav-main-link-name">Pengaturan</span>
-    </a>
-</li>
+    <?php
+    $isActive = $menu['active'] ?? ($segment2 === ($menu['segment'] ?? ''));
+    ?>
 
-<li class="nav-main-item">
-    <a class="nav-main-link <?= $segment['2'] == 'pengaturan-gaji' ? 'active' : ''; ?>" href="<?= base_url('admin/pengaturan-gaji'); ?>">
-        <i class="nav-main-link-icon fa fa-money-bill-wave"></i>
-        <span class="nav-main-link-name">Pengaturan Gaji</span>
-    </a>
-</li>
-
-
-<li class="nav-main-item">
-    <a class="nav-main-link <?= $segment['2'] == 'jabatan' ? 'active' : ''; ?>" href="<?= base_url('admin/jabatan'); ?>">
-        <i class="nav-main-link-icon fa fa-sitemap"></i>
-        <span class="nav-main-link-name">Jabatan</span>
-    </a>
-</li>
-
-<li class="nav-main-item">
-    <a class="nav-main-link <?= $segment['2'] == 'shift' ? 'active' : ''; ?>" href="<?= base_url('admin/shift'); ?>">
-        <i class="nav-main-link-icon fa fa-clock"></i>
-        <span class="nav-main-link-name">Shift</span>
-    </a>
-</li>
-
-<li class="nav-main-item">
-    <a class="nav-main-link <?= $segment['2'] == 'pegawai' ? 'active' : ''; ?>" href="<?= base_url('admin/pegawai'); ?>">
-        <i class="nav-main-link-icon fa fa-users"></i>
-        <span class="nav-main-link-name">Pegawai</span>
-    </a>
-</li>
-
-<li class="nav-main-item">
-    <a class="nav-main-link <?= $segment['2'] == 'saldo-cuti' ? 'active' : ''; ?>" href="<?= base_url('admin/saldo-cuti'); ?>">
-        <i class="nav-main-link-icon fa fa-wallet"></i>
-        <span class="nav-main-link-name">Saldo Cuti</span>
-    </a>
-</li>
-
-
-<li class="nav-main-item">
-    <a class="nav-main-link <?= $segment['2'] == 'pengguna' ? 'active' : ''; ?>" href="<?= base_url('admin/pengguna'); ?>">
-        <i class="nav-main-link-icon fa fa-user-shield"></i>
-        <span class="nav-main-link-name">Pengguna</span>
-    </a>
-</li>
-
-<li class="nav-main-item">
-    <a class="nav-main-link <?= $segment['2'] == 'jadwal' ? 'active' : ''; ?>" href="<?= base_url('admin/jadwal'); ?>">
-        <i class="nav-main-link-icon fa fa-calendar-alt"></i>
-        <span class="nav-main-link-name">Jadwal Kerja</span>
-    </a>
-</li>
-
-<li class="nav-main-item">
-    <a class="nav-main-link <?= $segment['2'] == 'libur' ? 'active' : ''; ?>" href="<?= base_url('admin/libur'); ?>">
-        <i class="nav-main-link-icon fa fa-calendar-xmark"></i>
-        <span class="nav-main-link-name">Hari Libur</span>
-    </a>
-</li>
-
-<li class="nav-main-item">
-    <a class="nav-main-link <?= $segment['2'] == 'izin-sakit' ? 'active' : ''; ?>" href="<?= base_url('admin/izin-sakit'); ?>">
-        <i class="nav-main-link-icon fa fa-file-medical"></i>
-        <span class="nav-main-link-name">Izin & Sakit</span>
-    </a>
-</li>
-
-<li class="nav-main-item">
-    <a class="nav-main-link <?= $segment['2'] == 'cuti' ? 'active' : ''; ?>" href="<?= base_url('admin/cuti'); ?>">
-        <i class="nav-main-link-icon fa fa-calendar-days"></i>
-        <span class="nav-main-link-name">Cuti</span>
-    </a>
-</li>
-
-
-
-<li class="nav-main-item">
-    <a class="nav-main-link <?= $segment['2'] == 'tukar' ? 'active' : ''; ?>" href="<?= base_url('admin/tukar'); ?>">
-        <i class="nav-main-link-icon fa fa-right-left"></i>
-        <span class="nav-main-link-name">Tukar Jadwal</span>
-    </a>
-</li>
-
-<li class="nav-main-item">
-    <a class="nav-main-link <?= $segment['2'] == 'presensi' ? 'active' : ''; ?>" href="<?= base_url('admin/presensi'); ?>">
-        <i class="nav-main-link-icon fa fa-calendar-check"></i>
-        <span class="nav-main-link-name">Presensi</span>
-    </a>
-</li>
-
-<li class="nav-main-item">
-    <a class="nav-main-link <?= $segment['2'] == 'penggajian' ? 'active' : ''; ?>" href="<?= base_url('admin/penggajian'); ?>">
-        <i class="nav-main-link-icon fa fa-money-check-dollar"></i>
-        <span class="nav-main-link-name">Penggajian</span>
-    </a>
-</li>
-
-
-<li class="nav-main-item">
-    <a class="nav-main-link <?= $segment['2'] == 'log' ? 'active' : ''; ?>" href="<?= base_url('admin/log'); ?>">
-        <i class="nav-main-link-icon fa fa-clipboard-list"></i>
-        <span class="nav-main-link-name">Audit Logs</span>
-    </a>
-</li>
+    <li class="nav-main-item">
+        <a class="nav-main-link <?= $isActive ? 'active' : ''; ?>" href="<?= base_url($menu['url']); ?>">
+            <i class="nav-main-link-icon <?= esc($menu['icon']); ?>"></i>
+            <span class="nav-main-link-name"><?= esc($menu['label']); ?></span>
+        </a>
+    </li>
+<?php endforeach; ?>

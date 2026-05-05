@@ -47,10 +47,10 @@
   <link rel="stylesheet" href="/assets/plugins/select2/css/select2.min.css">
   <link rel="stylesheet" href="/assets/plugins/sweetalert2/sweetalert2.min.css">
   <link rel="stylesheet" href="/assets/plugins/animate/animate.min.css">
-  <link rel="stylesheet" id="css-main" href="/assets/css/custom/custom.css">
   <!-- You can include a specific file from css/themes/ folder to alter the default color theme of the template. eg: -->
 
   <link rel="stylesheet" id="css-theme" href="/assets/css/themes/corporate.min.css">
+  <link rel="stylesheet" href="/assets/css/custom/custom.css">
   <!-- END Stylesheets -->
 
   <!-- Load and set color theme + dark mode preference (blocking script to prevent flashing) -->
