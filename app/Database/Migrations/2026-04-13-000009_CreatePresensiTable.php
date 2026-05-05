@@ -82,6 +82,15 @@ class CreatePresensiTable extends Migration
                 'type'       => 'TEXT',
                 'null'       => true,
             ],
+            'selfie_datang_upload_status' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 20,
+                'null'       => true,
+            ],
+            'selfie_datang_upload_error' => [
+                'type'       => 'TEXT',
+                'null'       => true,
+            ],
             'selfie_pulang' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 255,
@@ -93,6 +102,15 @@ class CreatePresensiTable extends Migration
                 'null'       => true,
             ],
             'selfie_pulang_drive_url' => [
+                'type'       => 'TEXT',
+                'null'       => true,
+            ],
+            'selfie_pulang_upload_status' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 20,
+                'null'       => true,
+            ],
+            'selfie_pulang_upload_error' => [
                 'type'       => 'TEXT',
                 'null'       => true,
             ],

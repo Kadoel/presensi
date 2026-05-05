@@ -273,6 +273,8 @@ class PresensiService extends BaseService
 
         $driveId  = null;
         $driveUrl = null;
+        $uploadStatus = 'pending';
+        $uploadError = null;
 
         if (! empty($selfiePath)) {
             try {
@@ -296,10 +298,13 @@ class PresensiService extends BaseService
                     $driveUrl = $upload->web_view_link ?? null;
 
                     if (! empty($driveId)) {
+                        $uploadStatus = 'success';
                         $this->hapusFileLokalJikaAda($selfiePath);
                     }
                 }
             } catch (\Throwable $e) {
+                $uploadStatus = 'failed';
+                $uploadError = $e->getMessage();
                 log_message('error', 'Upload selfie datang Google Drive gagal: ' . $e->getMessage());
             }
         }
@@ -317,7 +322,9 @@ class PresensiService extends BaseService
             $this->stringAtauNull($meta['ip_address'] ?? service('request')->getIPAddress()),
             $this->stringAtauNull($meta['user_agent'] ?? service('request')->getUserAgent()?->getAgentString()),
             $driveId,
-            $driveUrl
+            $driveUrl,
+            $uploadStatus,
+            $uploadError
         );
 
         if (! $insert) {
@@ -369,6 +376,8 @@ class PresensiService extends BaseService
 
         $driveId  = null;
         $driveUrl = null;
+        $uploadStatus = 'pending';
+        $uploadError = null;
 
         if (! empty($selfiePath)) {
             try {
@@ -396,10 +405,13 @@ class PresensiService extends BaseService
                     // optional: hapus file lokal kalau upload sukses
                     // unlink($fullPath);
                     if (! empty($driveId)) {
+                        $uploadStatus = 'success';
                         $this->hapusFileLokalJikaAda($selfiePath);
                     }
                 }
             } catch (\Throwable $e) {
+                $uploadStatus = 'failed';
+                $uploadError = $e->getMessage();
                 log_message('error', 'Upload selfie pulang Google Drive gagal: ' . $e->getMessage());
             }
         }
@@ -414,7 +426,9 @@ class PresensiService extends BaseService
             $this->stringAtauNull($meta['ip_address'] ?? service('request')->getIPAddress()),
             $this->stringAtauNull($meta['user_agent'] ?? service('request')->getUserAgent()?->getAgentString()),
             $driveId,
-            $driveUrl
+            $driveUrl,
+            $uploadStatus,
+            $uploadError
         );
 
         if (! $update) {

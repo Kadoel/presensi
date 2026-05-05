@@ -545,6 +545,7 @@
 
                     if (result.sukses) {
                         const p = result.presensi || {};
+                        console.log(p);
 
                         $('#detail-kode_pegawai').text(p.kode_pegawai || '-');
                         $('#detail-nama_pegawai').text(p.nama_pegawai || '-');
@@ -553,14 +554,14 @@
                         $('#detail-alamat').text(p.alamat || '-');
                         $('#detail-tanggal').text(p.tanggal || '-');
                         $('#detail-shift').text(p.nama_shift || '-');
-                        $('#detail-jam_datang').text(p.jam_datang || '-');
-                        $('#detail-status_datang').text(p.status_datang || '-');
-                        $('#detail-jam_pulang').text(p.jam_pulang || '-');
-                        $('#detail-status_pulang').text(p.status_pulang || '-');
-                        $('#detail-hasil_presensi').text(p.hasil_presensi || '-');
+                        $('#detail-jam_datang').text(KadoelHelper.ambilJam(p.jam_datang, 'H:i') || '-');
+                        $('#detail-status_datang').text(KadoelHelper.formatStatus(p.status_datang) || '-');
+                        $('#detail-jam_pulang').text(KadoelHelper.ambilJam(p.jam_pulang, 'H:i') || '-');
+                        $('#detail-status_pulang').text(KadoelHelper.formatStatus(p.status_pulang) || '-');
+                        $('#detail-hasil_presensi').text(KadoelHelper.formatStatus(p.hasil_presensi) || '-');
                         $('#detail-menit_telat').text(p.menit_telat ?? 0);
                         $('#detail-menit_pulang_cepat').text(p.menit_pulang_cepat ?? 0);
-                        $('#detail-sumber_presensi').text(p.sumber_presensi || '-');
+                        $('#detail-sumber_presensi').text(KadoelHelper.formatStatus(p.sumber_presensi) || '-');
                         $('#detail-catatan_admin').text(p.catatan_admin || '-');
                         setSelfieDrive('detail-selfie-datang', p.selfie_datang_drive_id);
                         setSelfieDrive('detail-selfie-pulang', p.selfie_pulang_drive_id);

@@ -476,7 +476,54 @@ const KadoelHelper = {
             .split(/[\s\-_]+/) // 🔥 split: spasi, -, _
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
             .join(' ');
-    }
+    },
+
+    /**
+     * Mengambil jam dari datetime string
+     *
+     * @param {string} datetime - format "YYYY-MM-DD HH:MM:SS"
+     * @param {string} format - "H:i:s" atau "H:i"
+     * @returns {string}
+     *
+     * Contoh:
+     * KadoelHelper.ambilJam("2026-04-01 07:00:00") => "07:00:00"
+     * KadoelHelper.ambilJam("2026-04-01 07:00:00", "H:i") => "07:00"
+     */
+    ambilJam(datetime, format = 'H:i:s') {
+        if (!datetime || typeof datetime !== 'string') return '';
+
+        const parts = datetime.split(' ');
+
+        if (parts.length < 2) return '';
+
+        const time = parts[1]; // ambil HH:MM:SS
+
+        if (format === 'H:i') {
+            return time.substring(0, 5);
+        }
+
+        return time.substring(0, 8);
+    },
+
+    /**
+     * Mengubah string snake_case menjadi format label (Title Case)
+     *
+     * @param {string} text
+     * @returns {string}
+     *
+     * Contoh:
+     * KadoelHelper.formatStatus("tepat_waktu") => "Tepat Waktu"
+     * KadoelHelper.formatStatus("pulang_cepat") => "Pulang Cepat"
+     */
+    formatStatus(text) {
+        if (!text || typeof text !== 'string') return '';
+
+        return text
+            .toLowerCase()
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    },
 };
 
 window.KadoelHelper = KadoelHelper;

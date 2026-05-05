@@ -30,8 +30,12 @@ class PresensiModel extends Model
         'barcode_pulang',
         'selfie_datang_drive_id',
         'selfie_datang_drive_url',
+        'selfie_datang_upload_status',
+        'selfie_datang_upload_error',
         'selfie_pulang_drive_id',
         'selfie_pulang_drive_url',
+        'selfie_pulang_upload_status',
+        'selfie_pulang_upload_error',
         'ip_address',
         'user_agent',
         'catatan_admin',
@@ -99,8 +103,8 @@ class PresensiModel extends Model
                 pegawai.jenis_kelamin,
                 shift.kode_shift,
                 shift.nama_shift,
-                shift.jam_masuk,
-                shift.jam_pulang,
+                shift.jam_masuk AS jam_masuk_shift,
+                shift.jam_pulang AS jam_pulang_shift,
                 shift.toleransi_telat_menit
             ')
             ->join('pegawai', 'pegawai.id = presensi.pegawai_id', 'left')
@@ -448,6 +452,8 @@ class PresensiModel extends Model
         ?string $userAgent,
         ?string $driveId,
         ?string $driveUrl,
+        ?string $uploadStatus,
+        ?string $uploadError,
     ): bool {
         return (bool) $this->insert([
             'pegawai_id'         => $pegawaiId,
@@ -471,6 +477,8 @@ class PresensiModel extends Model
             'is_manual'          => 0,
             'selfie_datang_drive_id'    => $driveId,
             'selfie_datang_drive_url'   => $driveUrl,
+            'selfie_datang_upload_status'  => $uploadStatus,
+            'selfie_datang_upload_error'   => $uploadError,
             'sumber_presensi'    => 'scan',
         ]);
     }
@@ -485,7 +493,9 @@ class PresensiModel extends Model
         ?string $ipAddress,
         ?string $userAgent,
         ?string $driveId,
-        ?string $driveUrl
+        ?string $driveUrl,
+        ?string $uploadStatus,
+        ?string $uploadError,
     ): bool {
         return (bool) $this->update($id, [
             'jam_pulang'           => $jamPulang,
@@ -495,6 +505,8 @@ class PresensiModel extends Model
             'barcode_pulang'       => $barcodePulang,
             'selfie_pulang_drive_id'  => $driveId,
             'selfie_pulang_drive_url' => $driveUrl,
+            'selfie_pulang_upload_status'  => $uploadStatus,
+            'selfie_pulang_upload_error'   => $uploadError,
             'ip_address'           => $ipAddress,
             'user_agent'           => $userAgent,
         ]);
