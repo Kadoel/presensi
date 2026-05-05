@@ -32,6 +32,7 @@ class PenggajianModel extends Model
         'total_potongan',
         'gaji_bersih',
         'status',
+        'slip_token',
         'created_by',
         'generated_at',
         'finalized_by',
@@ -108,14 +109,24 @@ class PenggajianModel extends Model
 
     public function finalkanByBulan(string $bulan, ?int $userId): bool
     {
-        return (bool) $this->where('bulan', $bulan)
+        $rows = $this->where('bulan', $bulan)
             ->where('status', 'draft')
-            ->set([
+            ->findAll();
+
+        if (empty($rows)) {
+            return false;
+        }
+
+        foreach ($rows as $row) {
+            $this->update($row->id, [
                 'status'       => 'final',
+                'slip_token'   => bin2hex(random_bytes(32)), // unik tiap row
                 'finalized_by' => $userId,
                 'finalized_at' => date('Y-m-d H:i:s'),
-            ])
-            ->update();
+            ]);
+        }
+
+        return true;
     }
 
     public function getDetailById(int $id): ?object
@@ -219,5 +230,36 @@ class PenggajianModel extends Model
             ->orderBy('pegawai.nama_pegawai', 'ASC')
             ->get()
             ->getResult();
+    }
+
+    public function generateTokenFinalKosongByBulan(string $bulan): void
+    {
+        $rows = $this->where('bulan', $bulan)
+            ->where('status', 'final')
+            ->where('slip_token', null)
+            ->findAll();
+
+        foreach ($rows as $row) {
+            $this->update($row->id, [
+                'slip_token' => bin2hex(random_bytes(32)),
+            ]);
+        }
+    }
+
+    public function getSlipByToken(string $token): ?object
+    {
+        return $this->db->table($this->table)
+            ->select('
+            penggajian.*,
+            pegawai.kode_pegawai,
+            pegawai.nama_pegawai,
+            jabatan.nama_jabatan
+        ')
+            ->join('pegawai', 'pegawai.id = penggajian.pegawai_id', 'left')
+            ->join('jabatan', 'jabatan.id = penggajian.jabatan_id', 'left')
+            ->where('penggajian.slip_token', $token)
+            ->where('penggajian.status', 'final')
+            ->get()
+            ->getRow();
     }
 }

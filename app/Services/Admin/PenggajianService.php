@@ -362,20 +362,22 @@ class PenggajianService extends BaseService
     public function previewSlip(int $id)
     {
         $slip = $this->penggajianModel->getSlipById($id);
-        $setting = $this->settingsModel->getSettings();
-        $urlVerifikasi = base_url('verifikasi-slip/' . ($slip->id ?? 0));
 
         if ($slip === null || ($slip->status ?? '') !== 'final') {
             return redirect()->back()->with('error', 'Slip gaji hanya tersedia untuk penggajian final');
         }
 
+        $setting = $this->settingsModel->getSettings();
+        $verifikasi = $this->siapkanSlipVerifikasi($slip);
+
         return view('pages/admin/penggajian/slip', [
-            'slip' => $slip,
-            'logo'  => $setting->logo ?? 'default.png',
-            'nama_usaha' => $setting->nama_usaha,
-            'alamat_usaha' => $setting->alamat,
-            'url_verifikasi' => $urlVerifikasi,
-            'qr_verifikasi'  => $this->generateQrSlipBase64($urlVerifikasi),
+            'slip'           => $slip,
+            'logo'           => $setting->logo ?? 'default.png',
+            'nama_usaha'     => $setting->nama_usaha,
+            'alamat_usaha'   => $setting->alamat,
+            'url_verifikasi' => $verifikasi->url,
+            'qr_verifikasi'  => $verifikasi->qr,
+            'isPdf'          => false,
         ]);
     }
 
@@ -383,19 +385,20 @@ class PenggajianService extends BaseService
     {
         $slip = $this->penggajianModel->getSlipById($id);
         $setting = $this->settingsModel->getSettings();
-        $urlVerifikasi = base_url('verifikasi-slip/' . ($slip->id ?? 0));
 
         if ($slip === null || ($slip->status ?? '') !== 'final') {
             return redirect()->back()->with('error', 'Slip gaji hanya tersedia untuk penggajian final');
         }
+
+        $verifikasi = $this->siapkanSlipVerifikasi($slip);
 
         $html = view('pages/admin/penggajian/slip', [
             'slip' => $slip,
             'logo'  => $setting->logo ?? 'default.png',
             'nama_usaha' => $setting->nama_usaha,
             'alamat_usaha' => $setting->alamat,
-            'url_verifikasi' => $urlVerifikasi,
-            'qr_verifikasi'  => $this->generateQrSlipBase64($urlVerifikasi),
+            'url_verifikasi' => $verifikasi->url,
+            'qr_verifikasi'  => $verifikasi->qr,
             'isPdf' => true,
         ]);
 
@@ -422,14 +425,14 @@ class PenggajianService extends BaseService
         }
 
         foreach ($rows as $slip) {
-            $urlVerifikasi = base_url('verifikasi-slip/' . ($slip->id ?? 0));
+            $verifikasi = $this->siapkanSlipVerifikasi($slip);
             $html = view('pages/admin/penggajian/slip', [
                 'slip' => $slip,
                 'logo'  => $setting->logo ?? 'default.png',
                 'nama_usaha' => $setting->nama_usaha,
                 'alamat_usaha' => $setting->alamat,
-                'url_verifikasi' => $urlVerifikasi,
-                'qr_verifikasi'  => $this->generateQrSlipBase64($urlVerifikasi),
+                'url_verifikasi' => $verifikasi->url,
+                'qr_verifikasi'  => $verifikasi->qr,
                 'isPdf' => true,
             ]);
 
@@ -456,6 +459,28 @@ class PenggajianService extends BaseService
         return service('response')
             ->download($zipPath, null)
             ->setFileName('slip-gaji-' . $bulan . '.zip');
+    }
+
+    protected function siapkanSlipVerifikasi(object $slip): object
+    {
+        $token = (string) ($slip->slip_token ?? '');
+
+        if ($token === '') {
+            $token = bin2hex(random_bytes(32));
+
+            $this->penggajianModel->update($slip->id, [
+                'slip_token' => $token,
+            ]);
+
+            $slip->slip_token = $token;
+        }
+
+        $urlVerifikasi = base_url('verifikasi-slip/' . $token);
+
+        return (object) [
+            'url' => $urlVerifikasi,
+            'qr'  => $this->generateQrSlipBase64($urlVerifikasi),
+        ];
     }
 
     protected function renderPdf(string $html, string $filename)

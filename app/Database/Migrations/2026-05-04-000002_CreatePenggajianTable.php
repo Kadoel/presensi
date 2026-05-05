@@ -115,6 +115,12 @@ class CreatePenggajianTable extends Migration
                 'constraint' => ['draft', 'final'],
                 'default' => 'draft',
             ],
+            'slip_token' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 64,
+                'null'       => true,
+                'after'      => 'status',
+            ],
             'created_by' => [
                 'type' => 'BIGINT',
                 'constraint' => 20,

@@ -12,6 +12,7 @@ $routes->set404Override(function () {
 $routes->GET('/tes', 'Tes::index', ['filter' => 'role:admin']);
 $routes->GET('/', 'Login::index');
 $routes->POST('/auth', 'Login::auth');
+$routes->get('verifikasi-slip/(:segment)', 'VerifikasiSlip::index/$1');
 
 //HALAMAN PRESENSI
 $routes->group('presensi', static function ($routes) {
