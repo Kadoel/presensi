@@ -482,6 +482,29 @@
             });
         });
 
+        const selfieDriveBaseUrl = '<?= base_url('admin/presensi/selfie-drive'); ?>';
+
+        function setSelfieDrive(prefix, driveId) {
+            const wrapper = $('#' + prefix + '-wrapper');
+            const empty = $('#' + prefix + '-empty');
+            const img = $('#' + prefix + '-img');
+
+            if (!driveId) {
+                wrapper.addClass('d-none');
+                empty.removeClass('d-none');
+                img.attr('src', '');
+                return;
+            }
+
+            img.attr('src', selfieDriveBaseUrl + '/' + encodeURIComponent(driveId));
+            wrapper.removeClass('d-none');
+            empty.addClass('d-none');
+        }
+
+        $('#detail-selfie-datang-img, #detail-selfie-pulang-img').on('error', function() {
+            $(this).closest('div').addClass('d-none');
+        });
+
         function resetDetail() {
             $('#detail-kode_pegawai').text('-');
             $('#detail-nama_pegawai').text('-');
@@ -499,6 +522,8 @@
             $('#detail-sumber_presensi').text('-');
             $('#detail-catatan_admin').text('-');
             $('#detail-hasil_presensi').text('-');
+            setSelfieDrive('detail-selfie-datang', null);
+            setSelfieDrive('detail-selfie-pulang', null);
         }
 
         $('#presensi-tabel').on('click', '#act-detail', function() {
@@ -537,6 +562,8 @@
                         $('#detail-menit_pulang_cepat').text(p.menit_pulang_cepat ?? 0);
                         $('#detail-sumber_presensi').text(p.sumber_presensi || '-');
                         $('#detail-catatan_admin').text(p.catatan_admin || '-');
+                        setSelfieDrive('detail-selfie-datang', p.selfie_datang_drive_id);
+                        setSelfieDrive('detail-selfie-pulang', p.selfie_pulang_drive_id);
 
                         $('#modal-detail').modal('show');
                     } else {

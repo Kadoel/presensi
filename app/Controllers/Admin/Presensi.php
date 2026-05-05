@@ -35,8 +35,8 @@ class Presensi extends BaseController
                 $builder->orderBy('presensi.id', 'DESC');
             })
             ->edit('tanggal', fn($row) => tanggal_indonesia($row->tanggal))
-            ->edit('jam_datang', fn($row) => $row->jam_datang ?: '-')
-            ->edit('jam_pulang', fn($row) => $row->jam_pulang ?: '-')
+            ->edit('jam_datang', fn($row) => $row->jam_datang ? ambil_jam($row->jam_datang, 'H:i') : '-')
+            ->edit('jam_pulang', fn($row) => $row->jam_pulang ? ambil_jam($row->jam_pulang, 'H:i') : '-')
             ->edit('status_datang', fn($row) => $this->presensiAdminService->badgeStatusDatang($row->status_datang))
             ->edit('status_pulang', fn($row) => $this->presensiAdminService->badgeStatusPulang($row->status_pulang))
             ->edit('sumber_presensi', fn($row) => $this->presensiAdminService->badgeSumberPresensi($row->sumber_presensi ?? 'scan'))
@@ -130,5 +130,20 @@ class Presensi extends BaseController
         return $this->presensiAdminService->exportBulanan(
             $this->request->getGet('bulan') ?: date('Y-m')
         );
+    }
+
+    public function selfieDrive(string $fileId)
+    {
+        $file = $this->presensiAdminService->ambilSelfieDrive($fileId);
+
+        if ($file === null || empty($file->content)) {
+            return $this->response->setStatusCode(404);
+        }
+
+        return $this->response
+            ->setHeader('Content-Type', $file->mime_type)
+            ->setHeader('Content-Length', strlen($file->content))
+            ->setHeader('Cache-Control', 'private, max-age=3600')
+            ->setBody($file->content);
     }
 }

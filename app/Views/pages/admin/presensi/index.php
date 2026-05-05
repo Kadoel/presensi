@@ -378,6 +378,23 @@
                             <div id="detail-catatan_admin" class="form-control bg-body-light">-</div>
                         </div>
                     </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Selfie Datang</label>
+                            <div id="detail-selfie-datang-wrapper" class="text-center d-none">
+                                <img id="detail-selfie-datang-img" src="" class="img-fluid rounded border" style="max-height:220px;">
+                            </div>
+                            <div id="detail-selfie-datang-empty" class="form-control bg-body-light">-</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Selfie Pulang</label>
+                            <div id="detail-selfie-pulang-wrapper" class="text-center d-none">
+                                <img id="detail-selfie-pulang-img" src="" class="img-fluid rounded border" style="max-height:220px;">
+                            </div>
+                            <div id="detail-selfie-pulang-empty" class="form-control bg-body-light">-</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="block-content block-content-full block-content-sm text-end border-top">
                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">

@@ -153,6 +153,7 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
         $routes->post('lupa/delete', 'Admin\Presensi::deleteLupa');
         $routes->post('rekap-bulanan', 'Admin\Presensi::rekapBulanan');
         $routes->post('lupa/update/(:num)', 'Admin\Presensi::updateLupa/$1');
+        $routes->get('selfie-drive/(:segment)', 'Admin\Presensi::selfieDrive/$1');
     });
 
     // Saldo Cuti

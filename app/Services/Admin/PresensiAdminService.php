@@ -14,6 +14,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use App\Services\Kios\GoogleDriveService;
 
 class PresensiAdminService extends BaseService
 {
@@ -21,6 +22,7 @@ class PresensiAdminService extends BaseService
     protected JadwalKerjaModel $jadwalKerjaModel;
     protected PegawaiModel $pegawaiModel;
     protected PengajuanIzinModel $pengajuanIzinModel;
+    protected GoogleDriveService $googleDriveService;
 
     public function __construct()
     {
@@ -29,6 +31,7 @@ class PresensiAdminService extends BaseService
         $this->jadwalKerjaModel = new JadwalKerjaModel();
         $this->pegawaiModel = new PegawaiModel();
         $this->pengajuanIzinModel = new PengajuanIzinModel();
+        $this->googleDriveService = new GoogleDriveService();
     }
 
     public function dataPegawaiSelect(): array
@@ -1011,5 +1014,15 @@ class PresensiAdminService extends BaseService
         }
 
         return null;
+    }
+
+    public function ambilSelfieDrive(string $fileId): ?object
+    {
+        try {
+            return $this->googleDriveService->downloadFile($fileId);
+        } catch (\Throwable $e) {
+            log_message('error', 'Download selfie Drive gagal: ' . $e->getMessage());
+            return null;
+        }
     }
 }

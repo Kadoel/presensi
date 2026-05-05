@@ -356,4 +356,19 @@ if (!function_exists('show_date_filter')) {
             return $start_dates_arr;
         }
     }
+
+    if (!function_exists('ambil_jam')) {
+        function ambil_jam(?string $datetime, string $format = 'H:i:s'): ?string
+        {
+            if (empty($datetime)) {
+                return null;
+            }
+
+            try {
+                return (new DateTime($datetime))->format($format);
+            } catch (\Throwable $e) {
+                return null;
+            }
+        }
+    }
 }

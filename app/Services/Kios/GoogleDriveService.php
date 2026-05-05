@@ -124,4 +124,35 @@ class GoogleDriveService
 
         return $parentId;
     }
+
+    public function downloadFile(string $fileId): object
+    {
+        $metadata = $this->drive->files->get($fileId, [
+            'fields'            => 'name, mimeType',
+            'supportsAllDrives' => true,
+        ]);
+
+        $response = $this->drive->files->get($fileId, [
+            'alt'               => 'media',
+            'supportsAllDrives' => true,
+        ]);
+
+        $content = '';
+
+        if (is_string($response)) {
+            $content = $response;
+        } elseif (method_exists($response, 'getBody')) {
+            $content = $response->getBody()->getContents();
+        } elseif (method_exists($response, 'getContents')) {
+            $content = $response->getContents();
+        } else {
+            $content = (string) $response;
+        }
+
+        return (object) [
+            'name'      => $metadata->getName(),
+            'mime_type' => $metadata->getMimeType() ?: 'image/jpeg',
+            'content'   => $content,
+        ];
+    }
 }
