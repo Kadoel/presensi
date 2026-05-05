@@ -54,6 +54,7 @@ class PresensiService extends BaseService
                     'libur'        => 'Hari ini merupakan hari libur',
                     'izin'         => 'Pegawai sedang izin',
                     'sakit'        => 'Pegawai sedang sakit',
+                    'cuti'         => 'Pegawai sedang cuti',
                     'tanpa_jadwal' => 'Pegawai tidak memiliki jadwal kerja hari ini',
                     default        => 'Pegawai tidak dapat melakukan presensi',
                 };
@@ -176,19 +177,30 @@ class PresensiService extends BaseService
             $menitTelat = (int) floor(($now->getTimestamp() - $batasToleransi->getTimestamp()) / 60);
         }
 
-        return $this->hasilSukses('QRCode valid untuk presensi datang', [
-            'data' => [
-                'mode'            => 'datang',
-                'pegawai'         => $pegawai,
-                'jadwal'          => $jadwal,
-                'shift'           => $shift,
-                'status_harian'   => 'kerja',
-                'boleh_presensi'  => true,
-                'tanggal_kerja'   => $tanggalKerja,
-                'preview_status'  => $statusPreview,
-                'preview_telat'   => $menitTelat,
-            ],
-        ]);
+        // return $this->hasilSukses('QRCode valid untuk presensi datang', [
+        //     'data' => [
+        //         'mode'            => 'datang',
+        //         'pegawai'         => $pegawai,
+        //         'jadwal'          => $jadwal,
+        //         'shift'           => $shift,
+        //         'status_harian'   => 'kerja',
+        //         'boleh_presensi'  => true,
+        //         'tanggal_kerja'   => $tanggalKerja,
+        //         'preview_status'  => $statusPreview,
+        //         'preview_telat'   => $menitTelat,
+        //     ],
+        // ]);
+        return $this->hasilData([
+            'mode'            => 'datang',
+            'pegawai'         => $pegawai,
+            'jadwal'          => $jadwal,
+            'shift'           => $shift,
+            'status_harian'   => 'kerja',
+            'boleh_presensi'  => true,
+            'tanggal_kerja'   => $tanggalKerja,
+            'preview_status'  => $statusPreview,
+            'preview_telat'   => $menitTelat,
+        ], 'QRCode valid untuk presensi datang');
     }
 
     protected function previewPulang(
@@ -228,19 +240,30 @@ class PresensiService extends BaseService
             $menitPulangCepat = (int) floor(($jamPulang->getTimestamp() - $now->getTimestamp()) / 60);
         }
 
-        return $this->hasilSukses('QRCode valid untuk presensi pulang', [
-            'data' => [
-                'mode'                 => 'pulang',
-                'pegawai'              => $pegawai,
-                'jadwal'               => $jadwal,
-                'shift'                => $shift,
-                'status_harian'        => 'kerja',
-                'boleh_presensi'       => true,
-                'tanggal_kerja'        => $tanggalKerja,
-                'preview_status'       => $statusPreview,
-                'preview_pulang_cepat' => $menitPulangCepat,
-            ],
-        ]);
+        // return $this->hasilSukses('QRCode valid untuk presensi pulang', [
+        //     'data' => [
+        //         'mode'                 => 'pulang',
+        //         'pegawai'              => $pegawai,
+        //         'jadwal'               => $jadwal,
+        //         'shift'                => $shift,
+        //         'status_harian'        => 'kerja',
+        //         'boleh_presensi'       => true,
+        //         'tanggal_kerja'        => $tanggalKerja,
+        //         'preview_status'       => $statusPreview,
+        //         'preview_pulang_cepat' => $menitPulangCepat,
+        //     ],
+        // ]);
+        return $this->hasilData([
+            'mode'                 => 'pulang',
+            'pegawai'              => $pegawai,
+            'jadwal'               => $jadwal,
+            'shift'                => $shift,
+            'status_harian'        => 'kerja',
+            'boleh_presensi'       => true,
+            'tanggal_kerja'        => $tanggalKerja,
+            'preview_status'       => $statusPreview,
+            'preview_pulang_cepat' => $menitPulangCepat,
+        ], 'QRCode valid untuk presensi pulang');
     }
 
     protected function prosesDatangByMode(
@@ -266,28 +289,41 @@ class PresensiService extends BaseService
             $menitTelat = (int) floor(($now->getTimestamp() - $batasToleransi->getTimestamp()) / 60);
         }
 
-        $insert = $this->presensiModel->insert([
-            'pegawai_id'         => (int) $pegawai->id,
-            'tanggal'            => $tanggalKerja,
-            'jadwal_kerja_id'    => (int) $jadwal->id,
-            'shift_id'           => $this->intAtauNull($jadwal->shift_id),
-            'jam_datang'         => $now->format('Y-m-d H:i:s'),
-            'jam_pulang'         => null,
-            'status_datang'      => $statusDatang,
-            'status_pulang'      => null,
-            'hasil_presensi'     => null,
-            'menit_telat'        => $menitTelat,
-            'menit_pulang_cepat' => 0,
-            'selfie_datang'      => $this->stringAtauNull($selfiePath),
-            'selfie_pulang'      => null,
-            'barcode_datang'     => $this->stringWajib($scanValue),
-            'barcode_pulang'     => null,
-            'ip_address'         => $this->stringAtauNull($meta['ip_address'] ?? service('request')->getIPAddress()),
-            'user_agent'         => $this->stringAtauNull($meta['user_agent'] ?? service('request')->getUserAgent()?->getAgentString()),
-            'catatan_admin'      => null,
-            'is_manual'          => 0,
-            'sumber_presensi'    => 'scan'
-        ]);
+        // $insert = $this->presensiModel->insert([
+        //     'pegawai_id'         => (int) $pegawai->id,
+        //     'tanggal'            => $tanggalKerja,
+        //     'jadwal_kerja_id'    => (int) $jadwal->id,
+        //     'shift_id'           => $this->intAtauNull($jadwal->shift_id),
+        //     'jam_datang'         => $now->format('Y-m-d H:i:s'),
+        //     'jam_pulang'         => null,
+        //     'status_datang'      => $statusDatang,
+        //     'status_pulang'      => null,
+        //     'hasil_presensi'     => null,
+        //     'menit_telat'        => $menitTelat,
+        //     'menit_pulang_cepat' => 0,
+        //     'selfie_datang'      => $this->stringAtauNull($selfiePath),
+        //     'selfie_pulang'      => null,
+        //     'barcode_datang'     => $this->stringWajib($scanValue),
+        //     'barcode_pulang'     => null,
+        //     'ip_address'         => $this->stringAtauNull($meta['ip_address'] ?? service('request')->getIPAddress()),
+        //     'user_agent'         => $this->stringAtauNull($meta['user_agent'] ?? service('request')->getUserAgent()?->getAgentString()),
+        //     'catatan_admin'      => null,
+        //     'is_manual'          => 0,
+        //     'sumber_presensi'    => 'scan'
+        // ]);
+        $insert = $this->presensiModel->simpanDatangScan(
+            (int) $pegawai->id,
+            $tanggalKerja,
+            (int) $jadwal->id,
+            $this->intAtauNull($jadwal->shift_id),
+            $now->format('Y-m-d H:i:s'),
+            $statusDatang,
+            $menitTelat,
+            $this->stringAtauNull($selfiePath),
+            $this->stringWajib($scanValue),
+            $this->stringAtauNull($meta['ip_address'] ?? service('request')->getIPAddress()),
+            $this->stringAtauNull($meta['user_agent'] ?? service('request')->getUserAgent()?->getAgentString())
+        );
 
         if (! $insert) {
             return $this->hasilGagal([], 'Presensi datang gagal disimpan');
@@ -336,15 +372,26 @@ class PresensiService extends BaseService
             $menitPulangCepat = (int) floor(($jamPulang->getTimestamp() - $now->getTimestamp()) / 60);
         }
 
-        $update = $this->presensiModel->update((int) $presensi->id, [
-            'jam_pulang'           => $now->format('Y-m-d H:i:s'),
-            'status_pulang'        => $statusPulang,
-            'menit_pulang_cepat'   => $menitPulangCepat,
-            'selfie_pulang'        => $this->stringAtauNull($selfiePath),
-            'barcode_pulang'       => $this->stringWajib($scanValue),
-            'ip_address'           => $this->stringAtauNull($meta['ip_address'] ?? service('request')->getIPAddress()),
-            'user_agent'           => $this->stringAtauNull($meta['user_agent'] ?? service('request')->getUserAgent()?->getAgentString()),
-        ]);
+        // $update = $this->presensiModel->update((int) $presensi->id, [
+        //     'jam_pulang'           => $now->format('Y-m-d H:i:s'),
+        //     'status_pulang'        => $statusPulang,
+        //     'menit_pulang_cepat'   => $menitPulangCepat,
+        //     'selfie_pulang'        => $this->stringAtauNull($selfiePath),
+        //     'barcode_pulang'       => $this->stringWajib($scanValue),
+        //     'ip_address'           => $this->stringAtauNull($meta['ip_address'] ?? service('request')->getIPAddress()),
+        //     'user_agent'           => $this->stringAtauNull($meta['user_agent'] ?? service('request')->getUserAgent()?->getAgentString()),
+        // ]);
+
+        $update = $this->presensiModel->simpanPulangScan(
+            (int) $presensi->id,
+            $now->format('Y-m-d H:i:s'),
+            $statusPulang,
+            $menitPulangCepat,
+            $this->stringAtauNull($selfiePath),
+            $this->stringWajib($scanValue),
+            $this->stringAtauNull($meta['ip_address'] ?? service('request')->getIPAddress()),
+            $this->stringAtauNull($meta['user_agent'] ?? service('request')->getUserAgent()?->getAgentString())
+        );
 
         if (! $update) {
             return $this->hasilGagal([], 'Presensi pulang gagal disimpan');

@@ -34,10 +34,7 @@ class JadwalPresensiResolverService extends BaseService
                 ], 'QR Code tidak valid');
             }
 
-            $pegawai = $this->pegawaiModel
-                ->where('kode_pegawai', $kodePegawai)
-                ->where('is_active', 1)
-                ->first();
+            $pegawai = $this->pegawaiModel->getPegawaiAktifByKode($kodePegawai);
 
             if (! is_object($pegawai)) {
                 return $this->hasilGagal([
@@ -45,8 +42,7 @@ class JadwalPresensiResolverService extends BaseService
                 ], 'Pegawai tidak ditemukan atau tidak aktif');
             }
 
-            $jadwal = $this->jadwalKerjaModel
-                ->getJadwalByPegawaiDanTanggal((int) $pegawai->id, $tanggalKerja);
+            $jadwal = $this->jadwalKerjaModel->getJadwalByPegawaiDanTanggal((int) $pegawai->id, $tanggalKerja);
 
             if (! is_object($jadwal)) {
                 return $this->hasilData([
@@ -62,7 +58,7 @@ class JadwalPresensiResolverService extends BaseService
 
             $statusHarian = (string) ($jadwal->status_hari ?? '');
 
-            if (in_array($statusHarian, ['libur', 'izin', 'sakit'], true)) {
+            if (in_array($statusHarian, ['libur', 'izin', 'sakit', 'cuti'], true)) {
                 return $this->hasilData([
                     'pegawai'         => $pegawai,
                     'jadwal'          => $jadwal,

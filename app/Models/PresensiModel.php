@@ -429,4 +429,62 @@ class PresensiModel extends Model
             ->get()
             ->getRow();
     }
+
+    public function simpanDatangScan(
+        int $pegawaiId,
+        string $tanggal,
+        int $jadwalKerjaId,
+        ?int $shiftId,
+        string $jamDatang,
+        string $statusDatang,
+        int $menitTelat,
+        ?string $selfieDatang,
+        string $barcodeDatang,
+        ?string $ipAddress,
+        ?string $userAgent
+    ): bool {
+        return (bool) $this->insert([
+            'pegawai_id'         => $pegawaiId,
+            'tanggal'            => $tanggal,
+            'jadwal_kerja_id'    => $jadwalKerjaId,
+            'shift_id'           => $shiftId,
+            'jam_datang'         => $jamDatang,
+            'jam_pulang'         => null,
+            'status_datang'      => $statusDatang,
+            'status_pulang'      => null,
+            'hasil_presensi'     => null,
+            'menit_telat'        => $menitTelat,
+            'menit_pulang_cepat' => 0,
+            'selfie_datang'      => $selfieDatang,
+            'selfie_pulang'      => null,
+            'barcode_datang'     => $barcodeDatang,
+            'barcode_pulang'     => null,
+            'ip_address'         => $ipAddress,
+            'user_agent'         => $userAgent,
+            'catatan_admin'      => null,
+            'is_manual'          => 0,
+            'sumber_presensi'    => 'scan',
+        ]);
+    }
+
+    public function simpanPulangScan(
+        int $id,
+        string $jamPulang,
+        string $statusPulang,
+        int $menitPulangCepat,
+        ?string $selfiePulang,
+        string $barcodePulang,
+        ?string $ipAddress,
+        ?string $userAgent
+    ): bool {
+        return (bool) $this->update($id, [
+            'jam_pulang'           => $jamPulang,
+            'status_pulang'        => $statusPulang,
+            'menit_pulang_cepat'   => $menitPulangCepat,
+            'selfie_pulang'        => $selfiePulang,
+            'barcode_pulang'       => $barcodePulang,
+            'ip_address'           => $ipAddress,
+            'user_agent'           => $userAgent,
+        ]);
+    }
 }
