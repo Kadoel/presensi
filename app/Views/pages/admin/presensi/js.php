@@ -1,4 +1,5 @@
 <script src="/assets/plugins/select2/js/select2.full.min.js"></script>
+<script src="/assets/plugins/flatpickr/plugins/monthSelect/index.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
         let csrfToken = '<?= csrf_token(); ?>';
@@ -341,12 +342,13 @@
             }
         });
 
-        $('#filter-bulan').on('change', function() {
-            data_rekap.ajax.reload();
-        });
+        // $('#filter-bulan').on('change', function() {
+        //     data_rekap.ajax.reload();
+        // });
 
         if (typeof flatpickr !== 'undefined') {
             flatpickr('#filter-tanggal', {
+                disableMobile: true,
                 dateFormat: 'Y-m-d',
                 maxDate: 'today',
                 onChange: function() {
@@ -356,8 +358,25 @@
             });
 
             flatpickr('#tanggal', {
+                disableMobile: true,
                 dateFormat: 'Y-m-d',
                 maxDate: 'today'
+            });
+
+            flatpickr('#filter-bulan', {
+                disableMobile: true,
+                dateFormat: 'Y-m',
+                maxDate: 'today',
+                plugins: [
+                    new monthSelectPlugin({
+                        shorthand: true,
+                        dateFormat: 'Y-m',
+                        altFormat: 'F Y'
+                    })
+                ],
+                onChange: function() {
+                    data_rekap.ajax.reload();
+                }
             });
         }
 

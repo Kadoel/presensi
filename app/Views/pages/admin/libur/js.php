@@ -488,11 +488,13 @@
     document.addEventListener('DOMContentLoaded', function() {
         if (typeof flatpickr !== 'undefined') {
             flatpickr('#tanggal', {
+                disableMobile: true,
                 dateFormat: 'Y-m-d',
                 minDate: minTanggalHariLibur
             });
 
             flatpickr('#edit-tanggal', {
+                disableMobile: true,
                 dateFormat: 'Y-m-d',
                 minDate: minTanggalHariLibur,
                 clickOpens: false,

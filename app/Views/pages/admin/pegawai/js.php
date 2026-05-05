@@ -532,11 +532,13 @@
     document.addEventListener('DOMContentLoaded', function() {
         if (typeof flatpickr !== 'undefined') {
             flatpickr('#tanggal_lahir', {
+                disableMobile: true,
                 dateFormat: 'Y-m-d',
                 maxDate: maxTanggalHariLibur
             });
 
             flatpickr('#edit-tanggal_lahir', {
+                disableMobile: true,
                 dateFormat: 'Y-m-d',
                 maxDate: maxTanggalHariLibur
             });

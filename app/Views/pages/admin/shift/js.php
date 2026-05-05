@@ -414,4 +414,31 @@
 </script>
 <script>
     Codebase.helpersOnLoad(['jq-select2', 'js-flatpickr']);
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof flatpickr !== 'undefined') {
+            flatpickr('#jam_masuk', {
+                disableMobile: true,
+            });
+
+            flatpickr('#batas_mulai_datang', {
+                disableMobile: true,
+            });
+
+            flatpickr('#batas_akhir_datang', {
+                disableMobile: true,
+            });
+
+            flatpickr('#jam_pulang', {
+                disableMobile: true,
+            });
+
+            flatpickr('#batas_mulai_pulang', {
+                disableMobile: true,
+            });
+
+            flatpickr('#batas_akhir_pulang', {
+                disableMobile: true,
+            });
+        }
+    });
 </script>

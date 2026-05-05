@@ -512,6 +512,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         if (typeof flatpickr !== 'undefined') {
             const fpTanggalMulai = flatpickr('#tanggal_mulai', {
+                disableMobile: true,
                 dateFormat: 'Y-m-d',
                 minDate: minTanggalHariIni,
                 onChange: function(selectedDates, dateStr) {
@@ -526,11 +527,13 @@
             });
 
             const fpTanggalSelesai = flatpickr('#tanggal_selesai', {
+                disableMobile: true,
                 dateFormat: 'Y-m-d',
                 minDate: minTanggalHariIni
             });
 
             const fpEditTanggalMulai = flatpickr('#edit-tanggal_mulai', {
+                disableMobile: true,
                 dateFormat: 'Y-m-d',
                 minDate: minTanggalHariIni,
                 onChange: function(selectedDates, dateStr) {
@@ -545,6 +548,7 @@
             });
 
             const fpEditTanggalSelesai = flatpickr('#edit-tanggal_selesai', {
+                disableMobile: true,
                 dateFormat: 'Y-m-d',
                 minDate: minTanggalHariIni
             });
