@@ -2,14 +2,17 @@
 
 namespace App\Services\Kios;
 
+use App\Services\Kios\GoogleDriveService;
 use App\Models\PresensiModel;
 use App\Services\BaseService;
+
 use DateTime;
 
 class PresensiService extends BaseService
 {
     protected PresensiModel $presensiModel;
     protected JadwalPresensiResolverService $resolverService;
+    protected GoogleDriveService $googleDriveService;
 
     public function __construct()
     {
@@ -17,6 +20,7 @@ class PresensiService extends BaseService
 
         $this->presensiModel   = new PresensiModel();
         $this->resolverService = new JadwalPresensiResolverService();
+        $this->googleDriveService = new GoogleDriveService();
     }
 
     public function previewScan(string $scanValue, string $mode, array $meta = []): array
@@ -177,30 +181,19 @@ class PresensiService extends BaseService
             $menitTelat = (int) floor(($now->getTimestamp() - $batasToleransi->getTimestamp()) / 60);
         }
 
-        // return $this->hasilSukses('QRCode valid untuk presensi datang', [
-        //     'data' => [
-        //         'mode'            => 'datang',
-        //         'pegawai'         => $pegawai,
-        //         'jadwal'          => $jadwal,
-        //         'shift'           => $shift,
-        //         'status_harian'   => 'kerja',
-        //         'boleh_presensi'  => true,
-        //         'tanggal_kerja'   => $tanggalKerja,
-        //         'preview_status'  => $statusPreview,
-        //         'preview_telat'   => $menitTelat,
-        //     ],
-        // ]);
-        return $this->hasilData([
-            'mode'            => 'datang',
-            'pegawai'         => $pegawai,
-            'jadwal'          => $jadwal,
-            'shift'           => $shift,
-            'status_harian'   => 'kerja',
-            'boleh_presensi'  => true,
-            'tanggal_kerja'   => $tanggalKerja,
-            'preview_status'  => $statusPreview,
-            'preview_telat'   => $menitTelat,
-        ], 'QRCode valid untuk presensi datang');
+        return $this->hasilSukses('QRCode valid untuk presensi datang', [
+            'data' => [
+                'mode'            => 'datang',
+                'pegawai'         => $pegawai,
+                'jadwal'          => $jadwal,
+                'shift'           => $shift,
+                'status_harian'   => 'kerja',
+                'boleh_presensi'  => true,
+                'tanggal_kerja'   => $tanggalKerja,
+                'preview_status'  => $statusPreview,
+                'preview_telat'   => $menitTelat,
+            ],
+        ]);
     }
 
     protected function previewPulang(
@@ -240,30 +233,19 @@ class PresensiService extends BaseService
             $menitPulangCepat = (int) floor(($jamPulang->getTimestamp() - $now->getTimestamp()) / 60);
         }
 
-        // return $this->hasilSukses('QRCode valid untuk presensi pulang', [
-        //     'data' => [
-        //         'mode'                 => 'pulang',
-        //         'pegawai'              => $pegawai,
-        //         'jadwal'               => $jadwal,
-        //         'shift'                => $shift,
-        //         'status_harian'        => 'kerja',
-        //         'boleh_presensi'       => true,
-        //         'tanggal_kerja'        => $tanggalKerja,
-        //         'preview_status'       => $statusPreview,
-        //         'preview_pulang_cepat' => $menitPulangCepat,
-        //     ],
-        // ]);
-        return $this->hasilData([
-            'mode'                 => 'pulang',
-            'pegawai'              => $pegawai,
-            'jadwal'               => $jadwal,
-            'shift'                => $shift,
-            'status_harian'        => 'kerja',
-            'boleh_presensi'       => true,
-            'tanggal_kerja'        => $tanggalKerja,
-            'preview_status'       => $statusPreview,
-            'preview_pulang_cepat' => $menitPulangCepat,
-        ], 'QRCode valid untuk presensi pulang');
+        return $this->hasilSukses('QRCode valid untuk presensi pulang', [
+            'data' => [
+                'mode'                 => 'pulang',
+                'pegawai'              => $pegawai,
+                'jadwal'               => $jadwal,
+                'shift'                => $shift,
+                'status_harian'        => 'kerja',
+                'boleh_presensi'       => true,
+                'tanggal_kerja'        => $tanggalKerja,
+                'preview_status'       => $statusPreview,
+                'preview_pulang_cepat' => $menitPulangCepat,
+            ],
+        ]);
     }
 
     protected function prosesDatangByMode(
@@ -289,28 +271,39 @@ class PresensiService extends BaseService
             $menitTelat = (int) floor(($now->getTimestamp() - $batasToleransi->getTimestamp()) / 60);
         }
 
-        // $insert = $this->presensiModel->insert([
-        //     'pegawai_id'         => (int) $pegawai->id,
-        //     'tanggal'            => $tanggalKerja,
-        //     'jadwal_kerja_id'    => (int) $jadwal->id,
-        //     'shift_id'           => $this->intAtauNull($jadwal->shift_id),
-        //     'jam_datang'         => $now->format('Y-m-d H:i:s'),
-        //     'jam_pulang'         => null,
-        //     'status_datang'      => $statusDatang,
-        //     'status_pulang'      => null,
-        //     'hasil_presensi'     => null,
-        //     'menit_telat'        => $menitTelat,
-        //     'menit_pulang_cepat' => 0,
-        //     'selfie_datang'      => $this->stringAtauNull($selfiePath),
-        //     'selfie_pulang'      => null,
-        //     'barcode_datang'     => $this->stringWajib($scanValue),
-        //     'barcode_pulang'     => null,
-        //     'ip_address'         => $this->stringAtauNull($meta['ip_address'] ?? service('request')->getIPAddress()),
-        //     'user_agent'         => $this->stringAtauNull($meta['user_agent'] ?? service('request')->getUserAgent()?->getAgentString()),
-        //     'catatan_admin'      => null,
-        //     'is_manual'          => 0,
-        //     'sumber_presensi'    => 'scan'
-        // ]);
+        $driveId  = null;
+        $driveUrl = null;
+
+        if (! empty($selfiePath)) {
+            try {
+                $fullPath = FCPATH . $selfiePath;
+
+                if (is_file($fullPath)) {
+                    $folderId = $this->googleDriveService->getOrCreateNestedFolder([
+                        date('Y'),
+                        date('m'),
+                        date('d'),
+                    ]);
+
+                    $upload = $this->googleDriveService->uploadFile(
+                        $fullPath,
+                        'selfie-datang-' . $pegawai->kode_pegawai . '-' . date('YmdHis') . '.jpg',
+                        mime_content_type($fullPath) ?: 'image/jpeg',
+                        $folderId
+                    );
+
+                    $driveId  = $upload->id ?? null;
+                    $driveUrl = $upload->web_view_link ?? null;
+
+                    if (! empty($driveId)) {
+                        $this->hapusFileLokalJikaAda($selfiePath);
+                    }
+                }
+            } catch (\Throwable $e) {
+                log_message('error', 'Upload selfie datang Google Drive gagal: ' . $e->getMessage());
+            }
+        }
+
         $insert = $this->presensiModel->simpanDatangScan(
             (int) $pegawai->id,
             $tanggalKerja,
@@ -322,7 +315,9 @@ class PresensiService extends BaseService
             $this->stringAtauNull($selfiePath),
             $this->stringWajib($scanValue),
             $this->stringAtauNull($meta['ip_address'] ?? service('request')->getIPAddress()),
-            $this->stringAtauNull($meta['user_agent'] ?? service('request')->getUserAgent()?->getAgentString())
+            $this->stringAtauNull($meta['user_agent'] ?? service('request')->getUserAgent()?->getAgentString()),
+            $driveId,
+            $driveUrl
         );
 
         if (! $insert) {
@@ -372,15 +367,42 @@ class PresensiService extends BaseService
             $menitPulangCepat = (int) floor(($jamPulang->getTimestamp() - $now->getTimestamp()) / 60);
         }
 
-        // $update = $this->presensiModel->update((int) $presensi->id, [
-        //     'jam_pulang'           => $now->format('Y-m-d H:i:s'),
-        //     'status_pulang'        => $statusPulang,
-        //     'menit_pulang_cepat'   => $menitPulangCepat,
-        //     'selfie_pulang'        => $this->stringAtauNull($selfiePath),
-        //     'barcode_pulang'       => $this->stringWajib($scanValue),
-        //     'ip_address'           => $this->stringAtauNull($meta['ip_address'] ?? service('request')->getIPAddress()),
-        //     'user_agent'           => $this->stringAtauNull($meta['user_agent'] ?? service('request')->getUserAgent()?->getAgentString()),
-        // ]);
+        $driveId  = null;
+        $driveUrl = null;
+
+        if (! empty($selfiePath)) {
+            try {
+                $fullPath = FCPATH . $selfiePath;
+
+                if (is_file($fullPath)) {
+
+                    // 📁 folder otomatis: YYYY/MM/DD
+                    $folderId = $this->googleDriveService->getOrCreateNestedFolder([
+                        date('Y'),
+                        date('m'),
+                        date('d'),
+                    ]);
+
+                    $upload = $this->googleDriveService->uploadFile(
+                        $fullPath,
+                        'selfie-pulang-' . $pegawai->kode_pegawai . '-' . date('YmdHis') . '.jpg',
+                        mime_content_type($fullPath) ?: 'image/jpeg',
+                        $folderId
+                    );
+
+                    $driveId  = $upload->id ?? null;
+                    $driveUrl = $upload->web_view_link ?? null;
+
+                    // optional: hapus file lokal kalau upload sukses
+                    // unlink($fullPath);
+                    if (! empty($driveId)) {
+                        $this->hapusFileLokalJikaAda($selfiePath);
+                    }
+                }
+            } catch (\Throwable $e) {
+                log_message('error', 'Upload selfie pulang Google Drive gagal: ' . $e->getMessage());
+            }
+        }
 
         $update = $this->presensiModel->simpanPulangScan(
             (int) $presensi->id,
@@ -390,7 +412,9 @@ class PresensiService extends BaseService
             $this->stringAtauNull($selfiePath),
             $this->stringWajib($scanValue),
             $this->stringAtauNull($meta['ip_address'] ?? service('request')->getIPAddress()),
-            $this->stringAtauNull($meta['user_agent'] ?? service('request')->getUserAgent()?->getAgentString())
+            $this->stringAtauNull($meta['user_agent'] ?? service('request')->getUserAgent()?->getAgentString()),
+            $driveId,
+            $driveUrl
         );
 
         if (! $update) {
@@ -419,5 +443,18 @@ class PresensiService extends BaseService
     protected function gabungTanggalJam(string $tanggal, string $jam): DateTime
     {
         return new DateTime($tanggal . ' ' . $jam);
+    }
+
+    protected function hapusFileLokalJikaAda(?string $relativePath): void
+    {
+        if (empty($relativePath)) {
+            return;
+        }
+
+        $fullPath = FCPATH . ltrim($relativePath, '/');
+
+        if (is_file($fullPath)) {
+            unlink($fullPath);
+        }
     }
 }

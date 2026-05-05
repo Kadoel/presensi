@@ -28,6 +28,10 @@ class PresensiModel extends Model
         'selfie_pulang',
         'barcode_datang',
         'barcode_pulang',
+        'selfie_datang_drive_id',
+        'selfie_datang_drive_url',
+        'selfie_pulang_drive_id',
+        'selfie_pulang_drive_url',
         'ip_address',
         'user_agent',
         'catatan_admin',
@@ -441,7 +445,9 @@ class PresensiModel extends Model
         ?string $selfieDatang,
         string $barcodeDatang,
         ?string $ipAddress,
-        ?string $userAgent
+        ?string $userAgent,
+        ?string $driveId,
+        ?string $driveUrl,
     ): bool {
         return (bool) $this->insert([
             'pegawai_id'         => $pegawaiId,
@@ -463,6 +469,8 @@ class PresensiModel extends Model
             'user_agent'         => $userAgent,
             'catatan_admin'      => null,
             'is_manual'          => 0,
+            'selfie_datang_drive_id'    => $driveId,
+            'selfie_datang_drive_url'   => $driveUrl,
             'sumber_presensi'    => 'scan',
         ]);
     }
@@ -475,7 +483,9 @@ class PresensiModel extends Model
         ?string $selfiePulang,
         string $barcodePulang,
         ?string $ipAddress,
-        ?string $userAgent
+        ?string $userAgent,
+        ?string $driveId,
+        ?string $driveUrl
     ): bool {
         return (bool) $this->update($id, [
             'jam_pulang'           => $jamPulang,
@@ -483,6 +493,8 @@ class PresensiModel extends Model
             'menit_pulang_cepat'   => $menitPulangCepat,
             'selfie_pulang'        => $selfiePulang,
             'barcode_pulang'       => $barcodePulang,
+            'selfie_pulang_drive_id'  => $driveId,
+            'selfie_pulang_drive_url' => $driveUrl,
             'ip_address'           => $ipAddress,
             'user_agent'           => $userAgent,
         ]);

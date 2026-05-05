@@ -73,9 +73,27 @@ class CreatePresensiTable extends Migration
                 'constraint' => 255,
                 'null'       => true,
             ],
+            'selfie_datang_drive_id' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 128,
+                'null'       => true,
+            ],
+            'selfie_datang_drive_url' => [
+                'type'       => 'TEXT',
+                'null'       => true,
+            ],
             'selfie_pulang' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 255,
+                'null'       => true,
+            ],
+            'selfie_pulang_drive_id' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 128,
+                'null'       => true,
+            ],
+            'selfie_pulang_drive_url' => [
+                'type'       => 'TEXT',
                 'null'       => true,
             ],
             'barcode_datang' => [
