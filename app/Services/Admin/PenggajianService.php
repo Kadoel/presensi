@@ -19,6 +19,10 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use ZipArchive;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
+use Endroid\QrCode\Logo\Logo;
 
 class PenggajianService extends BaseService
 {
@@ -29,6 +33,7 @@ class PenggajianService extends BaseService
     protected JadwalKerjaModel $jadwalKerjaModel;
     protected PengajuanIzinModel $pengajuanIzinModel;
     protected SettingsModel $settingsModel;
+    protected SettingsService $settingsService;
 
     public function __construct()
     {
@@ -40,6 +45,7 @@ class PenggajianService extends BaseService
         $this->jadwalKerjaModel    = new JadwalKerjaModel();
         $this->pengajuanIzinModel  = new PengajuanIzinModel();
         $this->settingsModel       = new SettingsModel();
+        $this->settingsService = new SettingsService();
     }
 
     public function dataTabel(?string $bulan = null): BaseBuilder
@@ -357,6 +363,7 @@ class PenggajianService extends BaseService
     {
         $slip = $this->penggajianModel->getSlipById($id);
         $setting = $this->settingsModel->getSettings();
+        $urlVerifikasi = base_url('verifikasi-slip/' . ($slip->id ?? 0));
 
         if ($slip === null || ($slip->status ?? '') !== 'final') {
             return redirect()->back()->with('error', 'Slip gaji hanya tersedia untuk penggajian final');
@@ -367,6 +374,8 @@ class PenggajianService extends BaseService
             'logo'  => $setting->logo ?? 'default.png',
             'nama_usaha' => $setting->nama_usaha,
             'alamat_usaha' => $setting->alamat,
+            'url_verifikasi' => $urlVerifikasi,
+            'qr_verifikasi'  => $this->generateQrSlipBase64($urlVerifikasi),
         ]);
     }
 
@@ -374,6 +383,7 @@ class PenggajianService extends BaseService
     {
         $slip = $this->penggajianModel->getSlipById($id);
         $setting = $this->settingsModel->getSettings();
+        $urlVerifikasi = base_url('verifikasi-slip/' . ($slip->id ?? 0));
 
         if ($slip === null || ($slip->status ?? '') !== 'final') {
             return redirect()->back()->with('error', 'Slip gaji hanya tersedia untuk penggajian final');
@@ -384,6 +394,8 @@ class PenggajianService extends BaseService
             'logo'  => $setting->logo ?? 'default.png',
             'nama_usaha' => $setting->nama_usaha,
             'alamat_usaha' => $setting->alamat,
+            'url_verifikasi' => $urlVerifikasi,
+            'qr_verifikasi'  => $this->generateQrSlipBase64($urlVerifikasi),
             'isPdf' => true,
         ]);
 
@@ -410,11 +422,14 @@ class PenggajianService extends BaseService
         }
 
         foreach ($rows as $slip) {
+            $urlVerifikasi = base_url('verifikasi-slip/' . ($slip->id ?? 0));
             $html = view('pages/admin/penggajian/slip', [
                 'slip' => $slip,
                 'logo'  => $setting->logo ?? 'default.png',
                 'nama_usaha' => $setting->nama_usaha,
                 'alamat_usaha' => $setting->alamat,
+                'url_verifikasi' => $urlVerifikasi,
+                'qr_verifikasi'  => $this->generateQrSlipBase64($urlVerifikasi),
                 'isPdf' => true,
             ]);
 
@@ -539,5 +554,36 @@ class PenggajianService extends BaseService
     {
         $tanggalMulai = $bulan . '-01';
         return [$tanggalMulai, date('Y-m-t', strtotime($tanggalMulai))];
+    }
+
+    protected function generateQrSlipBase64(string $urlVerifikasi): string
+    {
+        $qr = new QrCode($urlVerifikasi);
+        $qr->setSize(120);
+        $qr->setMargin(10);
+        $qr->setErrorCorrectionLevel(new ErrorCorrectionLevelHigh());
+
+        $writer = new PngWriter();
+
+        $logoPath = $this->settingsService->getLogoPath();
+
+        $logo = null;
+
+        if (! empty($logoPath) && is_file($logoPath)) {
+            $logo = new Logo(
+                $logoPath,
+                40,
+                40
+            );
+        }
+
+        $result = $writer->write(
+            $qr,
+            $logo,
+            null,
+            ['margin' => 10]
+        );
+
+        return 'data:image/png;base64,' . base64_encode($result->getString());
     }
 }
