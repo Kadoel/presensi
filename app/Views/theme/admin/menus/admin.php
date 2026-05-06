@@ -11,6 +11,13 @@ $menus = [
         'active' => $totalSegment == 1,
     ],
     [
+        'type' => 'item',
+        'label' => 'Scan Presensi',
+        'url' => 'presensi',
+        'icon' => 'fa fa-qrcode',
+        'target' => 'target="_blank"',
+    ],
+    [
         'type' => 'heading',
         'label' => 'MASTER DATA',
     ],
@@ -145,11 +152,15 @@ $menus = [
     <?php endif; ?>
 
     <?php
-    $isActive = $menu['active'] ?? ($segment2 === ($menu['segment'] ?? ''));
+    $isActive = $menu['active'] ?? (
+        isset($menu['segment']) && $segment2 === $menu['segment']
+    );
+
+    $target = $menu['target'] ?? '';
     ?>
 
     <li class="nav-main-item">
-        <a class="nav-main-link <?= $isActive ? 'active' : ''; ?>" href="<?= base_url($menu['url']); ?>">
+        <a class="nav-main-link <?= $isActive ? 'active' : ''; ?>" href="<?= base_url($menu['url']); ?>" <?= $target; ?>>
             <i class="nav-main-link-icon <?= esc($menu['icon']); ?>"></i>
             <span class="nav-main-link-name"><?= esc($menu['label']); ?></span>
         </a>
