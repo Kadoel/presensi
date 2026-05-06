@@ -14,8 +14,11 @@ $routes->GET('/', 'Login::index');
 $routes->POST('/auth', 'Login::auth');
 $routes->get('verifikasi-slip/(:segment)', 'VerifikasiSlip::index/$1');
 
+$routes->get('presensi/login', 'KiosPresensiController::login');
+$routes->post('presensi/login', 'KiosPresensiController::prosesLogin');
+
 //HALAMAN PRESENSI
-$routes->group('presensi', static function ($routes) {
+$routes->group('presensi', ['filter' => 'kiosPresensi'], static function ($routes) {
     $routes->get('/', 'KiosPresensiController::index');
     $routes->post('preview', 'KiosPresensiController::preview');
     $routes->post('submit', 'KiosPresensiController::submit');

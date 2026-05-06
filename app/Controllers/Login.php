@@ -6,7 +6,7 @@ use App\Models\UsersModel;
 
 class Login extends BaseController
 {
-    protected $users_model;
+    protected UsersModel $users_model;
 
     public function __construct()
     {
@@ -16,6 +16,17 @@ class Login extends BaseController
     public function index()
     {
         if (session()->get('is_login') === true) {
+            if (session()->get('role') === 'kios') {
+                session()->remove([
+                    'is_login',
+                    'role',
+                    'is_kios_login',
+                    'kios_login_at',
+                ]);
+
+                return redirect()->to('/');
+            }
+
             $redirect = '/';
 
             if (session()->get('role') === 'admin') {

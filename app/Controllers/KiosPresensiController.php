@@ -14,6 +14,58 @@ class KiosPresensiController extends BaseController
         $this->presensiService = new PresensiService();
     }
 
+    public function login()
+    {
+        $isLogin = session()->get('is_login');
+        $role    = session()->get('role');
+
+        if ($isLogin === true && in_array($role, ['admin', 'kios'], true)) {
+            return redirect()->to('/presensi');
+        }
+
+        if ($isLogin === true && $role === 'pegawai') {
+            return redirect()->to('/pegawai')->with('error', 'Anda tidak memiliki akses ke scan presensi.');
+        }
+
+        return view('pages/kios_presensi/login', [
+            'pageTitle' => 'Login Kios Presensi',
+        ]);
+    }
+
+    public function prosesLogin()
+    {
+        $isLogin = session()->get('is_login');
+        $role    = session()->get('role');
+
+        if ($isLogin === true && $role === 'admin') {
+            return redirect()->to('/presensi');
+        }
+
+        if ($isLogin === true && $role === 'pegawai') {
+            return redirect()->to('/pegawai')->with('error', 'Anda tidak memiliki akses ke scan presensi.');
+        }
+
+        $pin    = trim((string) $this->request->getPost('pin'));
+        $pinEnv = (string) env('KIOS_PIN');
+
+        if ($pinEnv === '') {
+            return redirect()->back()->with('error', 'PIN kios belum dikonfigurasi.');
+        }
+
+        if (! hash_equals($pinEnv, $pin)) {
+            return redirect()->back()->withInput()->with('error', 'PIN kios tidak valid.');
+        }
+
+        session()->set([
+            'is_login'      => true,
+            'role'          => 'kios',
+            'is_kios_login' => true,
+            'kios_login_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        return redirect()->to('/presensi');
+    }
+
     /**
      * Halaman utama kios
      */
