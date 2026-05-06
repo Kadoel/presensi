@@ -744,7 +744,7 @@
                     <video id="camera" autoplay playsinline class="hidden"></video>
                     <canvas id="canvas" class="hidden"></canvas>
                     <img id="selfie-preview" class="hidden" alt="Preview selfie">
-                    <div id="camera-placeholder">Kamera depan akan aktif setelah mode dipilih.</div>
+                    <div id="camera-placeholder">Kamera akan aktif setelah mode dipilih.</div>
                     <div id="qr-scan-status" class="qr-scan-status hidden">Mencari QRCode...</div>
                     <div id="camera-mode-frame" class="camera-mode-frame scan"></div>
                     <div id="camera-flash" class="camera-flash"></div>
@@ -934,7 +934,7 @@
         }
 
         function setQrScanStatus(message = '', show = false) {
-            qrScanStatus.textContent = message;
+            qrScanStatus.innerHTML = message;
             qrScanStatus.classList.toggle('hidden', !show);
         }
 
@@ -1048,7 +1048,7 @@
 
             setCameraPhase('Mode Scan QRCode', 'scan');
             cameraCardTitle.innerHTML = '<i class="fa-solid fa-camera"></i> Kamera Presensi';
-            cameraPlaceholder.textContent = 'Kamera depan akan aktif untuk scan QRCode.';
+            cameraPlaceholder.textContent = 'Kamera akan aktif untuk scan QRCode.';
             scanInput.focus();
         }
 
@@ -1079,7 +1079,7 @@
             setBanner('Silahkan pilih mode presensi', 'info');
             setCameraPhase('Menunggu Mode', 'scan');
             cameraCardTitle.innerHTML = '<i class="fa-solid fa-camera"></i> Kamera Presensi';
-            cameraPlaceholder.textContent = 'Kamera depan akan aktif setelah mode dipilih.';
+            cameraPlaceholder.textContent = 'Kamera akan aktif setelah mode dipilih.';
         }
 
         function initQrDetector() {
@@ -1103,7 +1103,7 @@
             if (!mediaStream || !qrDetector || camera.readyState < 2) return;
 
             stopScanLoop();
-            setQrScanStatus('Mencari QRCode...', true);
+            setQrScanStatus('<i class="fa-solid fa-qrcode"></i> Mencari QRCode...', true);
 
             const scanFrame = async () => {
                 if (!mediaStream || camera.readyState < 2) {
@@ -1166,7 +1166,7 @@
                 startQrScanLoop();
             } catch (error) {
                 stopCamera();
-                setBanner('Kamera depan tidak dapat diakses.', 'error');
+                setBanner('Kamera tidak dapat diakses.', 'error');
             }
         }
 
@@ -1235,7 +1235,7 @@
                 startSelfieCountdown();
             } catch (error) {
                 stopCountdown();
-                setBanner('Kamera depan tidak dapat diakses untuk selfie.', 'error');
+                setBanner('Kamera tidak dapat diakses untuk selfie.', 'error');
             }
         }
 
@@ -1361,6 +1361,7 @@
             formData.append('scan_value', currentScanValue);
             formData.append('selfie_base64', currentSelfieBase64);
             formData.append('mode', currentMode);
+            formData.append('scan_at', previewData.scan_at || '');
 
             try {
                 const response = await fetch(submitUrl, {

@@ -66,6 +66,7 @@ class KiosPresensiController extends BaseController
 
         $scanValue   = trim((string) $this->request->getPost('scan_value'));
         $mode        = trim((string) $this->request->getPost('mode'));
+        $scanAt      = trim((string) $this->request->getPost('scan_at'));
         $selfieBase64 = (string) $this->request->getPost('selfie_base64');
 
         $selfiePath = null;
@@ -82,6 +83,7 @@ class KiosPresensiController extends BaseController
 
         $hasil = $this->presensiService->prosesScan($scanValue, $selfiePath, [
             'mode'       => $mode,
+            'scan_at'    => $scanAt,
             'ip_address' => $this->request->getIPAddress(),
             'user_agent' => $this->request->getUserAgent()?->getAgentString(),
         ]);

@@ -199,6 +199,7 @@ class PresensiService extends BaseService
                 'tanggal_kerja'   => $tanggalKerja,
                 'preview_status'  => $statusPreview,
                 'preview_telat'   => $menitTelat,
+                'scan_at'         => $now->format('Y-m-d H:i:s'),
             ],
         ]);
     }
@@ -258,6 +259,7 @@ class PresensiService extends BaseService
                 'tanggal_kerja'        => $tanggalKerja,
                 'preview_status'       => $statusPreview,
                 'preview_pulang_cepat' => $menitPulangCepat,
+                'scan_at'              => $now->format('Y-m-d H:i:s'),
             ],
         ]);
     }
@@ -271,7 +273,7 @@ class PresensiService extends BaseService
         ?string $selfiePath,
         array $meta = []
     ): array {
-        $now = new DateTime();
+        $now = $this->waktuPresensiDariMeta($meta);
 
         $jamMasuk = $this->gabungTanggalJam($tanggalKerja, (string) $shift->jam_masuk);
         $toleransiMenit = (int) ($shift->toleransi_telat_menit ?? 0);
@@ -382,7 +384,7 @@ class PresensiService extends BaseService
         ?string $selfiePath,
         array $meta = []
     ): array {
-        $now = new DateTime();
+        $now = $this->waktuPresensiDariMeta($meta);
         $tanggalKerja = (string) $presensi->tanggal;
 
         $jamPulang = $this->gabungTanggalJam($tanggalKerja, (string) $shift->jam_pulang);
@@ -499,6 +501,21 @@ class PresensiService extends BaseService
         return (int) floor(
             ($akhir->getTimestamp() - $awal->getTimestamp()) / 60
         );
+    }
+
+    protected function waktuPresensiDariMeta(array $meta): DateTime
+    {
+        $scanAt = $this->stringAtauNull($meta['scan_at'] ?? null);
+
+        if ($scanAt !== null) {
+            try {
+                return new DateTime($scanAt);
+            } catch (\Throwable $e) {
+                log_message('warning', 'scan_at presensi tidak valid: ' . $scanAt);
+            }
+        }
+
+        return new DateTime();
     }
 
     protected function hapusFileLokalJikaAda(?string $relativePath): void
