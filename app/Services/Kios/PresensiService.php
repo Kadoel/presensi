@@ -176,11 +176,16 @@ class PresensiService extends BaseService
         $statusPreview = 'tepat_waktu';
         $menitTelat    = 0;
 
-        if ($now > $batasToleransi) {
+        $nowCompare = $this->normalisasiJamMenit($now);
+        $batasCompare = $this->normalisasiJamMenit($batasToleransi);
+
+        if ($nowCompare > $batasCompare) {
             $statusPreview = 'telat';
 
-            $selisihDetik = $now->getTimestamp() - $batasToleransi->getTimestamp();
-            $menitTelat = max(1, (int) ceil($selisihDetik / 60));
+            $menitTelat = $this->selisihMenit(
+                $batasCompare,
+                $nowCompare
+            );
         }
 
         return $this->hasilSukses('QRCode valid untuk presensi datang', [
@@ -230,12 +235,16 @@ class PresensiService extends BaseService
         $statusPreview = 'tepat_waktu';
         $menitPulangCepat = 0;
 
-        // Untuk pulang cepat
-        if ($now < $jamPulang) {
+        $nowCompare = $this->normalisasiJamMenit($now);
+        $jamPulangCompare = $this->normalisasiJamMenit($jamPulang);
+
+        if ($nowCompare < $jamPulangCompare) {
             $statusPreview = 'pulang_cepat';
 
-            $selisihDetik = $jamPulang->getTimestamp() - $now->getTimestamp();
-            $menitPulangCepat = max(1, (int) ceil($selisihDetik / 60));
+            $menitPulangCepat = $this->selisihMenit(
+                $nowCompare,
+                $jamPulangCompare
+            );
         }
 
         return $this->hasilSukses('QRCode valid untuk presensi pulang', [
@@ -271,12 +280,16 @@ class PresensiService extends BaseService
         $statusDatang = 'tepat_waktu';
         $menitTelat   = 0;
 
-        // Untuk telat datang
-        if ($now > $batasToleransi) {
+        $nowCompare = $this->normalisasiJamMenit($now);
+        $batasCompare = $this->normalisasiJamMenit($batasToleransi);
+
+        if ($nowCompare > $batasCompare) {
             $statusDatang = 'telat';
 
-            $selisihDetik = $now->getTimestamp() - $batasToleransi->getTimestamp();
-            $menitTelat = max(1, (int) ceil($selisihDetik / 60));
+            $menitTelat = $this->selisihMenit(
+                $batasCompare,
+                $nowCompare
+            );
         }
 
         $driveId  = null;
@@ -377,12 +390,16 @@ class PresensiService extends BaseService
         $statusPulang = 'tepat_waktu';
         $menitPulangCepat = 0;
 
-        // Untuk pulang cepat
-        if ($now < $jamPulang) {
+        $nowCompare = $this->normalisasiJamMenit($now);
+        $jamPulangCompare = $this->normalisasiJamMenit($jamPulang);
+
+        if ($nowCompare < $jamPulangCompare) {
             $statusPulang = 'pulang_cepat';
 
-            $selisihDetik = $jamPulang->getTimestamp() - $now->getTimestamp();
-            $menitPulangCepat = max(1, (int) ceil($selisihDetik / 60));
+            $menitPulangCepat = $this->selisihMenit(
+                $nowCompare,
+                $jamPulangCompare
+            );
         }
 
         $driveId  = null;
@@ -468,6 +485,20 @@ class PresensiService extends BaseService
     protected function gabungTanggalJam(string $tanggal, string $jam): DateTime
     {
         return new DateTime($tanggal . ' ' . $jam);
+    }
+
+    protected function normalisasiJamMenit(DateTime $dateTime): DateTime
+    {
+        return new DateTime(
+            $dateTime->format('Y-m-d H:i:00')
+        );
+    }
+
+    protected function selisihMenit(DateTime $awal, DateTime $akhir): int
+    {
+        return (int) floor(
+            ($akhir->getTimestamp() - $awal->getTimestamp()) / 60
+        );
     }
 
     protected function hapusFileLokalJikaAda(?string $relativePath): void

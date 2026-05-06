@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\JadwalKerjaModel;
+use DateTime;
 
 class Tes extends BaseController
 {
@@ -11,27 +12,23 @@ class Tes extends BaseController
         helper(['string_helper', 'register_helper', 'pengaturan_helper', 'waktu_helper', 'printer_helper', 'filesystem']);
 
         $jadwalKerja = new JadwalKerjaModel();
+        $now = new DateTime();
+        $jamMasuk = new DateTime("2026-05-06 18:00:00");
+        $toleransiMenit = (int) 0;
+        $batasToleransi = (clone $jamMasuk)->modify('+' . $toleransiMenit . ' minutes');
 
-        $sinkron = $jadwalKerja->db->table('jadwal_kerja')
-            ->select('
-            jadwal_kerja.tanggal,
-            COUNT(jadwal_kerja.id) AS total_jadwal,
-            COUNT(presensi.id) AS total_presensi,
-            SUM(CASE WHEN presensi.hasil_presensi IS NOT NULL THEN 1 ELSE 0 END) AS total_sudah_sinkron
-        ')
-            ->join(
-                'presensi',
-                'presensi.pegawai_id = jadwal_kerja.pegawai_id 
-            AND presensi.tanggal = jadwal_kerja.tanggal',
-                'left'
-            )
-            ->where('jadwal_kerja.tanggal <', date('Y-m') . '-02')
-            ->groupBy('jadwal_kerja.tanggal')
-            ->having('total_sudah_sinkron < total_jadwal')
-            ->orderBy('jadwal_kerja.tanggal', 'ASC')
-            ->get()
-            ->getResult();
+        $statusPreview = 'tepat_waktu';
+        $menitTelat    = 0;
 
-        dd($sinkron);
+        if ($now > $batasToleransi) {
+            $statusPreview = 'telat';
+
+            $selisihDetik = $now->getTimestamp() - $batasToleransi->getTimestamp();
+            $menitTelat = max(1, (int) floor($selisihDetik / 60));
+        }
+
+        $ket = $statusPreview . ' ' . $menitTelat;
+
+        dd($ket);
     }
 }
