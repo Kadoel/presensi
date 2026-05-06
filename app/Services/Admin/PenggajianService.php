@@ -424,41 +424,46 @@ class PenggajianService extends BaseService
             mkdir($dir, 0775, true);
         }
 
-        foreach ($rows as $slip) {
-            $verifikasi = $this->siapkanSlipVerifikasi($slip);
-            $html = view('pages/admin/penggajian/slip', [
-                'slip' => $slip,
-                'logo'  => $setting->logo ?? 'default.png',
-                'nama_usaha' => $setting->nama_usaha,
-                'alamat_usaha' => $setting->alamat,
-                'url_verifikasi' => $verifikasi->url,
-                'qr_verifikasi'  => $verifikasi->qr,
-                'isPdf' => true,
-            ]);
+        try {
+            foreach ($rows as $slip) {
+                $verifikasi = $this->siapkanSlipVerifikasi($slip);
 
-            $pdfContent = $this->renderPdfContent($html);
-            $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $slip->kode_pegawai . '-' . $slip->nama_pegawai);
+                $html = view('pages/admin/penggajian/slip', [
+                    'slip'           => $slip,
+                    'logo'           => $setting->logo ?? 'default.png',
+                    'nama_usaha'     => $setting->nama_usaha,
+                    'alamat_usaha'   => $setting->alamat,
+                    'url_verifikasi' => $verifikasi->url,
+                    'qr_verifikasi'  => $verifikasi->qr,
+                    'isPdf'          => true,
+                ]);
 
-            file_put_contents($dir . 'slip-gaji-' . $safeName . '-' . $bulan . '.pdf', $pdfContent);
+                $pdfContent = $this->renderPdfContent($html);
+                $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $slip->kode_pegawai . '-' . $slip->nama_pegawai);
+
+                file_put_contents($dir . 'slip-gaji-' . $safeName . '-' . $bulan . '.pdf', $pdfContent);
+            }
+
+            $zipPath = WRITEPATH . 'uploads/slip-gaji-' . $bulan . '.zip';
+
+            $zip = new ZipArchive();
+
+            if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+                return redirect()->back()->with('error', 'Gagal membuat file ZIP');
+            }
+
+            foreach (glob($dir . '*.pdf') as $file) {
+                $zip->addFile($file, basename($file));
+            }
+
+            $zip->close();
+
+            return service('response')
+                ->download($zipPath, null)
+                ->setFileName('slip-gaji-' . $bulan . '.zip');
+        } finally {
+            $this->hapusFolderRecursive($dir);
         }
-
-        $zipPath = WRITEPATH . 'uploads/slip-gaji-' . $bulan . '.zip';
-
-        $zip = new ZipArchive();
-
-        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-            return redirect()->back()->with('error', 'Gagal membuat file ZIP');
-        }
-
-        foreach (glob($dir . '*.pdf') as $file) {
-            $zip->addFile($file, basename($file));
-        }
-
-        $zip->close();
-
-        return service('response')
-            ->download($zipPath, null)
-            ->setFileName('slip-gaji-' . $bulan . '.zip');
     }
 
     protected function siapkanSlipVerifikasi(object $slip): object
@@ -515,6 +520,23 @@ class PenggajianService extends BaseService
         $options->set('defaultFont', 'DejaVu Sans');
 
         return new Dompdf($options);
+    }
+
+    protected function hapusFolderRecursive(string $dir): void
+    {
+        if (! is_dir($dir)) {
+            return;
+        }
+
+        foreach (glob($dir . '*') as $file) {
+            if (is_dir($file)) {
+                $this->hapusFolderRecursive($file . DIRECTORY_SEPARATOR);
+            } else {
+                @unlink($file);
+            }
+        }
+
+        @rmdir($dir);
     }
 
     protected function formatBulanIndonesia(string $bulan): string
