@@ -901,7 +901,7 @@
             cameraPhaseBadge.className = 'camera-phase-badge';
             cameraPhaseBadge.classList.add(phase === 'selfie' ? 'mode-selfie' : 'mode-scan');
             cameraPhaseBadge.innerHTML = `<i class="fa-solid ${phase === 'selfie' ? 'fa-user-check' : 'fa-qrcode'}"></i><span>${text}</span>`;
-            cameraCardTitle.textContent = phase === 'selfie' ? 'Ambil Selfie Otomatis' : 'Scan QRCode';
+            cameraCardTitle.innerHTML = phase === 'selfie' ? '<i class="fa-solid fa-user-check"></i> Ambil Selfie Otomatis' : '<i class="fa-solid fa-qrcode"></i> Scan QRCode';
             cameraModeFrame.className = 'camera-mode-frame ' + (phase === 'selfie' ? 'selfie' : 'scan');
         }
 
@@ -1047,7 +1047,7 @@
             }
 
             setCameraPhase('Mode Scan QRCode', 'scan');
-            cameraCardTitle.textContent = 'Kamera Presensi';
+            cameraCardTitle.innerHTML = '<i class="fa-solid fa-camera"></i> Kamera Presensi';
             cameraPlaceholder.textContent = 'Kamera depan akan aktif untuk scan QRCode.';
             scanInput.focus();
         }
@@ -1078,7 +1078,7 @@
 
             setBanner('Silahkan pilih mode presensi', 'info');
             setCameraPhase('Menunggu Mode', 'scan');
-            cameraCardTitle.textContent = 'Kamera Presensi';
+            cameraCardTitle.innerHTML = '<i class="fa-solid fa-camera"></i> Kamera Presensi';
             cameraPlaceholder.textContent = 'Kamera depan akan aktif setelah mode dipilih.';
         }
 
