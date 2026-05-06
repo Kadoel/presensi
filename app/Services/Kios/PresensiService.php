@@ -178,7 +178,9 @@ class PresensiService extends BaseService
 
         if ($now > $batasToleransi) {
             $statusPreview = 'telat';
-            $menitTelat = (int) floor(($now->getTimestamp() - $batasToleransi->getTimestamp()) / 60);
+
+            $selisihDetik = $now->getTimestamp() - $batasToleransi->getTimestamp();
+            $menitTelat = max(1, (int) ceil($selisihDetik / 60));
         }
 
         return $this->hasilSukses('QRCode valid untuk presensi datang', [
@@ -228,9 +230,12 @@ class PresensiService extends BaseService
         $statusPreview = 'tepat_waktu';
         $menitPulangCepat = 0;
 
+        // Untuk pulang cepat
         if ($now < $jamPulang) {
             $statusPreview = 'pulang_cepat';
-            $menitPulangCepat = (int) floor(($jamPulang->getTimestamp() - $now->getTimestamp()) / 60);
+
+            $selisihDetik = $jamPulang->getTimestamp() - $now->getTimestamp();
+            $menitPulangCepat = max(1, (int) ceil($selisihDetik / 60));
         }
 
         return $this->hasilSukses('QRCode valid untuk presensi pulang', [
@@ -266,9 +271,12 @@ class PresensiService extends BaseService
         $statusDatang = 'tepat_waktu';
         $menitTelat   = 0;
 
+        // Untuk telat datang
         if ($now > $batasToleransi) {
             $statusDatang = 'telat';
-            $menitTelat = (int) floor(($now->getTimestamp() - $batasToleransi->getTimestamp()) / 60);
+
+            $selisihDetik = $now->getTimestamp() - $batasToleransi->getTimestamp();
+            $menitTelat = max(1, (int) ceil($selisihDetik / 60));
         }
 
         $driveId  = null;
@@ -369,9 +377,12 @@ class PresensiService extends BaseService
         $statusPulang = 'tepat_waktu';
         $menitPulangCepat = 0;
 
+        // Untuk pulang cepat
         if ($now < $jamPulang) {
             $statusPulang = 'pulang_cepat';
-            $menitPulangCepat = (int) floor(($jamPulang->getTimestamp() - $now->getTimestamp()) / 60);
+
+            $selisihDetik = $jamPulang->getTimestamp() - $now->getTimestamp();
+            $menitPulangCepat = max(1, (int) ceil($selisihDetik / 60));
         }
 
         $driveId  = null;
